@@ -1,0 +1,119 @@
+.config-partida {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.config-partida-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.config-partida-header h1 {
+  font-size: 22px;
+  color: var(--color-primary);
+  margin: 0 0 2px;
+}
+
+.config-partida-sub {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.config-partida-error {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.config-partida-estado {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.config-partida-vacio {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+}
+
+.config-partida-lista {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.set-opcion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  text-align: left;
+  box-shadow: var(--shadow-card);
+}
+
+.set-opcion strong {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.set-opcion small {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.set-opcion-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.set-opcion.seleccionada {
+  border-color: var(--color-primary);
+}
+
+.set-opcion.seleccionada .set-opcion-check {
+  border-color: var(--color-primary);
+  background: radial-gradient(var(--color-primary) 0 45%, transparent 46%);
+}
+
+.config-partida-acciones {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-grande {
+  padding: 14px 32px;
+  font-size: 15px;
+}
+
+.config-partida-header a.btn-secundario,
+.config-partida-vacio a.btn-primario {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}

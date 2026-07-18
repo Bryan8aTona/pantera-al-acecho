@@ -1,0 +1,121 @@
+.login-page {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 15%, #2A5D45 0%, var(--color-primary-dark) 55%, #0F241B 100%);
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  padding: 32px 28px 28px;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-brand-mark {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 4px;
+  filter: grayscale(1) brightness(0.4);
+}
+
+.login-brand h1 {
+  font-size: 20px;
+  margin: 0;
+  color: var(--color-primary);
+}
+
+.login-brand-sub {
+  margin: 2px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.login-tabs {
+  display: flex;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.login-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 13px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  color: var(--color-text-secondary);
+}
+
+.login-tab.activo {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-card);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.campo input {
+  font-size: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+}
+
+.campo small {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.login-error {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 13px;
+  margin: 0;
+}
+
+.login-submit {
+  margin-top: 6px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 0;
+  font-size: 14px;
+  transition: background 0.15s ease;
+}
+
+.login-submit:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.login-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
