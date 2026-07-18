@@ -140,7 +140,7 @@ Al finalizar todos los turnos de la Ronda 2, o de forma inmediata si ningún equ
 
 ### 4.2 Persistencia y Portabilidad
 
-**Autenticación:** El acceso al sistema requiere inicio de sesión.
+**Autenticación:** El acceso al sistema requiere inicio de sesión. Los docentes pueden crear sus propias cuentas mediante un formulario de registro sencillo; sin embargo, la versión actual no cuenta con recuperación automatizada de credenciales. En caso de olvido de contraseña, el usuario deberá solicitar el restablecimiento directamente al administrador.
 
 **Persistencia de Sets:** Los sets de frases creados por el docente se almacenan en la nube y quedan vinculados a su cuenta, accesibles desde cualquier equipo de cómputo.
 

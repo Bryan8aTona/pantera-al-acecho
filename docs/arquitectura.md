@@ -1,4 +1,4 @@
-# Arquitectura — Pantera al Acecho
+# Arquitectura - Pantera al Acecho
 
 ## 1. Visión general
 
@@ -32,7 +32,7 @@ Muestra el interior de cada capa: los módulos que la componen y las relaciones 
 Los módulos del cliente siguen un flujo secuencial: el docente inicia sesión, gestiona sus sets de frases, configura la partida y opera el tablero durante el juego.
 
 ### 3.1 Login
-Pantalla de acceso al sistema. El docente ingresa sus credenciales para autenticarse. Es la puerta de entrada a todos los demás módulos.
+Pantalla de acceso al sistema. Permite a los docentes nuevos crear una cuenta (nombre, email, contraseña) y a los usuarios existentes ingresar sus credenciales para autenticarse.
 
 ### 3.2 Back-office
 Módulo privado accesible solo tras autenticación. Permite al docente crear, nombrar, editar y eliminar sets de frases. Los sets quedan vinculados a su cuenta y disponibles para sesiones futuras.
