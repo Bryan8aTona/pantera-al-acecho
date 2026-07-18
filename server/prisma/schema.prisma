@@ -1,0 +1,48 @@
+// schema.prisma
+// Fuente: docs/modelo-datos.md — no modificar sin actualizar ese documento.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  nombre       String   @db.VarChar(100)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  sets         Set[]
+
+  @@map("usuarios")
+}
+
+model Set {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuarioId  String   @map("usuario_id") @db.Uuid
+  nombre     String   @db.VarChar(100)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  frases     Frase[]
+
+  @@index([usuarioId])
+  @@map("sets")
+}
+
+model Frase {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  setId     String   @map("set_id") @db.Uuid
+  texto     String   @db.VarChar(500)
+  orden     Int      @db.SmallInt
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  set       Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
+
+  @@unique([setId, orden])
+  @@index([setId])
+  @@map("frases")
+}
