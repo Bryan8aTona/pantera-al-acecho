@@ -2,31 +2,9 @@
   background: var(--color-surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
-  padding: 24px;
-  max-width: 640px;
+  padding: 28px 32px;
+  max-width: 760px;
   margin: 0 auto;
-}
-
-.set-form-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.set-form-header h2 {
-  font-size: 18px;
-  color: var(--color-primary);
-  margin: 0;
-}
-
-.set-form-cerrar {
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  color: var(--color-text-secondary);
-  line-height: 1;
-  padding: 4px;
 }
 
 .set-form-nombre {
@@ -35,61 +13,66 @@
   gap: 6px;
   font-size: 13px;
   color: var(--color-text-secondary);
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
 .set-form-nombre input {
-  font-size: 15px;
-  padding: 10px 12px;
+  font-size: 16px;
+  padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   color: var(--color-text);
 }
 
 .set-form-frases {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 8px;
 }
 
-.frase-tile {
-  position: relative;
+.frase-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 10px 10px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  padding: 10px 14px;
 }
 
-.frase-tile-num {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  width: 20px;
-  height: 20px;
+.frase-fila:focus-within {
+  border-color: var(--color-primary);
+}
+
+.frase-fila-num {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  margin-top: 2px;
   border-radius: 50%;
   background: var(--color-accent);
   color: var(--color-primary-dark);
   font-family: var(--font-display);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.frase-tile textarea {
+.frase-fila textarea {
+  flex: 1;
   border: none;
-  resize: none;
+  resize: vertical;
+  min-height: 44px;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 15px;
+  line-height: 1.5;
   color: var(--color-text);
-  padding: 2px;
+  padding: 4px 2px;
 }
 
-.frase-tile textarea:focus-visible {
+.frase-fila textarea:focus-visible {
   outline: none;
 }
 
@@ -106,7 +89,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 22px;
 }
 
 .btn-primario,
@@ -132,13 +115,17 @@
 }
 
 .btn-secundario {
-  background: transparent;
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1.5px solid var(--color-primary);
 }
 
-@media (max-width: 480px) {
-  .set-form-frases {
-    grid-template-columns: 1fr;
+.btn-secundario:hover:not(:disabled) {
+  background: var(--color-bg);
+}
+
+@media (max-width: 600px) {
+  .set-form {
+    padding: 20px;
   }
 }

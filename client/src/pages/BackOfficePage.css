@@ -39,7 +39,8 @@
   margin-bottom: 20px;
 }
 
-.backoffice-toolbar a.btn-secundario {
+.backoffice-toolbar a.btn-secundario,
+.backoffice-toolbar a.btn-primario {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -101,6 +102,12 @@
   gap: 8px;
 }
 
+.set-card-acciones a.btn-secundario {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
 .set-card-confirmar {
   display: flex;
   flex-direction: column;
@@ -134,16 +141,4 @@
   border-radius: var(--radius-sm);
   padding: 8px 14px;
   font-size: 13px;
-}
-
-.backoffice-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 36, 27, 0.45);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow-y: auto;
-  padding: 40px 16px;
-  z-index: 10;
 }

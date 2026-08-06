@@ -1,4 +1,11 @@
 .tablero {
+  /* El resto de la app pasó a la paleta naranja de la UAM (ver
+     global.css), pero las pantallas de la partida en sí conservan el
+     verde selva original — se redefinen las variables aquí, scoped a
+     .tablero, sin tocar el resto del proyecto. */
+  --color-primary: #1F4D3A;
+  --color-primary-dark: #163A2B;
+
   min-height: 100%;
   background: var(--color-primary-dark);
   color: white;
@@ -165,28 +172,88 @@
 }
 
 .carta-boca-abajo {
+  position: relative;
   width: 90px;
-  height: 120px;
+  height: 126px;
   border-radius: var(--radius);
-  background: linear-gradient(160deg, #2a5d45, var(--color-primary-dark));
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: none;
+  padding: 0;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: 8px;
-  font-size: 28px;
-  color: white;
+  animation: cartaEntrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+@keyframes cartaEntrada {
+  0% {
+    opacity: 0;
+    transform: translateY(70px) scale(0.7) rotate(-10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
 }
 
 .carta-boca-abajo:disabled {
   opacity: 0.35;
 }
 
+.carta-seleccionada {
+  opacity: 1 !important;
+  animation: cartaClick 0.45s ease-out forwards;
+  z-index: 2;
+}
+
+@keyframes cartaClick {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  35% {
+    transform: scale(1.18) rotate(-5deg);
+    filter: brightness(1.15);
+  }
+  65% {
+    transform: scale(1.1) rotate(4deg);
+  }
+  100% {
+    transform: scale(1.2) rotate(0deg);
+    filter: brightness(1.3);
+    box-shadow: 0 0 28px var(--color-accent);
+  }
+}
+
+.carta-imagen {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .carta-boca-abajo-num {
+  position: relative;
   font-family: var(--font-display);
   font-size: 13px;
-  color: var(--color-accent);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  background: var(--color-accent);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carta-boca-abajo,
+  .carta-seleccionada {
+    animation-duration: 0.01ms !important;
+  }
 }
 
 .progreso-frase {
@@ -284,21 +351,6 @@
   line-height: 1.5;
 }
 
-.panel-robo-form,
-.panel-adivinar-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.panel-robo-form input,
-.panel-adivinar-form input {
-  font-size: 16px;
-  padding: 12px 14px;
-  border-radius: var(--radius-sm);
-  border: none;
-}
-
 /* Modo adivinar */
 
 .panel-adivinar {
@@ -314,12 +366,6 @@
   color: var(--color-accent);
   font-size: 14px;
   margin: 0 0 12px;
-}
-
-.panel-adivinar-acciones {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
 }
 
 /* Cierre */
@@ -385,4 +431,279 @@
 
 .panel-cierre-valor {
   color: var(--color-accent);
+}
+
+/* Pantera — video ambiente */
+
+.pantera-display {
+  position: relative;
+  width: 260px;
+  height: 145px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.pantera-display-vacia {
+  background: transparent;
+}
+
+.pantera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Anuncio a pantalla completa (vida perdida / derrota) */
+
+.pantera-display-completa {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background: black;
+  z-index: 40;
+}
+
+.pantera-display-completa .pantera-video {
+  object-fit: contain;
+}
+
+.pantera-display-encogiendo {
+  animation: encogerAnuncio 0.4s ease-in forwards;
+}
+
+@keyframes encogerAnuncio {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.25);
+  }
+}
+
+/* Impacto de vida perdida: vibración de toda la pantalla + destello rojo */
+
+.tablero-shake {
+  animation: vibrarPantalla 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes vibrarPantalla {
+  10%,
+  90% {
+    transform: translate3d(-2px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(4px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-8px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(8px, 0, 0);
+  }
+}
+
+.flash-rojo {
+  position: fixed;
+  inset: 0;
+  background: rgba(200, 20, 20, 0.4);
+  z-index: 45;
+  pointer-events: none;
+  animation: destelloPantalla 0.6s ease-out forwards;
+}
+
+@keyframes destelloPantalla {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tablero-shake,
+  .pantera-display-encogiendo,
+  .flash-rojo {
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Zarpazo — overlay de garras + filtro rojo */
+
+.zarpazo-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(179, 43, 43, 0.55) 0%, rgba(120, 10, 10, 0.75) 100%);
+  animation: destelloRojo 1.1s ease-out forwards;
+}
+
+@keyframes destelloRojo {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.zarpazo-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.zarpazo-garra {
+  fill: none;
+  stroke: white;
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-dasharray: 340;
+  stroke-dashoffset: 340;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+  animation: trazoGarra 0.35s ease-out forwards;
+}
+
+.zarpazo-garra-1 {
+  animation-delay: 0s;
+}
+.zarpazo-garra-2 {
+  animation-delay: 0.07s;
+}
+.zarpazo-garra-3 {
+  animation-delay: 0.14s;
+}
+
+@keyframes trazoGarra {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Victoria — animación Lottie */
+
+.animacion-victoria {
+  position: relative;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.animacion-victoria-lottie {
+  width: 220px;
+  height: 220px;
+}
+
+.animacion-victoria-texto {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-accent);
+  z-index: 1;
+  margin-top: -20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zarpazo-overlay,
+  .zarpazo-garra {
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Relleno inteligente (Modo Adivinar y Robo) */
+
+.relleno-inteligente {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.relleno-celdas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.celda-editable {
+  border: none;
+  border-bottom: 3px solid var(--color-accent);
+  background: rgba(217, 164, 65, 0.14);
+  border-radius: 4px 4px 0 0;
+  text-align: center;
+  color: white;
+  text-transform: uppercase;
+  padding: 0;
+}
+
+.celda-editable:focus {
+  background: rgba(217, 164, 65, 0.3);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.celda-bloqueada {
+  color: var(--color-success);
+}
+
+.panel-adivinar-cancelar {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Revelación de la frase — pausa obligatoria para el docente */
+
+.panel-revelacion {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  text-align: center;
+  max-width: 520px;
+}
+
+.panel-revelacion-etiqueta {
+  margin: 0 0 6px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.panel-revelacion-frase {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 16px;
+  line-height: 1.3;
+}
+
+.panel-revelacion-resultado {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 22px;
+}
+
+.panel-revelacion-resultado.ganador {
+  color: var(--color-accent);
+  font-weight: 600;
 }

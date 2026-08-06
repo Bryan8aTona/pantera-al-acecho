@@ -4,6 +4,8 @@ import { api } from '../lib/api.js';
 import { usePartida } from '../context/PartidaContext.jsx';
 import './ConfiguracionPartidaPage.css';
 
+const formateador = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' });
+
 export default function ConfiguracionPartidaPage() {
   const [sets, setSets] = useState(null); // null = cargando
   const [seleccionId, setSeleccionId] = useState(null);
@@ -76,7 +78,7 @@ export default function ConfiguracionPartidaPage() {
                   <span className="set-opcion-check" aria-hidden="true" />
                   <span>
                     <strong>{set.nombre}</strong>
-                    <small>{set.cantidadFrases} frases</small>
+                    <small>Editado el {formateador.format(new Date(set.updatedAt))}</small>
                   </span>
                 </button>
               </li>

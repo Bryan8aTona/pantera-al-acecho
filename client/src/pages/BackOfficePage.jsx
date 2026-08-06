@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import SetForm from '../components/SetForm.jsx';
 import './BackOfficePage.css';
 
 const formateador = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' });
@@ -12,9 +11,6 @@ export default function BackOfficePage() {
 
   const [sets, setSets] = useState(null); // null = cargando
   const [error, setError] = useState(null);
-
-  const [formulario, setFormulario] = useState(null); // null | 'crear' | { id, nombre, frases }
-  const [guardando, setGuardando] = useState(false);
   const [confirmando, setConfirmando] = useState(null); // id del set a eliminar
   const [eliminandoId, setEliminandoId] = useState(null);
 
@@ -30,31 +26,6 @@ export default function BackOfficePage() {
   useEffect(() => {
     cargarSets();
   }, [cargarSets]);
-
-  async function abrirEdicion(id) {
-    setError(null);
-    try {
-      const data = await api.get(`/sets/${id}/frases`);
-      setFormulario({ modo: 'editar', ...data.set });
-    } catch (err) {
-      setError(err.message || 'No se pudo abrir el set');
-    }
-  }
-
-  async function guardarSet(payload) {
-    setGuardando(true);
-    try {
-      if (formulario === 'crear') {
-        await api.post('/sets', payload);
-      } else {
-        await api.put(`/sets/${formulario.id}`, payload);
-      }
-      setFormulario(null);
-      await cargarSets();
-    } finally {
-      setGuardando(false);
-    }
-  }
 
   async function confirmarEliminar(id) {
     setEliminandoId(id);
@@ -83,22 +54,10 @@ export default function BackOfficePage() {
 
       {error && <p className="backoffice-error" role="alert">{error}</p>}
 
-      {formulario && (
-        <div className="backoffice-overlay">
-          <SetForm
-            titulo={formulario === 'crear' ? 'Nuevo set' : 'Editar set'}
-            valorInicial={formulario === 'crear' ? null : formulario}
-            onGuardar={guardarSet}
-            onCancelar={() => setFormulario(null)}
-            guardando={guardando}
-          />
-        </div>
-      )}
-
       <div className="backoffice-toolbar">
-        <button type="button" className="btn-primario" onClick={() => setFormulario('crear')}>
+        <Link to="/sets/nuevo" className="btn-primario">
           + Nuevo set
-        </button>
+        </Link>
         <Link to="/configuracion-partida" className="btn-secundario">
           Iniciar partida →
         </Link>
@@ -145,9 +104,9 @@ export default function BackOfficePage() {
                 </div>
               ) : (
                 <div className="set-card-acciones">
-                  <button type="button" className="btn-secundario" onClick={() => abrirEdicion(set.id)}>
+                  <Link to={`/sets/${set.id}/editar`} className="btn-secundario">
                     Editar
-                  </button>
+                  </Link>
                   <button type="button" className="btn-peligro-outline" onClick={() => setConfirmando(set.id)}>
                     Eliminar
                   </button>

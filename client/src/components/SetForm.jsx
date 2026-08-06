@@ -20,7 +20,7 @@ function normalizarFrasesIniciales(frasesExistentes) {
   return base;
 }
 
-export default function SetForm({ titulo, valorInicial, onGuardar, onCancelar, guardando }) {
+export default function SetForm({ valorInicial, onGuardar, onCancelar, guardando }) {
   const [nombre, setNombre] = useState(valorInicial?.nombre ?? '');
   const [frases, setFrases] = useState(normalizarFrasesIniciales(valorInicial?.frases));
   const [error, setError] = useState(null);
@@ -52,13 +52,6 @@ export default function SetForm({ titulo, valorInicial, onGuardar, onCancelar, g
 
   return (
     <form className="set-form" onSubmit={manejarEnvio}>
-      <div className="set-form-header">
-        <h2>{titulo}</h2>
-        <button type="button" className="set-form-cerrar" onClick={onCancelar} aria-label="Cerrar">
-          ✕
-        </button>
-      </div>
-
       <label className="campo set-form-nombre">
         <span>Nombre del set</span>
         <input
@@ -72,8 +65,8 @@ export default function SetForm({ titulo, valorInicial, onGuardar, onCancelar, g
 
       <div className="set-form-frases">
         {frases.map((f) => (
-          <label key={f.orden} className="frase-tile">
-            <span className="frase-tile-num">{f.orden}</span>
+          <label key={f.orden} className="frase-fila">
+            <span className="frase-fila-num">{f.orden}</span>
             <textarea
               value={f.texto}
               onChange={(e) => actualizarFrase(f.orden, e.target.value)}

@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 20% 15%, #2A5D45 0%, var(--color-primary-dark) 55%, #0F241B 100%);
+  background: radial-gradient(circle at 20% 15%, #F5A93D 0%, var(--color-primary-dark) 55%, #4A2600 100%);
   padding: 24px;
 }
 
@@ -22,10 +22,11 @@
 }
 
 .login-brand-mark {
-  font-size: 32px;
+  width: 240px;
+  max-width: 85%;
+  height: auto;
   display: block;
-  margin-bottom: 4px;
-  filter: grayscale(1) brightness(0.4);
+  margin: 0 auto 8px;
 }
 
 .login-brand h1 {

@@ -23,6 +23,18 @@ export function posicionesDeLetra(textoOriginal, letra) {
   return posiciones;
 }
 
+// Todas las letras únicas (normalizadas) del texto, sin filtrar por
+// categoría. Se usa para detectar cuándo una frase quedó completamente
+// revelada por adivinanza de letras sueltas (sin pasar por Modo Adivinar).
+export function letrasUnicasDeTexto(textoOriginal) {
+  const normalizado = normalizarTexto(textoOriginal);
+  const vistas = new Set();
+  for (const caracter of normalizado) {
+    if (/[A-ZÑ]/.test(caracter)) vistas.add(caracter);
+  }
+  return [...vistas];
+}
+
 // Letras únicas (normalizadas) de una categoría presentes en el texto,
 // en su orden de primera aparición. Se usa para Acierto Seguro.
 export function letrasUnicasPorCategoria(textoOriginal, categoria) {

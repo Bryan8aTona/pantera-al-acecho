@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { usePartida } from '../context/PartidaContext.jsx';
 import { usePartidaEngine } from '../hooks/usePartidaEngine.js';
+import { useSecuenciasDramaticas } from '../hooks/useSecuenciasDramaticas.js';
+import { useVidaPerdida } from '../hooks/useVidaPerdida.js';
 import { debeAdivinar, hayLetrasDisponiblesAciertoSeguro } from '../motor/index.js';
 import { COSTO_ACIERTO_SEGURO } from '../motor/constantes.js';
 import EquipoPanel from '../components/tablero/EquipoPanel.jsx';
@@ -10,6 +12,10 @@ import ProgresoFrase from '../components/tablero/ProgresoFrase.jsx';
 import PanelRobo from '../components/tablero/PanelRobo.jsx';
 import PanelCierre from '../components/tablero/PanelCierre.jsx';
 import PanelAdivinar from '../components/tablero/PanelAdivinar.jsx';
+import PanelRevelacion from '../components/tablero/PanelRevelacion.jsx';
+import PanteraDisplay from '../components/tablero/PanteraDisplay.jsx';
+import SecuenciaVidaPerdida from '../components/tablero/SecuenciaVidaPerdida.jsx';
+import AnimacionVictoria from '../components/tablero/AnimacionVictoria.jsx';
 import './TableroJuegoPage.css';
 
 const NOMBRE_FASE = {
@@ -21,6 +27,15 @@ const NOMBRE_FASE = {
 export default function TableroJuegoPage() {
   const { set, salirPartida } = usePartida();
   const { estado, dispatch, limpiarError } = usePartidaEngine(set);
+  const { estadoAnunciando, completarAnuncio } = useVidaPerdida(estado);
+  const {
+    mostrarVictoria,
+    cartaGanadora,
+    completarVictoria,
+    mostrarRevelacion,
+    cartaRevelada,
+    completarRevelacion,
+  } = useSecuenciasDramaticas(estado);
   const navigate = useNavigate();
 
   function manejarSalida() {
@@ -28,7 +43,12 @@ export default function TableroJuegoPage() {
     navigate('/configuracion-partida');
   }
 
-  if (estado.fase === 'CIERRE') {
+  const haySecuenciaPendiente = Boolean(estadoAnunciando) || mostrarVictoria || mostrarRevelacion;
+
+  // Aunque ya se haya llegado a Cierre, si la ÚLTIMA carta de la
+  // partida todavía no terminó su secuencia, seguimos mostrando el
+  // tablero normal hasta que el docente presione "Continuar".
+  if (estado.fase === 'CIERRE' && !haySecuenciaPendiente) {
     return (
       <div className="tablero">
         <PanelCierre cierre={estado.cierre} onSalir={manejarSalida} />
@@ -49,7 +69,7 @@ export default function TableroJuegoPage() {
   const mostrandoAdivinar = estado.modoAdivinarActivo || forzarAdivinar;
 
   return (
-    <div className="tablero">
+    <div className={estadoAnunciando ? 'tablero tablero-shake' : 'tablero'}>
       <header className="tablero-header">
         <div>
           <p className="tablero-fase">{NOMBRE_FASE[estado.fase]}</p>
@@ -83,27 +103,48 @@ export default function TableroJuegoPage() {
       </div>
 
       <main className="tablero-mesa">
-        {estado.modoRobo ? (
+        {estadoAnunciando ? (
+          // Vida perdida (estados 1-4) o derrota (estado 5): vibración
+          // + destello, luego el video a pantalla completa.
+          <SecuenciaVidaPerdida estado={estadoAnunciando} onCompleta={completarAnuncio} />
+        ) : mostrarVictoria ? (
+          <AnimacionVictoria carta={cartaGanadora} onCompleta={completarVictoria} />
+        ) : mostrarRevelacion ? (
+          // Obligatorio para TODA carta resuelta (requerimientos.md 3.6).
+          <PanelRevelacion
+            carta={cartaRevelada}
+            equipoGanador={cartaRevelada.ganadorId ? estado.equipos[cartaRevelada.ganadorId] : null}
+            onContinuar={completarRevelacion}
+          />
+        ) : estado.modoRobo ? (
           <PanelRobo
             equipoQueRoba={equipoActual}
             equipoOriginal={equipoOriginal}
             carta={cartaActual}
+            letrasUsadas={estado.letrasUsadas}
             onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
           />
         ) : !estado.cartaActualId ? (
           <MazoCartas mazo={estado.mazo} onElegir={(cartaId) => dispatch({ type: 'ELEGIR_CARTA', cartaId })} />
         ) : (
           <>
-            <ProgresoFrase texto={cartaActual.texto} letrasUsadas={estado.letrasUsadas} />
+            {/* Modo ambiente: ya se "anunció" este estado a pantalla
+                completa cuando ocurrió; aquí solo se ve fijo en su
+                último frame como referencia mientras se sigue jugando. */}
+            <PanteraDisplay estado={equipoActual.panteraEstado} reproducir={false} />
 
             {mostrandoAdivinar ? (
               <PanelAdivinar
+                texto={cartaActual.texto}
+                letrasUsadas={estado.letrasUsadas}
                 obligatorio={forzarAdivinar}
                 onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
                 onCancelar={() => dispatch({ type: 'CANCELAR_MODO_ADIVINAR' })}
               />
             ) : (
               <>
+                <ProgresoFrase texto={cartaActual.texto} letrasUsadas={estado.letrasUsadas} />
+
                 <Teclado
                   letrasUsadas={estado.letrasUsadas}
                   equipo={equipoActual}

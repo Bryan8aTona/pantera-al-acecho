@@ -39,7 +39,7 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-brand">
-          <span className="login-brand-mark" aria-hidden="true">🐆</span>
+          <img src="/assets/logo-uam.png" alt="UAM" className="login-brand-mark" />
           <h1>Pantera al Acecho</h1>
           <p className="login-brand-sub">Panel del docente</p>
         </div>

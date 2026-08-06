@@ -1,14 +1,6 @@
-import { useState } from 'react';
+import RellenoInteligente from './RellenoInteligente.jsx';
 
-export default function PanelRobo({ equipoQueRoba, equipoOriginal, carta, onEnviar }) {
-  const [respuesta, setRespuesta] = useState('');
-
-  function manejarEnvio(e) {
-    e.preventDefault();
-    if (!respuesta.trim()) return;
-    onEnviar(respuesta.trim());
-  }
-
+export default function PanelRobo({ equipoQueRoba, equipoOriginal, carta, letrasUsadas, onEnviar }) {
   return (
     <div className="panel-robo">
       <p className="panel-robo-aviso">
@@ -17,18 +9,12 @@ export default function PanelRobo({ equipoQueRoba, equipoOriginal, carta, onEnvi
         sin letras, sin monedas.
       </p>
 
-      <form onSubmit={manejarEnvio} className="panel-robo-form">
-        <input
-          type="text"
-          value={respuesta}
-          onChange={(e) => setRespuesta(e.target.value)}
-          placeholder="Declara la frase completa…"
-          autoFocus
-        />
-        <button type="submit" className="btn-primario">
-          Declarar frase
-        </button>
-      </form>
+      <RellenoInteligente
+        texto={carta.texto}
+        letrasUsadas={letrasUsadas}
+        onEnviar={onEnviar}
+        textoBoton="Declarar frase"
+      />
     </div>
   );
 }

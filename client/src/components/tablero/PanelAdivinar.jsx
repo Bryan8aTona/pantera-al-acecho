@@ -1,18 +1,6 @@
-import { useState } from 'react';
+import RellenoInteligente from './RellenoInteligente.jsx';
 
-// Versión simple: un input de texto libre. El "relleno inteligente"
-// (prellenar letras ya reveladas, cursor que salta automáticamente
-// entre espacios vacíos) es la siguiente tarea de Fase 4 — aquí el
-// docente escribe la frase completa a mano.
-export default function PanelAdivinar({ obligatorio, onEnviar, onCancelar }) {
-  const [respuesta, setRespuesta] = useState('');
-
-  function manejarEnvio(e) {
-    e.preventDefault();
-    if (!respuesta.trim()) return;
-    onEnviar(respuesta.trim());
-  }
-
+export default function PanelAdivinar({ texto, letrasUsadas, obligatorio, onEnviar, onCancelar }) {
   return (
     <div className="panel-adivinar">
       {obligatorio && (
@@ -21,25 +9,13 @@ export default function PanelAdivinar({ obligatorio, onEnviar, onCancelar }) {
         </p>
       )}
 
-      <form onSubmit={manejarEnvio} className="panel-adivinar-form">
-        <input
-          type="text"
-          value={respuesta}
-          onChange={(e) => setRespuesta(e.target.value)}
-          placeholder="Escribe la frase completa…"
-          autoFocus
-        />
-        <div className="panel-adivinar-acciones">
-          {!obligatorio && (
-            <button type="button" className="btn-secundario" onClick={onCancelar}>
-              Cancelar
-            </button>
-          )}
-          <button type="submit" className="btn-primario">
-            Adivinar
-          </button>
-        </div>
-      </form>
+      <RellenoInteligente texto={texto} letrasUsadas={letrasUsadas} onEnviar={onEnviar} textoBoton="Adivinar" />
+
+      {!obligatorio && (
+        <button type="button" className="btn-secundario panel-adivinar-cancelar" onClick={onCancelar}>
+          Cancelar
+        </button>
+      )}
     </div>
   );
 }

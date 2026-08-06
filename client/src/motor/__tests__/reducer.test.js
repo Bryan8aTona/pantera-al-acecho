@@ -98,12 +98,13 @@ describe('PEDIR_LETRA_LIBRE', () => {
   });
 
   it('bloquea pedir letras de una categoría sin intentos restantes', () => {
-    // Carta sintética con 8 consonantes distintas y sin vocales, para
-    // agotar el límite de consonantes de Ronda 1 sin ningún fallo.
+    // Carta sintética con 9 consonantes distintas (una de más, 'X', que
+    // nunca se pide) para agotar el límite de consonantes de Ronda 1
+    // sin que la frase quede completamente revelada de paso.
     let estado = estadoBase({
       mazo: {
         ...estadoBase().mazo,
-        c1: { id: 'c1', texto: 'BCDFGHJK', orden: 1, valor: 100, jugada: false, ganadorId: null },
+        c1: { id: 'c1', texto: 'BCDFGHJKX', orden: 1, valor: 100, jugada: false, ganadorId: null },
       },
     });
     estado = motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
@@ -114,7 +115,8 @@ describe('PEDIR_LETRA_LIBRE', () => {
 
     expect(estado.equipos.rojo.intentos.consonantes).toBe(0);
     expect(estado.equipos.rojo.panteraEstado).toBe(0); // ninguna fue fallo
-    expect(() => motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'L' })).toThrow(MotorError);
+    expect(estado.cartaActualId).toBe('c1'); // la carta sigue en juego (falta la X)
+    expect(() => motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'X' })).toThrow(MotorError);
   });
 });
 
@@ -267,6 +269,47 @@ describe('Robo de frase', () => {
     expect(estado.mazo.c4.jugada).toBe(true);
     expect(estado.mazo.c4.ganadorId).toBe('rojo'); // rojo robó exitosamente
     expect(['REPECHAJE', 'CIERRE']).toContain(estado.fase);
+  });
+});
+
+describe('Victoria automática al revelar todas las letras (sin Modo Adivinar)', () => {
+  it('si el equipo adivina todas las letras sueltas, gana de inmediato sin ENVIAR_RESPUESTA', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' }); // SOL, valor 100
+
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'S' });
+    expect(estado.equipos.rojo.gano).toBeNull(); // todavía falta O y L
+
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'O' });
+    expect(estado.equipos.rojo.gano).toBeNull(); // todavía falta L
+
+    // Última letra: la frase queda completa -> gana automáticamente.
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'L' });
+
+    expect(estado.equipos.rojo.gano).toBe(true);
+    expect(estado.equipos.rojo.saldo).toBe(300); // 200 + 100
+    expect(estado.mazo.c1.jugada).toBe(true);
+    expect(estado.mazo.c1.ganadorId).toBe('rojo');
+    expect(estado.cartaActualId).toBeNull(); // el turno ya avanzó
+    expect(estado.turnoActualIndex).toBe(1);
+  });
+
+  it('también se detecta si la última letra la completa un Acierto Seguro', () => {
+    let estado = estadoBase({
+      mazo: {
+        ...estadoBase().mazo,
+        c1: { id: 'c1', texto: 'MAR', orden: 1, valor: 90, jugada: false, ganadorId: null },
+      },
+    });
+    estado = motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'M' });
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'R' });
+    expect(estado.equipos.rojo.gano).toBeNull(); // falta la A
+
+    // Compra la única vocal que falta -> frase completa -> gana.
+    estado = motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' });
+
+    expect(estado.equipos.rojo.gano).toBe(true);
+    expect(estado.mazo.c1.ganadorId).toBe('rojo');
   });
 });
 

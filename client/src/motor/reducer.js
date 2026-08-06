@@ -1,7 +1,7 @@
 import { MotorError } from './errores.js';
 import { LIMITES_INTENTOS, COSTO_ACIERTO_SEGURO, PANTERA_ESTADO_DERROTA } from './constantes.js';
 import { normalizarTexto, normalizarLetra } from './normalizacion.js';
-import { categoriaDeLetra, posicionesDeLetra, letrasUnicasPorCategoria } from './letras.js';
+import { categoriaDeLetra, posicionesDeLetra, letrasUnicasPorCategoria, letrasUnicasDeTexto } from './letras.js';
 
 // ---------------------------------------------------------------------
 // Helpers internos
@@ -38,6 +38,14 @@ function actualizarCarta(estado, cartaId, cambios) {
       [cartaId]: { ...estado.mazo[cartaId], ...cambios },
     },
   };
+}
+
+// El equipo puede ganar sin pasar nunca por Modo Adivinar, simplemente
+// acertando todas las letras de la frase una por una (bug reportado en
+// playtesting: el juego no lo detectaba). Se revisa después de cada
+// letra correcta y después de cada Acierto Seguro.
+function fraseCompletamenteRevelada(texto, letrasUsadas) {
+  return letrasUnicasDeTexto(texto).every((letra) => letrasUsadas[letra] === 'acierto');
 }
 
 // El robo siempre se calcula sobre el orden COMPLETO del sorteo (los 4
@@ -141,7 +149,14 @@ function manejarPedirLetraLibre(estado, { letra }) {
     letrasUsadas: { ...siguiente.letrasUsadas, [letraNorm]: acierto ? 'acierto' : 'fallo' },
   };
 
-  if (acierto) return siguiente;
+  if (acierto) {
+    // ¿La frase quedó completa con esta letra? El equipo gana de
+    // inmediato, sin necesidad de pasar por Modo Adivinar.
+    if (fraseCompletamenteRevelada(carta.texto, siguiente.letrasUsadas)) {
+      return resolverAciertoDeTurno(siguiente, equipoId);
+    }
+    return siguiente;
+  }
 
   // Fallo en opción gratuita: avanza la pantera (arquitectura.md 3.4 /
   // requerimientos.md 3.4). Si llega al estado de derrota, el equipo
@@ -208,6 +223,10 @@ function manejarComprarAciertoSeguro(estado, { categoria }) {
     ...siguiente,
     letrasUsadas: { ...siguiente.letrasUsadas, [letraElegida]: 'acierto' },
   };
+
+  if (fraseCompletamenteRevelada(carta.texto, siguiente.letrasUsadas)) {
+    return resolverAciertoDeTurno(siguiente, equipoId);
+  }
 
   return siguiente;
 }

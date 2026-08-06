@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import RutaConPartida from './components/RutaConPartida.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import BackOfficePage from './pages/BackOfficePage.jsx';
+import SetFormPage from './pages/SetFormPage.jsx';
 import ConfiguracionPartidaPage from './pages/ConfiguracionPartidaPage.jsx';
 import TableroJuegoPage from './pages/TableroJuegoPage.jsx';
 
@@ -20,6 +21,22 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <BackOfficePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sets/nuevo"
+              element={
+                <ProtectedRoute>
+                  <SetFormPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sets/:id/editar"
+              element={
+                <ProtectedRoute>
+                  <SetFormPage />
                 </ProtectedRoute>
               }
             />
