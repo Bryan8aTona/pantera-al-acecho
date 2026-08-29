@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 20% 15%, #F5A93D 0%, var(--color-primary-dark) 55%, #4A2600 100%);
+  background: #ff9628;
   padding: 24px;
 }
 

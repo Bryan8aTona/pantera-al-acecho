@@ -35,7 +35,7 @@ Los módulos del cliente siguen un flujo secuencial: el docente inicia sesión, 
 Pantalla de acceso al sistema. Permite a los docentes nuevos crear una cuenta (nombre, email, contraseña) y a los usuarios existentes ingresar sus credenciales para autenticarse.
 
 ### 3.2 Back-office
-Módulo privado accesible solo tras autenticación. Permite al docente crear, nombrar, editar y eliminar sets de frases. Los sets quedan vinculados a su cuenta y disponibles para sesiones futuras.
+Módulo privado accesible solo tras autenticación. Permite al docente crear, nombrar, editar y eliminar sets de frases. Los sets quedan vinculados a su cuenta y disponibles para sesiones futuras. Crear y editar un set son páginas completas propias.
 
 ### 3.3 Configuración de partida
 Pantalla previa al juego donde el docente selecciona el set de frases a usar e inicia la partida. Al iniciar, el cliente precarga el set seleccionado junto con todas las frases que lo componen, manteniendo esta información en memoria durante toda la sesión.
@@ -46,6 +46,7 @@ Interfaz de alta visibilidad optimizada para proyección en aula. Muestra el est
 Para proteger contra recargas accidentales, el sistema detecta si hay una partida activa y activa la advertencia estándar del navegador ("¿Seguro que quieres salir?") si el docente intenta cerrar o recargar la pestaña, dándole una red de seguridad antes de perder la sesión.
 
 ### 3.5 Motor de reglas (cliente)
+
 Módulo dentro del cliente que contiene toda la lógica de negocio del juego:
 
 - Validación de letras y frases (normalización al momento: sin tildes ni mayúsculas)
@@ -56,6 +57,43 @@ Módulo dentro del cliente que contiene toda la lógica de negocio del juego:
 > **Nota sobre normalización:** Las frases se almacenan en la base de datos con su ortografía correcta (tildes, mayúsculas) para mostrarse correctamente al final del turno. La normalización se aplica únicamente al momento de comparar la respuesta del equipo con la frase objetivo.
 
 > **Nota sobre el modelo de amenaza:** La aplicación la opera el docente desde su propio equipo, proyectado al grupo. Los alumnos no tienen acceso al navegador ni a DevTools. Cargar las frases completas en el cliente no representa un riesgo de seguridad en este contexto.
+
+> **Nota técnica sobre la Ñ:** la normalización no usa un "strip" genérico de diacríticos Unicode (`texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '')`), porque eso también le quita la virgulilla a la "Ñ" (que se descompone en NFD como N + U+0303) y la convertiría incorrectamente en "N". En español la Ñ es una letra propia, no una "N con tilde". La normalización usa en cambio un mapeo explícito solo de vocales acentuadas (Á→A, É→E, Í→I, Ó→O, Ú→U, Ü→U), dejando la Ñ intacta. Esto aplica tanto a la comparación de frases completas como a la clasificación de letras del teclado virtual (vocal/consonante).
+
+#### 3.5.1 Implementación del motor
+
+El motor se construyó como módulos JavaScript puros, sin dependencia de React, en `client/src/motor/`:
+
+| Archivo | Responsabilidad |
+| --- | --- |
+| `constantes.js` | Todos los valores numéricos de `requerimientos.md` (saldos, costos, límites de intentos, premios) en un solo lugar |
+| `normalizacion.js` | Normalización de texto/letras (con el manejo especial de la Ñ descrito arriba) |
+| `letras.js` | Clasificación vocal/consonante, búsqueda de posiciones y letras únicas de una frase |
+| `mazo.js` | Construcción del mazo con premios aleatorios (función aleatoria inyectable, para pruebas determinísticas) |
+| `sorteo.js` | Barajado Fisher-Yates del orden de equipos (misma inyección de aleatoriedad) |
+| `estadoInicial.js` | Construye el estado completo de una partida nueva a partir de un set de 8 frases |
+| `reducer.js` | La máquina de estados en sí: un reducer puro `(estado, accion) => nuevoEstado`, que lanza `MotorError` ante acciones inválidas |
+| `selectores.js` | Datos derivados para la UI (progreso de la frase revelada, si debe forzarse el Modo Adivinar, disponibilidad de Acierto Seguro) |
+| `errores.js` | Clase `MotorError` |
+
+Este reducer se conecta a React mediante un hook dedicado, `usePartidaEngine` (`client/src/hooks/`), que envuelve `useReducer` con un `reducerSeguro` que atrapa `MotorError` y lo guarda como `estado.error` en vez de dejarlo tumbar el render.
+
+Dos hooks adicionales orquestan las pausas visuales que no son parte de la lógica de negocio en sí:
+
+- `useVidaPerdida`: detecta cuándo la pantera de un equipo avanzó de estado, para disparar la vibración de pantalla y el video con sonido correspondiente.
+- `useSecuenciasDramaticas`: detecta cuándo una carta se resolvió (con o sin ganador), para disparar la animación de victoria (si aplica) y la pausa de revelación de frase.
+
+> **Restricción de implementación — `React.StrictMode`:** cualquier lógica que compare "estado actual vs. estado anterior" dentro de un componente o hook debe hacer esa comparación (y la mutación de la referencia que guarda el valor anterior) dentro de un `useEffect`, nunca directamente durante el render. Mutar una referencia durante el render se rompe bajo `StrictMode` (activo en `main.jsx`): React invoca la función de render dos veces seguidas para detectar impurezas, y si la referencia ya fue mutada por la primera invocación, la segunda "ve" el cambio como si ya hubiera ocurrido, perdiendo la detección. `useVidaPerdida` y `useSecuenciasDramaticas` siguen este patrón correctamente; es la referencia a seguir para cualquier lógica similar que se agregue después.
+
+### 3.6 Componentes del Tablero (`client/src/components/tablero/`)
+
+- `MazoCartas` — el mazo de 8 cartas.
+- `PanteraDisplay` — el recuadro de la pantera; reproduce video con o sin sonido según si se está anunciando un nuevo estado o mostrando el estado en reposo.
+- `ZarpazoOverlay` — la imagen de garra superpuesta al llegar al estado 5.
+- `EfectoImpacto` — la vibración de pantalla y el destello rojo al perder una vida.
+- `Teclado`, `ProgresoFrase`, `RellenoInteligente` — el teclado virtual y las dos formas de mostrar/completar la frase (solo lectura y editable).
+- `PanelRobo`, `PanelRevelacion`, `AnimacionVictoria`, `PanelCierre`, `PanelAdivinar` — los distintos paneles que reemplazan el área de juego según el momento de la partida.
+- `EquipoPanel` — el panel de cada equipo.
 
 ---
 
@@ -70,12 +108,14 @@ Maneja el registro e inicio de sesión de los docentes. Al ingresar, el servidor
 CRUD completo de sets de frases vinculados al usuario autenticado. Al iniciar una partida, el cliente descarga el set seleccionado completo con un único GET.
 
 | Método | Ruta                  | Descripción                        |
-|--------|-----------------------|------------------------------------|
+|--------|-----------------------|-------------------------------------|
 | GET    | /api/sets             | Listar sets del docente            |
 | POST   | /api/sets             | Crear nuevo set                    |
 | PUT    | /api/sets/:id         | Editar set existente               |
 | DELETE | /api/sets/:id         | Eliminar set                       |
 | GET    | /api/sets/:id/frases  | Obtener frases completas de un set |
+
+Todas las rutas de sets están protegidas por el middleware de autenticación y verifican que el set pertenezca al usuario autenticado (devuelven 404, no 403, si el set existe pero es de otro docente, para no filtrar su existencia).
 
 ---
 
@@ -105,14 +145,25 @@ Despliegue: **A definir**
 
 ## 7. Stack tecnológico
 
-| Capa          | Tecnología               |
-|---------------|--------------------------|
-| Frontend      | React + Vite             |
-| Backend       | Node.js + Express        |
-| Base de datos | PostgreSQL               |
-| ORM           | Prisma                   |
-| Autenticación | JWT                      |
-| Despliegue    | A definir                |
+| Capa | Tecnología |
+|---|---|
+| Frontend | React + Vite, react-router-dom |
+| Backend | Node.js + Express |
+| Base de datos | PostgreSQL + Prisma |
+| Autenticación | JWT |
+| Animaciones | lottie-react |
+| Pruebas (cliente) | Vitest, Testing Library, jsdom |
+| Despliegue | A definir |
+
+### 7.1 Estrategia de pruebas
+
+El motor de reglas (lógica pura, sin React) se prueba con Vitest directamente: construcción de mazo, sorteo, normalización, clasificación de letras, y el reducer completo (turnos, robo, repechaje, cierre, victoria automática por letras).
+
+Los componentes de React que orquestan las secuencias dramáticas (derrota, victoria, revelación) se prueban con Vitest + Testing Library + jsdom, montando el `TableroJuegoPage` completo dentro de `React.StrictMode` (para que las pruebas atrapen el mismo tipo de problema descrito en 3.5.1) y simulando eventos reales (clics, el evento `ended` de un `<video>`, avance de temporizadores).
+
+**Limitaciones del entorno de pruebas:**
+- `jsdom` no implementa `<canvas>`, que `lottie-web` (usado por `lottie-react`) necesita al cargar. Se resuelve simulando (`vi.mock`) `lottie-react` globalmente en `client/src/test-setup.js`, en vez de instalar el paquete nativo `canvas` (frágil de compilar, sobre todo en Windows).
+- El JSON de Lottie se importa de forma estática (no con `import()` dinámico), por lo que queda incluido en el bundle principal (~913KB).
 
 ---
 

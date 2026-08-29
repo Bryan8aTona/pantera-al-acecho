@@ -19,7 +19,7 @@ usuarios  ──<  sets  ──<  frases
 Almacena las cuentas de los docentes. Un usuario puede tener cero o más sets.
 
 | Columna        | Tipo            | Restricciones                        | Descripción                              |
-|----------------|-----------------|--------------------------------------|------------------------------------------|
+|----------------|-----------------|---------------------------------------|------------------------------------------|
 | `id`           | `UUID`          | PK, default `gen_random_uuid()`      | Identificador único del usuario          |
 | `email`        | `VARCHAR(255)`  | NOT NULL, UNIQUE                     | Correo electrónico, usado para login     |
 | `password_hash`| `VARCHAR(255)`  | NOT NULL                             | Contraseña hasheada (bcrypt)             |
@@ -35,7 +35,7 @@ Almacena las cuentas de los docentes. Un usuario puede tener cero o más sets.
 Agrupaciones de frases creadas por un docente. Un set pertenece a un único usuario y contiene exactamente 8 frases.
 
 | Columna      | Tipo           | Restricciones                              | Descripción                                    |
-|--------------|----------------|--------------------------------------------|------------------------------------------------|
+|--------------|----------------|---------------------------------------------|------------------------------------------------|
 | `id`         | `UUID`         | PK, default `gen_random_uuid()`            | Identificador único del set                    |
 | `usuario_id` | `UUID`         | NOT NULL, FK → `usuarios(id)` ON DELETE CASCADE | Propietario del set                   |
 | `nombre`     | `VARCHAR(100)` | NOT NULL                                   | Nombre descriptivo del set (ej. "Semana 3")    |
@@ -53,7 +53,7 @@ Agrupaciones de frases creadas por un docente. Un set pertenece a un único usua
 Frases individuales pertenecientes a un set. Cada set contiene exactamente 8 frases (posiciones 1–8).
 
 | Columna     | Tipo            | Restricciones                            | Descripción                                                    |
-|-------------|-----------------|------------------------------------------|----------------------------------------------------------------|
+|-------------|-----------------|-------------------------------------------|------------------------------------------------------------------|
 | `id`        | `UUID`          | PK, default `gen_random_uuid()`          | Identificador único de la frase                                |
 | `set_id`    | `UUID`          | NOT NULL, FK → `sets(id)` ON DELETE CASCADE | Set al que pertenece                                      |
 | `texto`     | `VARCHAR(500)`  | NOT NULL                                 | Frase con ortografía correcta (tildes y mayúsculas preservadas)|
@@ -62,7 +62,7 @@ Frases individuales pertenecientes a un set. Cada set contiene exactamente 8 fra
 
 **Restricción compuesta:** `UNIQUE (set_id, orden)` - no pueden existir dos frases con el mismo orden dentro del mismo set.
 
-**Nota sobre ortografía:** El texto se almacena con ortografía correcta para mostrarse al revelar la frase al final de cada turno. La normalización (sin tildes, sin mayúsculas) se aplica solo en el motor de reglas del cliente.
+**Nota sobre ortografía:** El texto se almacena con ortografía correcta para mostrarse al revelar la frase al final de cada turno. La normalización (sin tildes, sin mayúsculas) se aplica solo en el motor de reglas del cliente — y preserva la Ñ como letra distinta, no como una "N acentuada". Ver `arquitectura.md` sección 3.5 para el detalle de por qué esto importa.
 
 ---
 
@@ -137,7 +137,7 @@ model Frase {
 
 **`orden` en `frases`.** El back-office presenta 8 inputs fijos (posiciones 1–8) sin posibilidad de reordenamiento. La columna `orden` garantiza que la BD devuelva siempre las frases en el mismo orden al editar o iniciar una partida. 
 
-**8 frases en el back-office.** Una partida requiere exactamente 8 frases (4 por ronda). El back-office impide guardar un set con más o menos de 8 frases; esta situación nunca llega al servidor.
+**8 frases en el back-office.** Una partida requiere exactamente 8 frases (4 por ronda). El back-office impide guardar un set con más o menos de 8 frases; esta situación nunca llega al servidor — aunque, en la práctica, el servidor también valida esto por una segunda capa de defensa (ver `arquitectura.md` / código de `server/src/modules/sets`).
 
 **`updated_at` solo en `sets`.** Las frases no necesitan `updated_at` propio porque siempre se editan en el contexto de su set; el `updated_at` del set refleja cualquier cambio en sus frases.
 

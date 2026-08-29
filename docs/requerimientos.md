@@ -38,7 +38,7 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Sorteo Inicial:** El sistema realiza un barajado aleatorio de los 4 equipos. Aparecen en posiciones aleatorias en pantalla y el orden de turno es de izquierda a derecha según el resultado.
 
-**Selección de Tarjetas:** En la Ronda 1, cada equipo elige una tarjeta del mazo boca abajo al inicio de su turno. En la Ronda 2, los equipos participantes reciben una tarjeta nueva del mazo sobrante (las 4 frases no jugadas en Ronda 1).
+**Selección de Tarjetas:** En la Ronda 1, cada equipo elige una tarjeta del mazo boca abajo al inicio de su turno. En la Ronda 2, los equipos participantes reciben una tarjeta nueva del mazo sobrante (las 4 frases no jugadas en Ronda 1). Una vez elegida su tarjeta, el equipo no puede cambiarla ni elegir otra durante ese turno.
 
 ### 3.2 El Sistema de Límite de Intentos
 
@@ -78,9 +78,11 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 
 - Estado 5 (Derrota): La pantera da un zarpazo que cubre la pantalla. El equipo sufre derrota inmediata sin oportunidad de entrar al Modo Adivinar. Se activa directamente la mecánica de Robo.
 
+> **Nota:** la pantera solo avanza por errores en la opción gratuita (letras al aire). El Acierto Seguro, al acertar siempre por diseño, nunca la hace avanzar.
+
 ### 3.5 Modo Adivinar Frase e Interfaz de Validación
 
-**Activación:** El docente activa este modo mediante un botón dedicado. Puede activarse en dos situaciones: (a) el equipo elige intentarlo voluntariamente en cualquier momento de su turno, o (b) el equipo ha agotado todos sus intentos de letras.
+**Activación:** El docente activa este modo mediante un botón dedicado. Puede activarse en tres situaciones: (a) el equipo elige intentarlo voluntariamente en cualquier momento de su turno, (b) el equipo ha agotado todos sus intentos de letras, o (c) el equipo revela todas las letras de la frase mediante la opción gratuita o el Acierto Seguro, en este último caso, el sistema otorga la victoria automáticamente en cuanto la última letra queda descubierta, sin requerir que el docente confirme manualmente a través del botón "Adivinar".
 
 **Interfaz (Relleno Inteligente):** El modal replica el tablero. Las letras ya adivinadas aparecen bloqueadas y pre-rellenadas. El cursor se posiciona automáticamente en los espacios vacíos y salta sobre las letras ya reveladas tras cada pulsación. El docente puede hacer clic en cualquier celda específica para corregir o ingresar una letra manualmente.
 
@@ -102,23 +104,25 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 
 - Los controles del equipo actual se inhabilitan.
 
-- Se habilita únicamente el Modo Adivinar para el equipo siguiente en el orden del sorteo.
+- Se habilita únicamente el Modo Adivinar para el equipo siguiente en el orden del sorteo original, de forma circular: si el equipo que pierde es el último de ese orden, le toca robar al primero, incluso si ese equipo ya jugó su propio turno antes en la ronda.
 
-- El equipo que roba tiene una única oportunidad: declarar verbalmente la frase completa. No puede pedir letras ni usar monedas.
+- El equipo que roba ve en pantalla las letras que ya estaban reveladas al momento del fallo — no parte de una frase en blanco. Tiene una única oportunidad: declarar verbalmente la frase completa. No puede pedir letras ni usar monedas.
 
 > - Si acierta: gana las monedas del premio de la tarjeta.
 
 > - Si falla: nadie suma monedas por esa tarjeta.
 
-El proceso termina siempre con la revelación de la frase y una pausa para intervención docente.
+- Resuelto el robo (con o sin éxito), el equipo que robó continúa normalmente con su propio turno y su propia tarjeta — robar no le adelanta ni le consume su turno.
+
+El proceso termina siempre con la revelación de la frase completa y una pausa para intervención docente antes de continuar. Esto aplica a **cualquier** tarjeta que se resuelva, sea por turno propio, robo exitoso, robo fallido, o derrota directa en Ronda 2 — nada avanza al siguiente equipo de forma automática.
 
 ### 3.7 Ronda 2 (Repechaje)
 
-**Participantes:** Solo los equipos que no adivinaron su frase en Ronda 1. Los equipos ganadores quedan en modo espectador.
+**Participantes:** Solo los equipos que no adivinaron su frase en Ronda 1. Los equipos ganadores quedan en modo espectador. El estado de la pantera se reinicia para todos los equipos participantes al comenzar esta ronda.
 
 **Condiciones:**
 
-- Sin economía de monedas ni mecánica de Acierto Seguro.
+- Sin economía de monedas ni mecánica de Acierto Seguro: un equipo no puede comprar letras, pero un acierto sigue sumando el valor completo de la tarjeta a su saldo.
 
 - Intentos reducidos: 2 vocales y 5 consonantes.
 
@@ -134,9 +138,13 @@ Al finalizar todos los turnos de la Ronda 2, o de forma inmediata si ningún equ
 
 **Teclado Virtual:** Las letras usadas se marcan visualmente en verde (acierto) o negro (fallo). Las letras agotadas por límite de intentos se inhabilitan visualmente.
 
-**Visibilidad:** Fuentes de gran tamaño y alto contraste optimizadas para proyección en aula. Todos los elementos del panel de control deben ser operables desde la distancia del escritorio del profesor.
+**Visibilidad:** Fuentes de gran tamaño y alto contraste optimizadas para proyección en aula. Toda la interfaz de juego debe caber en una sola pantalla, sin necesidad de desplazamiento. Todos los elementos del panel de control deben ser operables desde la distancia del escritorio del profesor.
 
 **Animaciones:** Las animaciones de victoria (tesoro) y derrota (zarpazo) deben ser llamativas para captar la atención del grupo, pero breves para no interrumpir el ritmo de la clase.
+
+**Panel de equipo:** cada uno de los 4 paneles debe mostrar el nombre del equipo en una pestaña sobre el borde superior, el saldo actual con un ícono de moneda, y los intentos restantes de vocales y consonantes, todo dentro de un marco con efecto de relieve. Cuando es el turno de un equipo, su panel se destaca con un resplandor en el color propio del equipo y una etiqueta "En turno" en verde fosforescente; cuando un equipo puede robar la frase, se marca con una etiqueta distinta en el color de acento dorado.
+
+**Identidad visual:** las pantallas administrativas (inicio de sesión, back-office, configuración de partida, gestión de sets) usan la paleta institucional de la UAM (naranja). El Tablero de juego mantiene su propia paleta temática (verde selva), independiente de la identidad institucional.
 
 ### 4.2 Persistencia y Portabilidad
 

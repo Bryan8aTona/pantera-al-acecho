@@ -4,7 +4,7 @@ import { usePartidaEngine } from '../hooks/usePartidaEngine.js';
 import { useSecuenciasDramaticas } from '../hooks/useSecuenciasDramaticas.js';
 import { useVidaPerdida } from '../hooks/useVidaPerdida.js';
 import { debeAdivinar, hayLetrasDisponiblesAciertoSeguro } from '../motor/index.js';
-import { COSTO_ACIERTO_SEGURO } from '../motor/constantes.js';
+import { COSTO_ACIERTO_SEGURO, LIMITES_INTENTOS } from '../motor/constantes.js';
 import EquipoPanel from '../components/tablero/EquipoPanel.jsx';
 import Teclado from '../components/tablero/Teclado.jsx';
 import MazoCartas from '../components/tablero/MazoCartas.jsx';
@@ -14,7 +14,7 @@ import PanelCierre from '../components/tablero/PanelCierre.jsx';
 import PanelAdivinar from '../components/tablero/PanelAdivinar.jsx';
 import PanelRevelacion from '../components/tablero/PanelRevelacion.jsx';
 import PanteraDisplay from '../components/tablero/PanteraDisplay.jsx';
-import SecuenciaVidaPerdida from '../components/tablero/SecuenciaVidaPerdida.jsx';
+import EfectoImpacto from '../components/tablero/EfectoImpacto.jsx';
 import AnimacionVictoria from '../components/tablero/AnimacionVictoria.jsx';
 import './TableroJuegoPage.css';
 
@@ -67,11 +67,28 @@ export default function TableroJuegoPage() {
 
   const forzarAdivinar = !estado.modoRobo && cartaActual ? debeAdivinar(equipoActual) : false;
   const mostrandoAdivinar = estado.modoAdivinarActivo || forzarAdivinar;
+  const limites = LIMITES_INTENTOS[estado.ronda];
+
+  // Pantera: mientras se está anunciando una vida perdida, la cajita
+  // reproduce el video del nuevo estado CON sonido. En reposo, se ve
+  // fija: primer fotograma si nunca perdió vidas, último fotograma del
+  // estado alcanzado si ya perdió alguna.
+  const panteraEstadoAmostrar = estadoAnunciando ?? (equipoActual.panteraEstado === 0 ? 1 : equipoActual.panteraEstado);
+  const panteraPrimerFrame = !estadoAnunciando && equipoActual.panteraEstado === 0;
+
+  const mostrandoControlesNormales =
+    !estadoAnunciando &&
+    !mostrarVictoria &&
+    !mostrarRevelacion &&
+    !estado.modoRobo &&
+    Boolean(cartaActual) &&
+    !mostrandoAdivinar;
 
   return (
     <div className={estadoAnunciando ? 'tablero tablero-shake' : 'tablero'}>
       <header className="tablero-header">
         <div>
+          <p className="tablero-titulo">Pantera al Acecho</p>
           <p className="tablero-fase">{NOMBRE_FASE[estado.fase]}</p>
           <h1>{set.nombre}</h1>
         </div>
@@ -89,109 +106,125 @@ export default function TableroJuegoPage() {
         </div>
       )}
 
-      <div className="tablero-equipos">
-        {Object.values(estado.equipos)
-          .filter((e) => estado.ordenTurnoActual.includes(e.id) || estado.fase === 'RONDA1')
-          .map((equipo) => (
-            <EquipoPanel
-              key={equipo.id}
-              equipo={equipo}
-              esTurnoActual={equipo.id === equipoTurnoId}
-              esQuienRoba={estado.modoRobo?.equipoId === equipo.id}
+      {estadoAnunciando && <EfectoImpacto />}
+
+      <div className="tablero-cuerpo">
+        <div className="tablero-jugada">
+          {mostrarVictoria ? (
+            <AnimacionVictoria carta={cartaGanadora} onCompleta={completarVictoria} />
+          ) : mostrarRevelacion ? (
+            <PanelRevelacion
+              carta={cartaRevelada}
+              equipoGanador={cartaRevelada.ganadorId ? estado.equipos[cartaRevelada.ganadorId] : null}
+              onContinuar={completarRevelacion}
             />
-          ))}
-      </div>
-
-      <main className="tablero-mesa">
-        {estadoAnunciando ? (
-          // Vida perdida (estados 1-4) o derrota (estado 5): vibración
-          // + destello, luego el video a pantalla completa.
-          <SecuenciaVidaPerdida estado={estadoAnunciando} onCompleta={completarAnuncio} />
-        ) : mostrarVictoria ? (
-          <AnimacionVictoria carta={cartaGanadora} onCompleta={completarVictoria} />
-        ) : mostrarRevelacion ? (
-          // Obligatorio para TODA carta resuelta (requerimientos.md 3.6).
-          <PanelRevelacion
-            carta={cartaRevelada}
-            equipoGanador={cartaRevelada.ganadorId ? estado.equipos[cartaRevelada.ganadorId] : null}
-            onContinuar={completarRevelacion}
-          />
-        ) : estado.modoRobo ? (
-          <PanelRobo
-            equipoQueRoba={equipoActual}
-            equipoOriginal={equipoOriginal}
-            carta={cartaActual}
-            letrasUsadas={estado.letrasUsadas}
-            onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
-          />
-        ) : !estado.cartaActualId ? (
-          <MazoCartas mazo={estado.mazo} onElegir={(cartaId) => dispatch({ type: 'ELEGIR_CARTA', cartaId })} />
-        ) : (
-          <>
-            {/* Modo ambiente: ya se "anunció" este estado a pantalla
-                completa cuando ocurrió; aquí solo se ve fijo en su
-                último frame como referencia mientras se sigue jugando. */}
-            <PanteraDisplay estado={equipoActual.panteraEstado} reproducir={false} />
-
-            {mostrandoAdivinar ? (
-              <PanelAdivinar
-                texto={cartaActual.texto}
-                letrasUsadas={estado.letrasUsadas}
-                obligatorio={forzarAdivinar}
-                onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
-                onCancelar={() => dispatch({ type: 'CANCELAR_MODO_ADIVINAR' })}
-              />
-            ) : (
-              <>
-                <ProgresoFrase texto={cartaActual.texto} letrasUsadas={estado.letrasUsadas} />
-
-                <Teclado
-                  letrasUsadas={estado.letrasUsadas}
-                  equipo={equipoActual}
-                  onPedirLetra={(letra) => dispatch({ type: 'PEDIR_LETRA_LIBRE', letra })}
+          ) : estado.modoRobo && !estadoAnunciando ? (
+            <PanelRobo
+              equipoQueRoba={equipoActual}
+              equipoOriginal={equipoOriginal}
+              carta={cartaActual}
+              letrasUsadas={estado.letrasUsadas}
+              onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
+            />
+          ) : (
+            <>
+              <div className="jugada-superior">
+                <PanteraDisplay
+                  estado={panteraEstadoAmostrar}
+                  reproducir={Boolean(estadoAnunciando)}
+                  mostrarPrimerFrame={panteraPrimerFrame}
+                  onSecuenciaCompleta={estadoAnunciando ? completarAnuncio : undefined}
                 />
+                <MazoCartas
+                  mazo={estado.mazo}
+                  interactivo={!estado.cartaActualId}
+                  cartaElegidaId={estado.cartaActualId}
+                  onElegir={(cartaId) => dispatch({ type: 'ELEGIR_CARTA', cartaId })}
+                />
+              </div>
 
-                {estado.ronda === 1 && (
-                  <div className="acierto-seguro">
-                    <button
-                      type="button"
-                      className="btn-secundario"
-                      disabled={
-                        equipoActual.intentos.vocales <= 0 ||
-                        equipoActual.saldo < COSTO_ACIERTO_SEGURO.vocal ||
-                        !hayLetrasDisponiblesAciertoSeguro(cartaActual.texto, 'vocal', estado.letrasUsadas)
-                      }
-                      onClick={() => dispatch({ type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })}
-                    >
-                      Acierto Seguro · Vocal ({COSTO_ACIERTO_SEGURO.vocal} 🪙)
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-secundario"
-                      disabled={
-                        equipoActual.intentos.consonantes <= 0 ||
-                        equipoActual.saldo < COSTO_ACIERTO_SEGURO.consonante ||
-                        !hayLetrasDisponiblesAciertoSeguro(cartaActual.texto, 'consonante', estado.letrasUsadas)
-                      }
-                      onClick={() => dispatch({ type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' })}
-                    >
-                      Acierto Seguro · Consonante ({COSTO_ACIERTO_SEGURO.consonante} 🪙)
-                    </button>
-                  </div>
+              <div className="jugada-frase">
+                {!cartaActual ? (
+                  <p className="jugada-frase-vacia">Elige una carta para comenzar</p>
+                ) : mostrandoAdivinar ? (
+                  <PanelAdivinar
+                    texto={cartaActual.texto}
+                    letrasUsadas={estado.letrasUsadas}
+                    obligatorio={forzarAdivinar}
+                    onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
+                    onCancelar={() => dispatch({ type: 'CANCELAR_MODO_ADIVINAR' })}
+                  />
+                ) : (
+                  <ProgresoFrase texto={cartaActual.texto} letrasUsadas={estado.letrasUsadas} />
                 )}
+              </div>
+            </>
+          )}
+        </div>
 
-                <button
-                  type="button"
-                  className="btn-primario btn-grande"
-                  onClick={() => dispatch({ type: 'ACTIVAR_MODO_ADIVINAR' })}
-                >
-                  Modo Adivinar
-                </button>
-              </>
-            )}
-          </>
-        )}
-      </main>
+        <div className="tablero-equipos">
+          {Object.values(estado.equipos)
+            .filter((e) => estado.ordenTurnoActual.includes(e.id) || estado.fase === 'RONDA1')
+            .map((equipo) => (
+              <EquipoPanel
+                key={equipo.id}
+                equipo={equipo}
+                limites={limites}
+                esTurnoActual={equipo.id === equipoTurnoId}
+                esQuienRoba={estado.modoRobo?.equipoId === equipo.id}
+              />
+            ))}
+        </div>
+
+        <div className="tablero-controles">
+          {mostrandoControlesNormales && (
+            <>
+              <Teclado
+                letrasUsadas={estado.letrasUsadas}
+                equipo={equipoActual}
+                onPedirLetra={(letra) => dispatch({ type: 'PEDIR_LETRA_LIBRE', letra })}
+              />
+
+              {estado.ronda === 1 && (
+                <div className="acierto-seguro">
+                  <button
+                    type="button"
+                    className="btn-secundario"
+                    disabled={
+                      equipoActual.intentos.vocales <= 0 ||
+                      equipoActual.saldo < COSTO_ACIERTO_SEGURO.vocal ||
+                      !hayLetrasDisponiblesAciertoSeguro(cartaActual.texto, 'vocal', estado.letrasUsadas)
+                    }
+                    onClick={() => dispatch({ type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })}
+                  >
+                    Acierto Seguro · Vocal ({COSTO_ACIERTO_SEGURO.vocal} 🪙)
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-secundario"
+                    disabled={
+                      equipoActual.intentos.consonantes <= 0 ||
+                      equipoActual.saldo < COSTO_ACIERTO_SEGURO.consonante ||
+                      !hayLetrasDisponiblesAciertoSeguro(cartaActual.texto, 'consonante', estado.letrasUsadas)
+                    }
+                    onClick={() => dispatch({ type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' })}
+                  >
+                    Acierto Seguro · Consonante ({COSTO_ACIERTO_SEGURO.consonante} 🪙)
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="btn-primario btn-grande"
+                onClick={() => dispatch({ type: 'ACTIVAR_MODO_ADIVINAR' })}
+              >
+                Modo Adivinar
+              </button>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

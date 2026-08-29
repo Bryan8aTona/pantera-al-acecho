@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ZarpazoOverlay from './ZarpazoOverlay.jsx';
 
 // Nombres exactos documentados en client/public/assets/pantera/README.md
@@ -10,28 +10,20 @@ const RUTA_VIDEOS = {
   5: '/assets/pantera/pantera-estado-5-zarpazo.mp4',
 };
 
-const DURACION_ENCOGER_MS = 400;
-
-// Dos modos de uso:
+// Dos modos de uso, siempre dentro de la misma cajita (ya no hay
+// versión a pantalla completa):
 //
-// - Ambiente (`reproducir=false`, cajita chica): no reproduce nada, se
-//   queda fijo en el último frame del video del estado actual — ya se
-//   "anunció" a pantalla completa antes, esto es solo la referencia
-//   visual mientras el equipo sigue jugando.
+// - Ambiente (`reproducir=false`): el video queda fijo, sin sonido.
+//   `mostrarPrimerFrame` deja el estado 1 en su primer fotograma (selva
+//   en calma, antes de cualquier error); si no, se queda en el ÚLTIMO
+//   fotograma del estado alcanzado.
 //
-// - Anuncio (`pantallaCompleta` + `reproducir=true`): reproduce el
-//   video completo a pantalla completa. Al terminar, si es el estado 5
-//   (derrota) dispara el overlay de garras; si no, se encoge con un
-//   fundido antes de avisar que la secuencia terminó.
-export default function PanteraDisplay({ estado, pantallaCompleta = false, reproducir = true, onSecuenciaCompleta }) {
+// - Anuncio (`reproducir=true`): reproduce el video completo CON
+//   sonido, dentro de la misma cajita. Al terminar, si es el estado 5
+//   (derrota) dispara el overlay de garras; si no, avisa directo que
+//   la secuencia terminó.
+export default function PanteraDisplay({ estado, reproducir = true, mostrarPrimerFrame = false, onSecuenciaCompleta }) {
   const [mostrarImpacto, setMostrarImpacto] = useState(false);
-  const [encogiendo, setEncogiendo] = useState(false);
-
-  useEffect(() => {
-    if (!encogiendo) return undefined;
-    const temporizador = setTimeout(() => onSecuenciaCompleta?.(), DURACION_ENCOGER_MS);
-    return () => clearTimeout(temporizador);
-  }, [encogiendo, onSecuenciaCompleta]);
 
   if (!estado) {
     return <div className="pantera-display pantera-display-vacia" aria-hidden="true" />;
@@ -44,9 +36,7 @@ export default function PanteraDisplay({ estado, pantallaCompleta = false, repro
       setMostrarImpacto(true);
       return;
     }
-    if (pantallaCompleta) {
-      setEncogiendo(true);
-    }
+    onSecuenciaCompleta?.();
   }
 
   // Si el archivo todavía no existe o falla la carga, no dejamos el
@@ -55,21 +45,17 @@ export default function PanteraDisplay({ estado, pantallaCompleta = false, repro
 
   function manejarCargaMetadatos(e) {
     if (!reproducir) {
-      e.target.currentTime = e.target.duration || 0;
+      e.target.currentTime = mostrarPrimerFrame ? 0 : e.target.duration || 0;
     }
   }
 
-  let clase = 'pantera-display';
-  if (pantallaCompleta) clase += ' pantera-display-completa';
-  if (encogiendo) clase += ' pantera-display-encogiendo';
-
   return (
-    <div className={clase}>
+    <div className="pantera-display">
       <video
-        key={`${estado}-${pantallaCompleta}`}
+        key={`${estado}-${reproducir}`}
         src={RUTA_VIDEOS[estado]}
         autoPlay={reproducir}
-        muted
+        muted={!reproducir}
         playsInline
         onLoadedMetadata={manejarCargaMetadatos}
         onEnded={manejarFinDeVideo}

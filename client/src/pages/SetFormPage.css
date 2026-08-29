@@ -17,6 +17,12 @@
   margin: 0;
 }
 
+.set-form-page-header a.btn-secundario {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
 .set-form-page-error {
   background: var(--color-danger-bg);
   color: var(--color-danger);

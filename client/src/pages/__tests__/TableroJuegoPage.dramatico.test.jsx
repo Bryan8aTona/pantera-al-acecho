@@ -89,8 +89,11 @@ describe('Secuencia dramática de derrota (Tablero de juego)', () => {
 
     elegirCarta('1'); // GATO
 
-    // Estado 0: sin video todavía.
-    expect(document.querySelector('video')).not.toBeInTheDocument();
+    // Estado 0: video ambiente en su primer fotograma (selva en calma,
+    // sin vidas perdidas todavía) — ya no está vacío como antes.
+    const videoInicial = document.querySelector('video');
+    expect(videoInicial).toBeInTheDocument();
+    expect(videoInicial.getAttribute('src')).toBe('/assets/pantera/pantera-estado-1.mp4');
 
     // 4 fallos que no llegan a la derrota, cada uno con su propia
     // mini-secuencia (vibración + pantalla completa + se encoge).
