@@ -18,7 +18,7 @@ export default function PanelCierre({ cierre, onSalir }) {
           <ul className="panel-cierre-reveladas">
             {cierre.cartasReveladas.map((carta) => (
               <li key={carta.id}>
-                <span>{carta.texto}</span>
+                <span className="panel-cierre-frase">{carta.texto}</span>
                 <span className="panel-cierre-valor">{carta.valor} 🪙</span>
               </li>
             ))}

@@ -72,6 +72,23 @@ describe('RellenoInteligente', () => {
     expect(onEnviar).toHaveBeenCalledWith('MAR');
   });
 
+  it('cada celda toma el caso (mayús/minús) de la frase objetivo', () => {
+    const onEnviar = vi.fn();
+    // "Ana" -> A mayúscula, n y a minúsculas.
+    render(<RellenoInteligente texto="Ana" letrasUsadas={{}} onEnviar={onEnviar} />);
+
+    fireEvent.change(screen.getByLabelText('Letra 1 por completar'), { target: { value: 'a' } });
+    fireEvent.change(screen.getByLabelText('Letra 2 por completar'), { target: { value: 'N' } });
+    fireEvent.change(screen.getByLabelText('Letra 3 por completar'), { target: { value: 'A' } });
+
+    expect(screen.getByLabelText('Letra 1 por completar')).toHaveValue('A'); // era mayúscula
+    expect(screen.getByLabelText('Letra 2 por completar')).toHaveValue('n'); // era minúscula
+    expect(screen.getByLabelText('Letra 3 por completar')).toHaveValue('a'); // era minúscula
+
+    fireEvent.click(screen.getByRole('button', { name: 'Adivinar' }));
+    expect(onEnviar).toHaveBeenCalledWith('Ana');
+  });
+
   it('los espacios de la frase no generan celda editable ni bloqueada', () => {
     render(<RellenoInteligente texto="EL SOL" letrasUsadas={{}} onEnviar={() => {}} />);
     // "EL SOL" tiene 5 letras -> 5 celdas editables, el espacio no cuenta.

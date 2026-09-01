@@ -86,15 +86,9 @@
 }
 
 .set-card h3 {
-  margin: 0 0 4px;
+  margin: 0;
   font-size: 16px;
   color: var(--color-text);
-}
-
-.set-card-meta {
-  margin: 0;
-  font-size: 12px;
-  color: var(--color-text-secondary);
 }
 
 .set-card-acciones {

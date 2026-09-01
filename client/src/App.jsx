@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { PartidaProvider } from './context/PartidaContext.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import RutaConPartida from './components/RutaConPartida.jsx';
+import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import BackOfficePage from './pages/BackOfficePage.jsx';
 import SetFormPage from './pages/SetFormPage.jsx';
@@ -15,9 +16,10 @@ export default function App() {
       <PartidaProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route
-              path="/"
+              path="/panel"
               element={
                 <ProtectedRoute>
                   <BackOfficePage />

@@ -8,8 +8,20 @@ import victoriaAnimacion from '../../assets/lottie/victoria.json';
 // import estático (más simple, robusto) a costa de un bundle más
 // pesado. Pendiente revisar la carga diferida más adelante.
 export default function AnimacionVictoria({ carta, onCompleta }) {
+  // La animación dura ~5 s. El docente puede adelantarla con un clic
+  // (o Enter/Espacio) para no cortar el ritmo de la clase; si no hace
+  // nada, `onComplete` de Lottie la cierra igual.
   return (
-    <div className="animacion-victoria" role="status" aria-live="polite">
+    <div
+      className="animacion-victoria"
+      role="button"
+      tabIndex={0}
+      aria-label="Ganó la carta — clic para continuar"
+      onClick={onCompleta}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onCompleta?.();
+      }}
+    >
       <Lottie
         animationData={victoriaAnimacion}
         loop={false}
@@ -17,6 +29,7 @@ export default function AnimacionVictoria({ carta, onCompleta }) {
         className="animacion-victoria-lottie"
       />
       <p className="animacion-victoria-texto">¡+{carta.valor} monedas!</p>
+      <p className="animacion-victoria-hint">clic para continuar</p>
     </div>
   );
 }

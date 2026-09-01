@@ -92,37 +92,8 @@
   margin-top: 22px;
 }
 
-.btn-primario,
-.btn-secundario {
-  border-radius: var(--radius-sm);
-  padding: 10px 18px;
-  font-size: 13px;
-  border: none;
-}
-
-.btn-primario {
-  background: var(--color-primary);
-  color: white;
-}
-
-.btn-primario:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-}
-
-.btn-primario:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.btn-secundario {
-  background: var(--color-surface);
-  color: var(--color-primary);
-  border: 1.5px solid var(--color-primary);
-}
-
-.btn-secundario:hover:not(:disabled) {
-  background: var(--color-bg);
-}
+/* .btn-primario / .btn-secundario se movieron a styles/global.css
+   para que estén disponibles en toda la app sin importar este módulo. */
 
 @media (max-width: 600px) {
   .set-form {

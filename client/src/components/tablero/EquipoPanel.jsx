@@ -1,9 +1,4 @@
-const COLORES_EQUIPO = {
-  rojo: '#C0392B',
-  azul: '#2A6DB0',
-  amarillo: '#C9971F',
-  verde: '#4C8C3C',
-};
+import { COLORES_EQUIPO } from './coloresEquipo.js';
 
 // La animación real de la pantera vive en su propio componente; aquí
 // solo un indicador compacto de cuántas vidas lleva perdidas el equipo.

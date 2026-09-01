@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { reproducirSonido } from '../../sonido/gestorSonido.js';
 
 const DURACION_CLICK_MS = 450;
 
@@ -14,8 +15,39 @@ export default function MazoCartas({ mazo, interactivo, cartaElegidaId, onElegir
     .filter((carta) => !carta.jugada)
     .sort((a, b) => a.orden - b.orden);
 
+  // Sonido de "se reparten las cartas" al empezar cada turno (cuando el
+  // mazo pasa a ser interactivo). Ref inicializada en false para que
+  // suene también en el primer turno; StrictMode lo dispara una sola vez.
+  //
+  // Se difiere un instante: en el commit en que una carta se resuelve,
+  // `cartaActualId` ya es null y este mazo aparece "interactivo" por un
+  // solo render antes de que la animación de victoria/revelación lo tape.
+  // Ese parpadeo dispararía un 'repartir' fantasma de fondo sobre la
+  // victoria. Si el mazo se desmonta (o deja de ser interactivo) antes de
+  // que venza el temporizador, se cancela y no suena.
+  const prevInteractivo = useRef(false);
+  const repartirPendiente = useRef(null);
+  useEffect(() => {
+    if (interactivo && !prevInteractivo.current) {
+      repartirPendiente.current = setTimeout(() => {
+        repartirPendiente.current = null;
+        prevInteractivo.current = true;
+        reproducirSonido('repartir');
+      }, 120);
+    } else if (!interactivo) {
+      prevInteractivo.current = false;
+    }
+    return () => {
+      if (repartirPendiente.current) {
+        clearTimeout(repartirPendiente.current);
+        repartirPendiente.current = null;
+      }
+    };
+  }, [interactivo]);
+
   function manejarClick(cartaId) {
     if (!interactivo || seleccionandoId) return;
+    reproducirSonido('elegirCarta');
     setSeleccionandoId(cartaId);
     // Deja ver la animación de reacción antes de disparar la acción real.
     setTimeout(() => onElegir(cartaId), DURACION_CLICK_MS);
@@ -39,6 +71,9 @@ export default function MazoCartas({ mazo, interactivo, cartaElegidaId, onElegir
               className={clase}
               style={{ '--i': i }}
               disabled={!interactivo || Boolean(seleccionandoId)}
+              onMouseEnter={() => {
+                if (interactivo && !seleccionandoId) reproducirSonido('hoverCarta', { volumen: 0.45 });
+              }}
               onClick={() => manejarClick(carta.id)}
             >
               <img src="/assets/cartas/carta-reverso.png" alt="" className="carta-imagen" />

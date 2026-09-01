@@ -130,6 +130,72 @@ describe('Secuencia dramática de derrota (Tablero de juego)', () => {
     expect(screen.getByText(/única oportunidad de robar/i)).toBeInTheDocument();
   });
 
+  it('en la derrota (estado 5) el teclado se ve igual que en los otros estados durante el anuncio, y el zarpazo es a pantalla completa', () => {
+    renderTablero();
+    elegirCarta('1'); // GATO
+
+    for (const letra of ['B', 'C', 'D', 'F']) {
+      pedirLetraLibreYAvanzar(letra);
+    }
+
+    // 5to fallo: durante el anuncio del estado 5 el teclado sigue montado
+    // (deshabilitado), como en los estados 1-4.
+    fireEvent.click(screen.getByRole('button', { name: 'H' }));
+    act(() => {
+      vi.advanceTimersByTime(DURACION_IMPACTO_MS);
+    });
+    const teclaM = screen.getByRole('button', { name: 'M' });
+    expect(teclaM).toBeInTheDocument();
+    expect(teclaM).toBeDisabled();
+
+    // El video termina -> el zarpazo aparece FUERA de la cajita del
+    // video (ya no anidado en .pantera-display; el CSS lo pone
+    // position: fixed a pantalla completa).
+    act(() => {
+      document.querySelector('video').dispatchEvent(new Event('ended'));
+    });
+    const overlay = document.querySelector('.zarpazo-overlay');
+    expect(overlay).toBeInTheDocument();
+    expect(overlay.closest('.pantera-display')).toBeNull();
+
+    // Cuando termina el zarpazo, recién entonces aparece el Robo (y ahí sí
+    // desaparece el teclado).
+    act(() => {
+      vi.advanceTimersByTime(1100);
+    });
+    expect(screen.getByText(/única oportunidad de robar/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'M' })).not.toBeInTheDocument();
+  });
+
+  it('en un fallo normal (pantera 1-4) el teclado NO se desmonta: sigue en el DOM, solo deshabilitado', () => {
+    renderTablero();
+    elegirCarta('1'); // GATO
+
+    // Fallo que lleva la pantera al estado 1, sin llegar a la derrota.
+    fireEvent.click(screen.getByRole('button', { name: 'B' }));
+    act(() => {
+      vi.advanceTimersByTime(DURACION_IMPACTO_MS);
+    });
+
+    // Durante el anuncio: el video del estado 1 corre en su cajita y el
+    // teclado sigue presente (regresión del bug donde desaparecía).
+    expect(document.querySelector('video').getAttribute('src')).toBe(
+      '/assets/pantera/pantera-estado-1.mp4',
+    );
+    const teclaM = screen.getByRole('button', { name: 'M' });
+    expect(teclaM).toBeInTheDocument();
+    expect(teclaM).toBeDisabled();
+
+    // Al terminar el video del anuncio, el teclado se rehabilita.
+    act(() => {
+      document.querySelector('video').dispatchEvent(new Event('ended'));
+    });
+    act(() => {
+      vi.advanceTimersByTime(DURACION_ENCOGER_MS);
+    });
+    expect(screen.getByRole('button', { name: 'M' })).toBeEnabled();
+  });
+
   it('muestra en vivo el video correspondiente a cada estado de la pantera', () => {
     renderTablero();
     elegirCarta('1');

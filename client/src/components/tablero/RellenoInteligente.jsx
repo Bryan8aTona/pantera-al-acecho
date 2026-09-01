@@ -5,6 +5,15 @@ function esLetra(caracter) {
   return /[A-ZÑa-zñ]/i.test(caracter);
 }
 
+// Copia SOLO el caso (mayúscula/minúscula) del carácter correspondiente
+// de la frase objetivo: si en la frase esa posición va en minúscula, lo
+// que teclee el docente se muestra en minúscula, y viceversa. Los
+// acentos no se inventan (la validación los ignora igual).
+function ajustarCaso(caracter, modelo) {
+  if (!modelo || /\p{Lu}/u.test(modelo)) return caracter.toUpperCase();
+  return caracter.toLowerCase();
+}
+
 // Arma, a partir de la frase y las letras ya reveladas, una celda por
 // carácter: fija (espacios/signos), bloqueada (letra ya adivinada) o
 // editable (todavía oculta). Solo las editables aceptan texto.
@@ -45,7 +54,7 @@ export default function RellenoInteligente({ texto, letrasUsadas = {}, onEnviar,
     const caracter = textoIngresado.slice(-1);
     setValores((prev) => {
       const copia = [...prev];
-      copia[indice] = caracter ? caracter.toUpperCase() : '';
+      copia[indice] = caracter ? ajustarCaso(caracter, texto[indice]) : '';
       return copia;
     });
     if (caracter) {
