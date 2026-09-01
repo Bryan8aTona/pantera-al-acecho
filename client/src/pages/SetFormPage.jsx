@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import { obtenerSet, crearSet, actualizarSet } from '../lib/sets.js';
 import SetForm from '../components/SetForm.jsx';
 import './SetFormPage.css';
 
@@ -16,9 +16,8 @@ export default function SetFormPage() {
 
   useEffect(() => {
     if (!esEdicion) return;
-    api
-      .get(`/sets/${id}/frases`)
-      .then((data) => setValorInicial(data.set))
+    obtenerSet(id)
+      .then((set) => setValorInicial(set))
       .catch((err) => setError(err.message || 'No se pudo abrir el set'))
       .finally(() => setCargando(false));
   }, [id, esEdicion]);
@@ -27,11 +26,11 @@ export default function SetFormPage() {
     setGuardando(true);
     try {
       if (esEdicion) {
-        await api.put(`/sets/${id}`, payload);
+        await actualizarSet(id, payload);
       } else {
-        await api.post('/sets', payload);
+        await crearSet(payload);
       }
-      navigate('/');
+      navigate('/panel');
     } finally {
       setGuardando(false);
     }
@@ -40,7 +39,7 @@ export default function SetFormPage() {
   return (
     <div className="set-form-page">
       <header className="set-form-page-header">
-        <Link to="/" className="btn-secundario">
+        <Link to="/panel" className="btn-secundario">
           ← Mis sets
         </Link>
         <h1>{esEdicion ? 'Editar set' : 'Nuevo set'}</h1>
@@ -54,7 +53,7 @@ export default function SetFormPage() {
         <SetForm
           valorInicial={valorInicial}
           onGuardar={guardarSet}
-          onCancelar={() => navigate('/')}
+          onCancelar={() => navigate('/panel')}
           guardando={guardando}
         />
       )}

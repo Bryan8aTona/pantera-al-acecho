@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Cada set pertenece a un docente (ownerUid). Solo su dueño lo lee o lo
+// modifica. Un set siempre tiene exactamente 8 frases (misma regla de
+// negocio que validaba el servidor Express antes de la migración).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /sets/{setId} {
+      allow read: if request.auth != null
+                  && resource.data.ownerUid == request.auth.uid;
+
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.frases.size() == 8;
+
+      allow update: if request.auth != null
+                    && resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.frases.size() == 8;
+
+      allow delete: if request.auth != null
+                    && resource.data.ownerUid == request.auth.uid;
+    }
+  }
+}

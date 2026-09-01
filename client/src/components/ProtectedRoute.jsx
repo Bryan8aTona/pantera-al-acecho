@@ -2,9 +2,13 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function ProtectedRoute({ children }) {
-  const { usuario, token } = useAuth();
+  const { usuario, cargando } = useAuth();
 
-  if (!usuario || !token) {
+  // Mientras Firebase resuelve si hay sesión, no decidimos nada (evita
+  // un parpadeo a /login al recargar estando autenticado).
+  if (cargando) return null;
+
+  if (!usuario) {
     return <Navigate to="/login" replace />;
   }
 

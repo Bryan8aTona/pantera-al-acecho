@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { ApiError } from '../lib/api.js';
 import './LoginPage.css';
 
 export default function LoginPage() {
@@ -27,9 +26,9 @@ export default function LoginPage() {
       } else {
         await registrar(form);
       }
-      navigate('/', { replace: true });
+      navigate('/panel', { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo conectar con el servidor');
+      setError(err.message || 'No se pudo completar la operación.');
     } finally {
       setEnviando(false);
     }

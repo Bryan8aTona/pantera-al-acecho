@@ -1,13 +1,17 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import { Link, useNavigate } from 'react-router-dom';
+import { listarSets, eliminarSet } from '../lib/sets.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import './BackOfficePage.css';
 
-const formateador = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' });
-
 export default function BackOfficePage() {
   const { usuario, cerrarSesion } = useAuth();
+  const navigate = useNavigate();
+
+  async function manejarCerrarSesion() {
+    await cerrarSesion();
+    navigate('/');
+  }
 
   const [sets, setSets] = useState(null); // null = cargando
   const [error, setError] = useState(null);
@@ -16,8 +20,7 @@ export default function BackOfficePage() {
 
   const cargarSets = useCallback(async () => {
     try {
-      const data = await api.get('/sets');
-      setSets(data.sets);
+      setSets(await listarSets());
     } catch (err) {
       setError(err.message || 'No se pudieron cargar los sets');
     }
@@ -30,7 +33,7 @@ export default function BackOfficePage() {
   async function confirmarEliminar(id) {
     setEliminandoId(id);
     try {
-      await api.del(`/sets/${id}`);
+      await eliminarSet(id);
       setConfirmando(null);
       await cargarSets();
     } catch (err) {
@@ -47,7 +50,7 @@ export default function BackOfficePage() {
           <h1>Mis sets de frases</h1>
           <p className="backoffice-usuario">{usuario?.nombre}</p>
         </div>
-        <button type="button" className="btn-secundario" onClick={cerrarSesion}>
+        <button type="button" className="btn-secundario" onClick={manejarCerrarSesion}>
           Cerrar sesión
         </button>
       </header>
@@ -80,9 +83,6 @@ export default function BackOfficePage() {
             <li key={set.id} className="set-card">
               <div>
                 <h3>{set.nombre}</h3>
-                <p className="set-card-meta">
-                  {set.cantidadFrases} frases · actualizado el {formateador.format(new Date(set.updatedAt))}
-                </p>
               </div>
 
               {confirmando === set.id ? (

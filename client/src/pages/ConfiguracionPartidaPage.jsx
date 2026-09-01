@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import { listarSets, obtenerSet } from '../lib/sets.js';
 import { usePartida } from '../context/PartidaContext.jsx';
 import './ConfiguracionPartidaPage.css';
 
@@ -16,9 +16,8 @@ export default function ConfiguracionPartidaPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api
-      .get('/sets')
-      .then((data) => setSets(data.sets))
+    listarSets()
+      .then((lista) => setSets(lista))
       .catch((err) => setError(err.message || 'No se pudieron cargar tus sets'));
   }, []);
 
@@ -29,8 +28,8 @@ export default function ConfiguracionPartidaPage() {
     try {
       // Descarga completa del set elegido: nombre + las 8 frases.
       // A partir de aquí toda la partida corre en memoria del cliente.
-      const data = await api.get(`/sets/${seleccionId}/frases`);
-      iniciarPartida(data.set);
+      const set = await obtenerSet(seleccionId);
+      iniciarPartida(set);
       navigate('/partida');
     } catch (err) {
       setError(err.message || 'No se pudo iniciar la partida');
@@ -45,7 +44,7 @@ export default function ConfiguracionPartidaPage() {
           <h1>Configurar partida</h1>
           <p className="config-partida-sub">Elige el set de frases con el que va a jugar el grupo</p>
         </div>
-        <Link to="/" className="btn-secundario">
+        <Link to="/panel" className="btn-secundario">
           ← Mis sets
         </Link>
       </header>
@@ -57,7 +56,7 @@ export default function ConfiguracionPartidaPage() {
       {sets && sets.length === 0 && (
         <div className="config-partida-vacio">
           <p>No tienes sets de frases todavía.</p>
-          <Link to="/" className="btn-primario">
+          <Link to="/panel" className="btn-primario">
             Crear mi primer set
           </Link>
         </div>
@@ -78,7 +77,7 @@ export default function ConfiguracionPartidaPage() {
                   <span className="set-opcion-check" aria-hidden="true" />
                   <span>
                     <strong>{set.nombre}</strong>
-                    <small>Editado el {formateador.format(new Date(set.updatedAt))}</small>
+                    {set.updatedAt && <small>Editado el {formateador.format(set.updatedAt)}</small>}
                   </span>
                 </button>
               </li>

@@ -9,6 +9,10 @@ node_modules/
 dist/
 build/
 
+# Firebase (caché de despliegue y logs)
+.firebase/
+.firebaserc.local
+
 # Sistema operativo
 .DS_Store
 Thumbs.db
@@ -16,5 +20,7 @@ Thumbs.db
 # Logs
 *.log
 
-# Documentos de trabajo interno (contexto de desarrollo, no del producto)
+# Documentos de trabajo interno: guías para completar tareas y notas de
+# desarrollo, no documentación del producto.
 docs/plan_trabajo.html
+client/public/assets/**/README.md
