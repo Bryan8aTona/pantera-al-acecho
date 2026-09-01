@@ -2,28 +2,98 @@
 
 ## 1. Visión general
 
-El sistema es una Single Page Application (SPA) operada por un docente desde su computadora. Se compone de tres capas: cliente (React), servidor (Node.js + Express) y base de datos (PostgreSQL).
+El sistema es una Single Page Application (SPA) operada por un docente desde su computadora. Se compone de dos partes: el **cliente** (React, donde vive toda la lógica del juego) y los **servicios gestionados de Firebase** (Authentication para las cuentas de docentes y Cloud Firestore para los sets de frases). No hay servidor propio.
 
-El **estado de la partida vive exclusivamente en la memoria del cliente**. Si el navegador se recarga durante el juego, la sesión se pierde. El servidor solo persiste datos de largo plazo: cuentas de docentes y sets de frases.
+El **estado de la partida vive exclusivamente en la memoria del cliente**. Si el navegador se recarga durante el juego, la sesión se pierde. Firebase solo persiste datos de largo plazo: las cuentas de docentes y sus sets de frases.
 
 ---
 
 ## 2. Diagramas de arquitectura
 
 ### 2.1 Diagrama de Contexto
-Muestra el sistema desde afuera: quién lo usa y cuál es su propósito. No detalla tecnologías ni componentes internos.
+Muestra el sistema desde afuera: quién lo usa y de qué depende. No detalla tecnologías ni componentes internos.
 
-![Diagrama de contexto](img/arquitectura-contexto.png)
+```mermaid
+flowchart TD
+    A(["Docente<br/>[Persona]"]) -->|"Configura sesiones y opera el juego<br/>desde su navegador"| B["Pantera al Acecho<br/>[Sistema de Software]"]
+    B -->|"Autenticación y almacenamiento<br/>de sets de frases"| C["Firebase<br/>[Sistema externo · Google]"]
+
+    style A fill:#404040,stroke:#2b2b2b,stroke-width:2px,color:#ffffff
+    style B fill:#0d6efd,stroke:#0a58ca,stroke-width:2px,color:#ffffff
+    style C fill:#6b7280,stroke:#4b5563,stroke-width:2px,color:#ffffff
+```
 
 ### 2.2 Diagrama de Capas
-Muestra los tres bloques principales del sistema (cliente, servidor y base de datos), las tecnologías que los conforman y cómo se comunican entre sí.
+Muestra los bloques principales del sistema y cómo se comunican entre sí.
 
-![Diagrama de capas](img/arquitectura-capas.png)
+```mermaid
+flowchart TD
+    docente(["Docente<br/>[Persona]"])
+
+    subgraph sistema ["Pantera al Acecho"]
+        spa["React SPA<br/>[Capa Cliente: React + Vite]<br/><br/>Interfaz del docente.<br/>Ejecuta toda la lógica<br/>del juego en la memoria."]
+    end
+
+    subgraph firebase ["Firebase · servicios gestionados"]
+        auth["Authentication<br/><br/>Cuentas de docentes<br/>(email / contraseña)."]
+        fs[("Cloud Firestore<br/><br/>Colección de sets de frases.<br/>Autorización por reglas<br/>de seguridad.")]
+    end
+
+    docente -->|"Usa desde su navegador"| spa
+    spa -->|"Registro e inicio de sesión<br/>[SDK Firebase / HTTPS]"| auth
+    spa -->|"Lee y escribe sets de frases<br/>[SDK Firestore / HTTPS]"| fs
+
+    style docente fill:#404040,stroke:#2b2b2b,stroke-width:2px,color:#ffffff
+    style sistema fill:transparent,stroke:#888888,stroke-width:2px,stroke-dasharray: 5 5,color:#ffffff
+    style firebase fill:transparent,stroke:#888888,stroke-width:2px,stroke-dasharray: 5 5,color:#ffffff
+    style spa fill:#0d6efd,stroke:#0a58ca,stroke-width:2px,color:#ffffff
+    style auth fill:#0d6efd,stroke:#0a58ca,stroke-width:2px,color:#ffffff
+    style fs fill:#0d6efd,stroke:#0a58ca,stroke-width:2px,color:#ffffff
+```
 
 ### 2.3 Diagrama de Módulos
-Muestra el interior de cada capa: los módulos que la componen y las relaciones entre ellos. 
+Muestra el interior del cliente: los módulos que lo componen y las relaciones entre ellos.
 
-![Diagrama de módulos](img/arquitectura-modulos.png)
+```mermaid
+flowchart TD
+    subgraph Cliente["Cliente · React SPA"]
+        Login["<b>Login</b><br/>Acceso al sistema"]
+        BackOffice["<b>Back-office</b><br/>Gestión de sets"]
+        ConfigPartida["<b>Configuración<br/>de partida</b><br/>Selección del set"]
+        Tablero["<b>Tablero<br/>de juego</b><br/>Interfaz de proyección"]
+        MotorReglas["<b>Motor de<br/>reglas</b><br/>Lógica del juego"]
+        Datos["<b>Acceso a datos</b><br/>lib/firebase.js · lib/sets.js<br/>context/AuthContext"]
+
+        Login -.-> BackOffice
+        BackOffice -.-> ConfigPartida
+        ConfigPartida -.-> Tablero
+        ConfigPartida -->|"Inicializa la partida"| MotorReglas
+        Tablero <-->|"Lee estado / Envía acciones"| MotorReglas
+        Login -->|"Registro / inicio de sesión"| Datos
+        BackOffice -->|"Crea, edita y elimina sets"| Datos
+        ConfigPartida -->|"Descarga el set completo"| Datos
+    end
+
+    subgraph Firebase["Firebase · servicios gestionados"]
+        Auth["<b>Authentication</b><br/>Sesión del docente<br/>(email / contraseña)"]
+        Firestore[("<b>Cloud Firestore</b><br/>Colección sets<br/>+ reglas de seguridad")]
+    end
+
+    Cliente ==>|"SDK de Firebase<br/>(HTTPS)"| Firebase
+    Datos -->|"Firebase Auth SDK"| Auth
+    Datos -->|"Firestore SDK"| Firestore
+
+    style Cliente fill:#0c4a7e,stroke:#083358,stroke-width:2px,color:#ffffff
+    style Firebase fill:#064e3b,stroke:#022c22,stroke-width:2px,color:#ffffff
+    style Login fill:#4b5563,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+    style BackOffice fill:#4b5563,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+    style ConfigPartida fill:#4b5563,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+    style Tablero fill:#4b5563,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+    style MotorReglas fill:#4b5563,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+    style Datos fill:#374151,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+    style Auth fill:#4b5563,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+    style Firestore fill:#4b5563,stroke:#9ca3af,stroke-width:1px,color:#ffffff
+```
 
 ---
 
@@ -32,13 +102,13 @@ Muestra el interior de cada capa: los módulos que la componen y las relaciones 
 Los módulos del cliente siguen un flujo secuencial: el docente inicia sesión, gestiona sus sets de frases, configura la partida y opera el tablero durante el juego.
 
 ### 3.1 Login
-Pantalla de acceso al sistema. Permite a los docentes nuevos crear una cuenta (nombre, email, contraseña) y a los usuarios existentes ingresar sus credenciales para autenticarse.
+Pantalla de acceso al sistema. Permite a los docentes nuevos crear una cuenta (nombre, email, contraseña) y a los existentes ingresar sus credenciales. La autenticación la resuelve **Firebase Authentication** (proveedor email/contraseña) desde el propio cliente; no hay endpoint de login propio.
 
 ### 3.2 Back-office
-Módulo privado accesible solo tras autenticación. Permite al docente crear, nombrar, editar y eliminar sets de frases. Los sets quedan vinculados a su cuenta y disponibles para sesiones futuras. Crear y editar un set son páginas completas propias.
+Módulo privado accesible solo tras autenticación. Permite al docente crear, nombrar, editar y eliminar sets de frases, guardados en Firestore y vinculados a su cuenta. Crear y editar un set son páginas completas propias.
 
 ### 3.3 Configuración de partida
-Pantalla previa al juego donde el docente selecciona el set de frases a usar e inicia la partida. Al iniciar, el cliente precarga el set seleccionado junto con todas las frases que lo componen, manteniendo esta información en memoria durante toda la sesión.
+Pantalla previa al juego donde el docente selecciona el set de frases a usar e inicia la partida. Al iniciar, el cliente descarga de Firestore el set seleccionado completo (nombre + las 8 frases) y lo mantiene en memoria durante toda la sesión.
 
 ### 3.4 Tablero de juego
 Interfaz de alta visibilidad optimizada para proyección en aula. Muestra el estado de los 4 equipos, el teclado virtual, la animación de la pantera y los controles del docente. Toda la lógica del juego, como la validación de letras y frases, corre aquí en memoria.
@@ -54,11 +124,11 @@ Módulo dentro del cliente que contiene toda la lógica de negocio del juego:
 - Economía de monedas y lógica de Acierto Seguro
 - Máquina de estados: sorteo, turnos, robo, repechaje, cierre
 
-> **Nota sobre normalización:** Las frases se almacenan en la base de datos con su ortografía correcta (tildes, mayúsculas) para mostrarse correctamente al final del turno. La normalización se aplica únicamente al momento de comparar la respuesta del equipo con la frase objetivo.
+> **Nota sobre normalización:** Las frases se almacenan en Firestore con su ortografía correcta (tildes, mayúsculas) para mostrarse correctamente al final del turno. La normalización se aplica únicamente al momento de comparar la respuesta del equipo con la frase objetivo.
 
-> **Nota sobre el modelo de amenaza:** La aplicación la opera el docente desde su propio equipo, proyectado al grupo. Los alumnos no tienen acceso al navegador ni a DevTools. Cargar las frases completas en el cliente no representa un riesgo de seguridad en este contexto.
+> **Nota sobre el modelo de amenaza:** La aplicación la opera el docente desde su propio equipo, proyectado al grupo. Los alumnos no tienen acceso al navegador ni a DevTools. Cargar las frases completas en el cliente no representa un riesgo de seguridad en este contexto. Las claves de configuración de Firebase que viajan en el bundle tampoco son secretas: la autorización real la imponen Firebase Auth y las reglas de Firestore (`firestore.rules`).
 
-> **Nota técnica sobre la Ñ:** la normalización no usa un "strip" genérico de diacríticos Unicode (`texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '')`), porque eso también le quita la virgulilla a la "Ñ" (que se descompone en NFD como N + U+0303) y la convertiría incorrectamente en "N". En español la Ñ es una letra propia, no una "N con tilde". La normalización usa en cambio un mapeo explícito solo de vocales acentuadas (Á→A, É→E, Í→I, Ó→O, Ú→U, Ü→U), dejando la Ñ intacta. Esto aplica tanto a la comparación de frases completas como a la clasificación de letras del teclado virtual (vocal/consonante).
+> **Nota técnica sobre la Ñ:** la normalización no usa un "strip" genérico de diacríticos Unicode (`texto.normalize('NFD').replace(/[̀-ͯ]/g, '')`), porque eso también le quita la virgulilla a la "Ñ" (que se descompone en NFD como N + U+0303) y la convertiría incorrectamente en "N". En español la Ñ es una letra propia, no una "N con tilde". La normalización usa en cambio un mapeo explícito solo de vocales acentuadas (Á→A, É→E, Í→I, Ó→O, Ú→U, Ü→U), dejando la Ñ intacta. Esto aplica tanto a la comparación de frases completas como a la clasificación de letras del teclado virtual (vocal/consonante).
 
 #### 3.5.1 Implementación del motor
 
@@ -89,57 +159,49 @@ Dos hooks adicionales orquestan las pausas visuales que no son parte de la lógi
 
 - `MazoCartas` — el mazo de 8 cartas.
 - `PanteraDisplay` — el recuadro de la pantera; reproduce video con o sin sonido según si se está anunciando un nuevo estado o mostrando el estado en reposo.
-- `ZarpazoOverlay` — la imagen de garra superpuesta al llegar al estado 5.
+- `ZarpazoOverlay` — la imagen de garra superpuesta a pantalla completa al llegar al estado 5.
 - `EfectoImpacto` — la vibración de pantalla y el destello rojo al perder una vida.
 - `Teclado`, `ProgresoFrase`, `RellenoInteligente` — el teclado virtual y las dos formas de mostrar/completar la frase (solo lectura y editable).
-- `PanelRobo`, `PanelRevelacion`, `AnimacionVictoria`, `PanelCierre`, `PanelAdivinar` — los distintos paneles que reemplazan el área de juego según el momento de la partida.
+- `PanelRobo`, `PanelRevelacion`, `AnimacionVictoria`, `PanelCierre`, `PanelAdivinar`, `PanelRepechaje` — los distintos paneles que reemplazan el área de juego según el momento de la partida.
 - `EquipoPanel` — el panel de cada equipo.
+- `HojasDecorativas` — el follaje de fondo del tablero (SVG inline).
 
 ---
 
-## 4. Módulos del servidor
+## 4. Autenticación (Firebase Authentication)
 
-### 4.1 Auth
-Maneja el registro e inicio de sesión de los docentes. Al ingresar, el servidor emite una credencial de acceso (Token JWT) que el navegador del docente guarda localmente. Esta credencial se adjunta automáticamente en cada petición privada.
+Registro e inicio de sesión de los docentes con proveedor **email/contraseña**. El flujo:
 
-**Almacenamiento de la credencial:** Se guarda en el almacenamiento local del navegador por simplicidad. Al ser un sistema operado únicamente por el docente en su propio equipo y para un entorno universitario, este método es suficiente y simplifica el desarrollo.
+1. El cliente llama a `createUserWithEmailAndPassword` / `signInWithEmailAndPassword` del SDK de Firebase (`client/src/context/AuthContext.jsx`).
+2. Al registrarse, se fija el nombre del docente con `updateProfile({ displayName })`.
+3. Firebase persiste la sesión en el navegador. `onAuthStateChanged` mantiene sincronizado el estado (`{ uid, email, nombre }`) en el `AuthProvider`; hasta que resuelve, `ProtectedRoute` no decide ninguna redirección (evita un parpadeo a `/login` al recargar).
+4. El SDK adjunta automáticamente el token de identidad en cada petición a Firestore; las reglas lo reciben como `request.auth`.
 
-### 4.2 API sets de frases
-CRUD completo de sets de frases vinculados al usuario autenticado. Al iniciar una partida, el cliente descarga el set seleccionado completo con un único GET.
-
-| Método | Ruta                  | Descripción                        |
-|--------|-----------------------|-------------------------------------|
-| GET    | /api/sets             | Listar sets del docente            |
-| POST   | /api/sets             | Crear nuevo set                    |
-| PUT    | /api/sets/:id         | Editar set existente               |
-| DELETE | /api/sets/:id         | Eliminar set                       |
-| GET    | /api/sets/:id/frases  | Obtener frases completas de un set |
-
-Todas las rutas de sets están protegidas por el middleware de autenticación y verifican que el set pertenezca al usuario autenticado (devuelven 404, no 403, si el set existe pero es de otro docente, para no filtrar su existencia).
+No se almacena ninguna contraseña ni hash: eso lo gestiona Firebase.
 
 ---
 
-## 5. Base de datos
+## 5. Persistencia (Cloud Firestore)
 
-Motor: **PostgreSQL**
-ORM: **Prisma**
-Despliegue: **A definir**
+Una sola colección, `sets`, con un documento por set de frases:
 
-### Tablas principales
+```
+sets/{setId} = {
+  ownerUid, nombre, frases: [{ orden, texto }] (×8), createdAt, updatedAt
+}
+```
 
-- `usuarios` — cuentas de docentes
-- `sets` — agrupaciones de frases vinculadas a un usuario
-- `frases` — frases individuales pertenecientes a un set, almacenadas con ortografía correcta
+El acceso está encapsulado en `client/src/lib/sets.js` (`listarSets`, `obtenerSet`, `crearSet`, `actualizarSet`, `eliminarSet`), que usa el build **`firebase/firestore/lite`** (operaciones CRUD por petición, sin listeners en tiempo real — el docente solo edita sus propios sets y no hace falta sincronización viva; además pesa menos en el bundle).
 
-> El modelo de datos detallado (campos, tipos, relaciones y restricciones) se documenta en `modelo-datos.md`.
+La autorización vive por completo en `firestore.rules`: cada set solo es legible/modificable por su dueño (`ownerUid == request.auth.uid`) y solo puede crearse/actualizarse con exactamente 8 frases. El detalle de campos y reglas está en `modelo-datos.md`.
 
 ---
 
 ## 6. Comunicación entre capas
 
-- Cliente → Servidor: **REST API sobre HTTPS**, validando la identidad en cada petición mediante el Token JWT guardado en el navegador del docente.
-- Servidor → BD: Las consultas se realizan mediante **Prisma ORM**, el cual gestiona automáticamente las conexiones para mantener el rendimiento del servidor.
-- El estado de partida **nunca viaja al servidor**; es exclusivo del cliente durante la sesión.
+- Cliente → Firebase Auth: SDK de Firebase sobre HTTPS; el registro/login devuelven una sesión que el SDK guarda y renueva sola en el navegador.
+- Cliente → Firestore: SDK de Firestore (lite) sobre HTTPS; cada operación lleva el token de identidad y se evalúa contra `firestore.rules`.
+- El estado de partida **nunca sale del cliente**; es exclusivo de la sesión en memoria.
 
 ---
 
@@ -148,25 +210,29 @@ Despliegue: **A definir**
 | Capa | Tecnología |
 |---|---|
 | Frontend | React + Vite, react-router-dom |
-| Backend | Node.js + Express |
-| Base de datos | PostgreSQL + Prisma |
-| Autenticación | JWT |
+| Autenticación | Firebase Authentication (email/contraseña) |
+| Persistencia | Cloud Firestore (`firebase/firestore/lite`) |
 | Animaciones | lottie-react |
 | Pruebas (cliente) | Vitest, Testing Library, jsdom |
-| Despliegue | A definir |
+| Hosting | Firebase Hosting |
 
 ### 7.1 Estrategia de pruebas
 
 El motor de reglas (lógica pura, sin React) se prueba con Vitest directamente: construcción de mazo, sorteo, normalización, clasificación de letras, y el reducer completo (turnos, robo, repechaje, cierre, victoria automática por letras).
 
-Los componentes de React que orquestan las secuencias dramáticas (derrota, victoria, revelación) se prueban con Vitest + Testing Library + jsdom, montando el `TableroJuegoPage` completo dentro de `React.StrictMode` (para que las pruebas atrapen el mismo tipo de problema descrito en 3.5.1) y simulando eventos reales (clics, el evento `ended` de un `<video>`, avance de temporizadores).
+Los componentes de React que orquestan las secuencias dramáticas (derrota, victoria, revelación, repechaje) se prueban con Vitest + Testing Library + jsdom, montando el `TableroJuegoPage` completo dentro de `React.StrictMode` (para que las pruebas atrapen el mismo tipo de problema descrito en 3.5.1) y simulando eventos reales (clics, el evento `ended` de un `<video>`, avance de temporizadores).
+
+La capa de datos (Firebase Auth y Firestore) no tiene pruebas automatizadas: es una integración fina con un servicio externo que se verifica manualmente. Ningún archivo de prueba importa `client/src/lib/firebase.js`.
 
 **Limitaciones del entorno de pruebas:**
 - `jsdom` no implementa `<canvas>`, que `lottie-web` (usado por `lottie-react`) necesita al cargar. Se resuelve simulando (`vi.mock`) `lottie-react` globalmente en `client/src/test-setup.js`, en vez de instalar el paquete nativo `canvas` (frágil de compilar, sobre todo en Windows).
-- El JSON de Lottie se importa de forma estática (no con `import()` dinámico), por lo que queda incluido en el bundle principal (~913KB).
+- `jsdom` no implementa `HTMLMediaElement.prototype.play/pause/load`; se sustituyen por stubs en `test-setup.js`.
+- El JSON de Lottie se importa de forma estática (no con `import()` dinámico), por lo que queda incluido en el chunk principal.
 
 ---
 
 ## 8. Decisión de diseño
 
-La decisión central de esta arquitectura es concentrar toda la lógica del juego en el cliente. Dado que la aplicación es operada exclusivamente por el docente desde su propio equipo y los alumnos no tienen acceso al navegador, no existe un riesgo real de manipulación. Esto permite descargar el set de frases completo al inicio de la partida y ejecutar toda la validación, el control de intentos y la economía de monedas en memoria, sin depender del servidor durante el juego. Como resultado, el backend queda reducido a dos responsabilidades concretas (autenticación y persistencia de sets) lo que simplifica el desarrollo y elimina latencia en cada interacción.
+La decisión central de esta arquitectura es concentrar toda la lógica del juego en el cliente. Dado que la aplicación es operada exclusivamente por el docente desde su propio equipo y los alumnos no tienen acceso al navegador, no existe un riesgo real de manipulación. Esto permite descargar el set de frases completo al inicio de la partida y ejecutar toda la validación, el control de intentos y la economía de monedas en memoria.
+
+La segunda decisión es no operar infraestructura propia. Como el backend solo tenía dos responsabilidades (autenticación y persistencia de sets), se sustituyó por servicios gestionados: Firebase Authentication y Cloud Firestore, con la autorización expresada en reglas declarativas. El resultado no tiene servidor ni base de datos que mantener, se despliega como un sitio estático en Firebase Hosting y su operación es gratuita a la escala de uso prevista (algunas decenas de docentes).

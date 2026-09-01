@@ -2,168 +2,112 @@
 
 ## 1. Visión general
 
-El modelo persiste únicamente los datos de largo plazo: cuentas de docentes y sus sets de frases. El estado de partida nunca se almacena; vive exclusivamente en la memoria del cliente durante la sesión.
+El modelo persiste únicamente los datos de largo plazo: **los sets de frases** de cada docente. El estado de partida nunca se almacena; vive exclusivamente en la memoria del cliente durante la sesión.
 
-Tres tablas principales con una jerarquía lineal:
+La persistencia usa dos servicios de Firebase:
+
+- **Firebase Authentication** — las cuentas de los docentes (email, contraseña, nombre para mostrar). No hay tabla/colección de usuarios propia: Firebase Auth es el registro de identidades y expone `uid`, `email` y `displayName`.
+- **Cloud Firestore** — una sola colección, `sets`, con un documento por set.
 
 ```
-usuarios  ──<  sets  ──<  frases
+Firebase Auth (usuarios)  ──<  Firestore: sets
+        uid                      sets/{setId}.ownerUid
 ```
 
 ---
 
-## 2. Tablas
+## 2. Autenticación (Firebase Auth)
 
-### 2.1 `usuarios`
+Cada docente es un usuario de Firebase Auth con proveedor **Email/Password**. Los datos relevantes:
 
-Almacena las cuentas de los docentes. Un usuario puede tener cero o más sets.
+| Campo         | Origen                        | Uso                                            |
+|---------------|-------------------------------|------------------------------------------------|
+| `uid`         | Firebase (inmutable)          | Dueño de cada set (`ownerUid`)                 |
+| `email`       | Registro / login             | Identificación de la cuenta                     |
+| `displayName` | Se fija con `updateProfile` al registrarse | Nombre del docente mostrado en el back-office |
 
-| Columna        | Tipo            | Restricciones                        | Descripción                              |
-|----------------|-----------------|---------------------------------------|------------------------------------------|
-| `id`           | `UUID`          | PK, default `gen_random_uuid()`      | Identificador único del usuario          |
-| `email`        | `VARCHAR(255)`  | NOT NULL, UNIQUE                     | Correo electrónico, usado para login     |
-| `password_hash`| `VARCHAR(255)`  | NOT NULL                             | Contraseña hasheada (bcrypt)             |
-| `nombre`       | `VARCHAR(100)`  | NOT NULL                             | Nombre del docente para mostrar en UI    |
-| `created_at`   | `TIMESTAMPTZ`   | NOT NULL, default `now()`            | Fecha de registro                        |
-
-**Índices:** `email` (UNIQUE ya crea índice implícito).
+La contraseña la gestiona Firebase (hash y verificación); la aplicación nunca la ve ni la almacena. La sesión persiste sola en el navegador y se sincroniza con `onAuthStateChanged`.
 
 ---
 
-### 2.2 `sets`
+## 3. Colección `sets` (Firestore)
 
-Agrupaciones de frases creadas por un docente. Un set pertenece a un único usuario y contiene exactamente 8 frases.
+Un documento por set de frases. El `id` del documento lo genera Firestore (`addDoc`).
 
-| Columna      | Tipo           | Restricciones                              | Descripción                                    |
-|--------------|----------------|---------------------------------------------|------------------------------------------------|
-| `id`         | `UUID`         | PK, default `gen_random_uuid()`            | Identificador único del set                    |
-| `usuario_id` | `UUID`         | NOT NULL, FK → `usuarios(id)` ON DELETE CASCADE | Propietario del set                   |
-| `nombre`     | `VARCHAR(100)` | NOT NULL                                   | Nombre descriptivo del set (ej. "Semana 3")    |
-| `created_at` | `TIMESTAMPTZ`  | NOT NULL, default `now()`                  | Fecha de creación                              |
-| `updated_at` | `TIMESTAMPTZ`  | NOT NULL, default `now()`                  | Última modificación (actualizar en cada PUT)   |
+| Campo       | Tipo                     | Descripción                                                        |
+|-------------|--------------------------|--------------------------------------------------------------------|
+| `ownerUid`  | `string`                 | `uid` del docente dueño (Firebase Auth). Base de todas las reglas. |
+| `nombre`    | `string`                 | Nombre descriptivo del set (ej. "Unidad 2 – Redes"). Máx. 100.     |
+| `frases`    | `array<{ orden, texto }>`| Exactamente 8 elementos. `orden` 1–8 sin repetir; `texto` con ortografía correcta (tildes y mayúsculas), máx. 500. |
+| `createdAt` | `timestamp`              | `serverTimestamp()` al crear.                                      |
+| `updatedAt` | `timestamp`              | `serverTimestamp()` en cada guardado. Ordena la lista del back-office. |
 
-**Índices:** `usuario_id` (para listar sets del docente autenticado).
+Ejemplo de documento:
 
-**Nota:** No hay restricción de unicidad en `nombre` por usuario. El docente puede tener dos sets con el mismo nombre; la distinción es por `id`.
-
----
-
-### 2.3 `frases`
-
-Frases individuales pertenecientes a un set. Cada set contiene exactamente 8 frases (posiciones 1–8).
-
-| Columna     | Tipo            | Restricciones                            | Descripción                                                    |
-|-------------|-----------------|-------------------------------------------|------------------------------------------------------------------|
-| `id`        | `UUID`          | PK, default `gen_random_uuid()`          | Identificador único de la frase                                |
-| `set_id`    | `UUID`          | NOT NULL, FK → `sets(id)` ON DELETE CASCADE | Set al que pertenece                                      |
-| `texto`     | `VARCHAR(500)`  | NOT NULL                                 | Frase con ortografía correcta (tildes y mayúsculas preservadas)|
-| `orden`     | `SMALLINT`      | NOT NULL                                 | Posición dentro del set (1-based, para mantener el orden de edición) |
-| `created_at`| `TIMESTAMPTZ`   | NOT NULL, default `now()`                | Fecha de creación                                              |
-
-**Restricción compuesta:** `UNIQUE (set_id, orden)` - no pueden existir dos frases con el mismo orden dentro del mismo set.
-
-**Nota sobre ortografía:** El texto se almacena con ortografía correcta para mostrarse al revelar la frase al final de cada turno. La normalización (sin tildes, sin mayúsculas) se aplica solo en el motor de reglas del cliente — y preserva la Ñ como letra distinta, no como una "N acentuada". Ver `arquitectura.md` sección 3.5 para el detalle de por qué esto importa.
-
----
-
-## 3. Relaciones
-
-| Relación               | Cardinalidad | Comportamiento al eliminar        |
-|------------------------|--------------|-----------------------------------|
-| `usuarios` → `sets`    | 1 : N        | `ON DELETE CASCADE` (eliminar usuario borra sus sets) |
-| `sets` → `frases`      | 1 : N        | `ON DELETE CASCADE` (eliminar set borra sus frases)   |
-
----
-
-## 4. Esquema Prisma
-
-```prisma
-// schema.prisma
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model Usuario {
-  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email        String   @unique @db.VarChar(255)
-  passwordHash String   @map("password_hash") @db.VarChar(255)
-  nombre       String   @db.VarChar(100)
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
-  sets         Set[]
-
-  @@map("usuarios")
-}
-
-model Set {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  usuarioId  String   @map("usuario_id") @db.Uuid
-  nombre     String   @db.VarChar(100)
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  frases     Frase[]
-
-  @@index([usuarioId])
-  @@map("sets")
-}
-
-model Frase {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  setId     String   @map("set_id") @db.Uuid
-  texto     String   @db.VarChar(500)
-  orden     Int      @db.SmallInt
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
-  set       Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
-
-  @@unique([setId, orden])
-  @@index([setId])
-  @@map("frases")
+```json
+{
+  "ownerUid": "a1B2c3D4e5F6g7H8i9J0kLmNoPq2",
+  "nombre": "Unidad 2 – Redes",
+  "frases": [
+    { "orden": 1, "texto": "El modelo OSI tiene siete capas" },
+    { "orden": 2, "texto": "TCP garantiza la entrega de paquetes" },
+    { "orden": 3, "texto": "DNS traduce nombres a direcciones IP" },
+    { "orden": 4, "texto": "HTTP es un protocolo sin estado" },
+    { "orden": 5, "texto": "Una subred se define con una máscara" },
+    { "orden": 6, "texto": "El protocolo ARP resuelve direcciones MAC" },
+    { "orden": 7, "texto": "FTP usa los puertos 20 y 21" },
+    { "orden": 8, "texto": "SSL y TLS cifran la comunicación en tránsito" }
+  ],
+  "createdAt": "<timestamp>",
+  "updatedAt": "<timestamp>"
 }
 ```
+
+> **Nota sobre ortografía.** El texto se guarda con ortografía correcta para mostrarse al revelar la frase al final de cada turno. La normalización (sin tildes, sin mayúsculas) se aplica solo en el motor de reglas del cliente — y preserva la Ñ como letra distinta, no como una "N acentuada". Ver `arquitectura.md` sección 3.5.
+
+> **`id` de frase.** Las frases se guardan solo como `{ orden, texto }`. El cliente (`client/src/lib/sets.js`) sintetiza un `id` estable por frase al leer el set (`f1`…`f8`, derivado de `orden`), porque el motor de juego indexa el mazo por `frase.id`. No se persiste.
+
+---
+
+## 4. Reglas de seguridad (`firestore.rules`)
+
+Toda la autorización vive en las reglas; no hay servidor intermediario. Un set solo es accesible por su dueño, y solo puede crearse/actualizarse con exactamente 8 frases.
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /sets/{setId} {
+      allow read: if request.auth != null
+                  && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.frases.size() == 8;
+      allow update: if request.auth != null
+                    && resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.frases.size() == 8;
+      allow delete: if request.auth != null
+                    && resource.data.ownerUid == request.auth.uid;
+    }
+  }
+}
+```
+
+El listado del back-office (`where('ownerUid', '==', uid)`) es coherente con la regla `read`: cada documento devuelto cumple `ownerUid == request.auth.uid`. No se usa `orderBy` en la consulta (el orden por `updatedAt` se hace en el cliente), así que no hace falta un índice compuesto.
 
 ---
 
 ## 5. Decisiones de diseño
 
-**UUIDs como PKs.** Se prefieren sobre enteros seriales para evitar IDs predecibles en los endpoints REST (`/api/sets/3` expone cuántos sets existen en total). Prisma los genera con `gen_random_uuid()` a nivel de base de datos.
+**Firebase Auth en vez de una colección `usuarios` propia.** Registro, verificación de contraseña y persistencia de sesión los resuelve Firebase sin código propio ni almacenar hashes. El `displayName` cubre la única necesidad de perfil (nombre para la UI).
 
-**`ON DELETE CASCADE` en ambas FK.** Eliminar un usuario borra automáticamente sus sets y frases. Eliminar un set borra sus frases. No se necesita soft delete: el back-office del docente gestiona explícitamente sus contenidos.
+**Las frases como campo `array` dentro del set, no como subcolección.** Un set son siempre 8 frases pequeñas que se leen y se escriben juntas. Un array las hace atómicas (un `addDoc`/`updateDoc` guarda el set completo), evita 8 lecturas extra al abrir un set o iniciar una partida, y permite validar el conteo (`frases.size() == 8`) directamente en las reglas.
 
-**`orden` en `frases`.** El back-office presenta 8 inputs fijos (posiciones 1–8) sin posibilidad de reordenamiento. La columna `orden` garantiza que la BD devuelva siempre las frases en el mismo orden al editar o iniciar una partida. 
+**`ownerUid` en cada documento.** Es la única pieza de autorización. Se compara contra `request.auth.uid` en las reglas y contra `auth.currentUser.uid` en el cliente antes de devolver o modificar (para dar un mensaje claro).
 
-**8 frases en el back-office.** Una partida requiere exactamente 8 frases (4 por ronda). El back-office impide guardar un set con más o menos de 8 frases; esta situación nunca llega al servidor — aunque, en la práctica, el servidor también valida esto por una segunda capa de defensa (ver `arquitectura.md` / código de `server/src/modules/sets`).
+**Sin `orderBy` en la consulta de listado.** Un docente tiene pocos sets; ordenarlos por `updatedAt` en memoria del cliente evita tener que declarar y desplegar un índice compuesto en Firestore.
 
-**`updated_at` solo en `sets`.** Las frases no necesitan `updated_at` propio porque siempre se editan en el contexto de su set; el `updated_at` del set refleja cualquier cambio en sus frases.
+**Sin colección de partidas.** Coherente con la decisión arquitectónica central: el estado de la partida vive en memoria del cliente. Firestore no necesita conocer el progreso del juego.
 
-**Sin tabla de partidas.** Coherente con la decisión arquitectónica central: el estado de la partida vive en memoria del cliente. El servidor no necesita conocer el progreso del juego.
-
----
-
-## 6. Datos de ejemplo
-
-```sql
--- Usuario
-INSERT INTO usuarios (email, password_hash, nombre)
-VALUES ('docente@correo.ejemplo', '$2b$10$...', 'Bryan Ochoa');
-
--- Set
-INSERT INTO sets (usuario_id, nombre)
-VALUES ('<uuid-usuario>', 'Unidad 2 – Redes');
-
--- Frases del set
-INSERT INTO frases (set_id, texto, orden) VALUES
-  ('<uuid-set>', 'El modelo OSI tiene siete capas', 1),
-  ('<uuid-set>', 'TCP garantiza la entrega de paquetes', 2),
-  ('<uuid-set>', 'DNS traduce nombres a direcciones IP', 3),
-  ('<uuid-set>', 'HTTP es un protocolo sin estado', 4),
-  ('<uuid-set>', 'Una subred se define con una máscara', 5),
-  ('<uuid-set>', 'El protocolo ARP resuelve direcciones MAC', 6),
-  ('<uuid-set>', 'FTP usa los puertos 20 y 21', 7),
-  ('<uuid-set>', 'SSL y TLS cifran la comunicación en tránsito', 8);
-```
+**IDs de documento autogenerados.** Firestore genera el `id` de cada set; no se exponen en URLs públicas (el back-office es privado) y no revelan conteos.
