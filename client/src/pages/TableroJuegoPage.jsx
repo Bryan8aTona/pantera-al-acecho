@@ -48,7 +48,18 @@ export default function TableroJuegoPage() {
   const [mostrarZarpazo, setMostrarZarpazo] = useState(false);
   const navigate = useNavigate();
 
-  useEfectosSonido(estado, { estadoAnunciando, mostrarZarpazo, mostrarVictoria, mostrarAnuncioRepechaje });
+  // El mensaje "Comienza la Ronda de Repechaje" solo se ve realmente
+  // cuando ya no hay un panel de Victoria o de Revelación tapando la
+  // pantalla (ver la prioridad de la cadena de ternarios más abajo). El
+  // reducer cambia estado.fase en el mismo commit que resuelve la última
+  // carta de Ronda 1, así que mostrarAnuncioRepechaje puede llevar rato
+  // en true mientras el docente todavía está leyendo "La frase era..."
+  // (o viendo la animación de Victoria, si esa última carta tuvo
+  // ganador). El sonido debe sonar recién cuando el mensaje se hace
+  // visible de verdad, no en el cambio de fase crudo.
+  const repechajeVisible = mostrarAnuncioRepechaje && !mostrarRevelacion && !mostrarVictoria;
+
+  useEfectosSonido(estado, { estadoAnunciando, mostrarZarpazo, mostrarVictoria, repechajeVisible });
 
   function manejarSalida() {
     salirPartida();

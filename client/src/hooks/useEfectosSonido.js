@@ -12,7 +12,7 @@ function contarAciertos(letrasUsadas) {
 // render, la doble invocación dispararía cada sonido dos veces).
 export function useEfectosSonido(
   estado,
-  { estadoAnunciando, mostrarZarpazo, mostrarVictoria, mostrarAnuncioRepechaje },
+  { estadoAnunciando, mostrarZarpazo, mostrarVictoria, repechajeVisible },
 ) {
   // Fallo de letra al aire: la pantera avanzó de estado. Suena igual en
   // todos los avances, incluido el 5 (la derrota) — ese fallo también es
@@ -50,12 +50,17 @@ export function useEfectosSonido(
     prevVictoria.current = mostrarVictoria;
   }, [mostrarVictoria]);
 
-  // Arranque de la Ronda de Repechaje.
-  const prevRepechaje = useRef(mostrarAnuncioRepechaje);
+  // Arranque de la Ronda de Repechaje: no alcanza con que el reducer haya
+  // cambiado estado.fase a REPECHAJE (ocurre en el mismo commit que
+  // resuelve la última carta de Ronda 1, mientras AnimacionVictoria o
+  // PanelRevelacion pueden seguir tapando la pantalla). El flanco se mide
+  // sobre `repechajeVisible` para que suene justo cuando el mensaje se
+  // hace visible de verdad.
+  const prevRepechaje = useRef(repechajeVisible);
   useEffect(() => {
-    if (mostrarAnuncioRepechaje && !prevRepechaje.current) reproducirSonido('repechaje');
-    prevRepechaje.current = mostrarAnuncioRepechaje;
-  }, [mostrarAnuncioRepechaje]);
+    if (repechajeVisible && !prevRepechaje.current) reproducirSonido('repechaje');
+    prevRepechaje.current = repechajeVisible;
+  }, [repechajeVisible]);
 
   // Marcador final.
   const prevCierre = useRef(estado.fase === 'CIERRE');
