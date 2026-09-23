@@ -1,12 +1,12 @@
-import { EQUIPOS_BASE, SALDO_INICIAL, LIMITES_INTENTOS } from './constantes.js';
+import { EQUIPOS_BASE, SALDO_INICIAL, LIMITES_INTENTOS, FRASES_POR_SET, FASES } from './constantes.js';
 import { crearMazo } from './mazo.js';
 import { sortearOrden } from './sorteo.js';
 
 // set: el objeto { id, nombre, frases: [...8] } descargado completo por
 // la pantalla de Configuración de partida (ver ConfiguracionPartidaPage).
 export function crearEstadoInicial({ set, aleatorio = Math.random }) {
-  if (!set?.frases || set.frases.length !== 8) {
-    throw new Error('Se requiere un set con exactamente 8 frases para iniciar la partida');
+  if (!set?.frases || set.frases.length !== FRASES_POR_SET) {
+    throw new Error(`Se requiere un set con exactamente ${FRASES_POR_SET} frases para iniciar la partida`);
   }
 
   const ordenTurno = sortearOrden(
@@ -28,7 +28,7 @@ export function crearEstadoInicial({ set, aleatorio = Math.random }) {
   }
 
   return {
-    fase: 'RONDA1', // 'RONDA1' | 'REPECHAJE' | 'CIERRE'
+    fase: FASES.RONDA1, // ver FASES en constantes.js
     ronda: 1,
     equipos,
     ordenTurnoRonda1: ordenTurno, // fijo: se usa para calcular quién roba

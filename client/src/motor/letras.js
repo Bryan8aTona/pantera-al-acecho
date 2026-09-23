@@ -1,5 +1,13 @@
 import { VOCALES } from './constantes.js';
+import { MotorError } from './errores.js';
 import { normalizarLetra, normalizarTexto } from './normalizacion.js';
+
+// ¿El carácter es una letra jugable? Se evalúa sobre la forma
+// normalizada, así que las vocales con tilde o diéresis (Á, ü...) cuentan
+// como letra, igual que la Ñ. Espacios, dígitos y signos de puntuación no.
+export function esLetra(caracter) {
+  return /^[A-ZÑ]$/.test(normalizarLetra(caracter));
+}
 
 export function esVocal(letra) {
   return VOCALES.includes(normalizarLetra(letra));
@@ -7,6 +15,13 @@ export function esVocal(letra) {
 
 export function categoriaDeLetra(letra) {
   return esVocal(letra) ? 'vocal' : 'consonante';
+}
+
+// Clave de `equipo.intentos` que corresponde a una categoría de letra.
+export function claveIntento(categoria) {
+  if (categoria === 'vocal') return 'vocales';
+  if (categoria === 'consonante') return 'consonantes';
+  throw new MotorError('CATEGORIA_INVALIDA', `Categoría inválida: ${categoria}`);
 }
 
 // Índices (0-based) donde aparece la letra dentro del texto, comparando
@@ -30,7 +45,7 @@ export function letrasUnicasDeTexto(textoOriginal) {
   const normalizado = normalizarTexto(textoOriginal);
   const vistas = new Set();
   for (const caracter of normalizado) {
-    if (/[A-ZÑ]/.test(caracter)) vistas.add(caracter);
+    if (esLetra(caracter)) vistas.add(caracter);
   }
   return [...vistas];
 }
@@ -43,7 +58,7 @@ export function letrasUnicasPorCategoria(textoOriginal, categoria) {
   const resultado = [];
 
   for (const caracter of normalizado) {
-    if (!/[A-ZÑ]/.test(caracter)) continue; // ignora espacios y signos
+    if (!esLetra(caracter)) continue; // ignora espacios y signos
     if (vistas.has(caracter)) continue;
     if (categoriaDeLetra(caracter) !== categoria) continue;
     vistas.add(caracter);

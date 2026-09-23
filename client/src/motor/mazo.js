@@ -1,11 +1,11 @@
-import { PREMIOS_DISPONIBLES } from './constantes.js';
+import { PREMIOS_DISPONIBLES, FRASES_POR_SET } from './constantes.js';
 
-// frases: [{ id, texto, orden }] — exactamente 8, ya validadas por el
-// servidor (modelo-datos.md). `aleatorio` es inyectable para que los
-// tests sean determinísticos.
+// frases: [{ id, texto, orden }] — exactamente 8, tal como las entrega
+// lib/sets.js (que sintetiza el `id`; ver modelo-datos.md). `aleatorio`
+// es inyectable para que los tests sean determinísticos.
 export function crearMazo(frases, aleatorio = Math.random) {
-  if (!Array.isArray(frases) || frases.length !== 8) {
-    throw new Error('El mazo requiere exactamente 8 frases');
+  if (!Array.isArray(frases) || frases.length !== FRASES_POR_SET) {
+    throw new Error(`El mazo requiere exactamente ${FRASES_POR_SET} frases`);
   }
 
   const mazo = {};

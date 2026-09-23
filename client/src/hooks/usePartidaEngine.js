@@ -7,13 +7,14 @@ import { reducerSeguro } from './reducerSeguro.js';
 // motor vive aparte, dentro de este hook — PartidaContext solo guarda
 // QUÉ set se eligió, este hook guarda CÓMO va la partida en curso.
 export function usePartidaEngine(set) {
-  const [estado, dispatchInterno] = useReducer(reducerSeguro, set, (setInicial) => ({
+  // El `dispatch` de useReducer ya es estable entre renders; no hace
+  // falta envolverlo.
+  const [estado, dispatch] = useReducer(reducerSeguro, set, (setInicial) => ({
     ...crearEstadoInicial({ set: setInicial }),
     error: null,
   }));
 
-  const dispatch = useCallback((accion) => dispatchInterno(accion), []);
-  const limpiarError = useCallback(() => dispatchInterno({ type: '__LIMPIAR_ERROR__' }), []);
+  const limpiarError = useCallback(() => dispatch({ type: '__LIMPIAR_ERROR__' }), []);
 
   return { estado, dispatch, limpiarError };
 }

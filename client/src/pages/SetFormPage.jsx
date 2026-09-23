@@ -12,13 +12,13 @@ export default function SetFormPage() {
   const [valorInicial, setValorInicial] = useState(null);
   const [cargando, setCargando] = useState(esEdicion);
   const [guardando, setGuardando] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorCarga, setErrorCarga] = useState(null);
 
   useEffect(() => {
     if (!esEdicion) return;
     obtenerSet(id)
       .then((set) => setValorInicial(set))
-      .catch((err) => setError(err.message || 'No se pudo abrir el set'))
+      .catch((err) => setErrorCarga(err.message || 'No se pudo abrir el set'))
       .finally(() => setCargando(false));
   }, [id, esEdicion]);
 
@@ -45,11 +45,13 @@ export default function SetFormPage() {
         <h1>{esEdicion ? 'Editar set' : 'Nuevo set'}</h1>
       </header>
 
-      {error && <p className="set-form-page-error" role="alert">{error}</p>}
+      {errorCarga && <p className="set-form-page-error" role="alert">{errorCarga}</p>}
 
+      {/* Si el set a editar no se pudo cargar, no se ofrece un formulario
+          vacío: guardarlo sobrescribiría el set original con otro contenido. */}
       {cargando ? (
         <p className="set-form-page-estado">Cargando el set…</p>
-      ) : (
+      ) : errorCarga ? null : (
         <SetForm
           valorInicial={valorInicial}
           onGuardar={guardarSet}

@@ -1,23 +1,35 @@
 import { MotorError } from './errores.js';
-import { LIMITES_INTENTOS, COSTO_ACIERTO_SEGURO, PANTERA_ESTADO_DERROTA } from './constantes.js';
+import { LIMITES_INTENTOS, COSTO_ACIERTO_SEGURO, PANTERA_ESTADO_DERROTA, FASES } from './constantes.js';
 import { normalizarTexto, normalizarLetra } from './normalizacion.js';
-import { categoriaDeLetra, posicionesDeLetra, letrasUnicasPorCategoria, letrasUnicasDeTexto } from './letras.js';
+import {
+  esLetra,
+  categoriaDeLetra,
+  claveIntento,
+  posicionesDeLetra,
+  letrasUnicasPorCategoria,
+  letrasUnicasDeTexto,
+} from './letras.js';
+import { equipoEnTurnoActual, hayDerrotaPendiente, impedimentoAciertoSeguro } from './selectores.js';
 
 // ---------------------------------------------------------------------
 // Helpers internos
 // ---------------------------------------------------------------------
 
-function claveIntento(categoria) {
-  if (categoria === 'vocal') return 'vocales';
-  if (categoria === 'consonante') return 'consonantes';
-  throw new MotorError('CATEGORIA_INVALIDA', `Categoría inválida: ${categoria}`);
+function equipoEnTurno(estado) {
+  const equipo = equipoEnTurnoActual(estado);
+  if (!equipo) throw new MotorError('SIN_TURNO', 'No hay un equipo en turno');
+  return equipo.id;
 }
 
-function equipoEnTurno(estado) {
-  if (estado.modoRobo) return estado.modoRobo.equipoId;
-  const id = estado.ordenTurnoActual[estado.turnoActualIndex];
-  if (!id) throw new MotorError('SIN_TURNO', 'No hay un equipo en turno');
-  return id;
+function exigirSinDerrotaPendiente(estado) {
+  if (hayDerrotaPendiente(estado)) {
+    throw new MotorError('DERROTA_PENDIENTE', 'El equipo ya perdió esta frase');
+  }
+}
+
+// Validación algorítmica de la respuesta (requerimientos.md 3.5).
+function respuestaCorrecta(intento, carta) {
+  return normalizarTexto(intento) === normalizarTexto(carta.texto);
 }
 
 function actualizarEquipo(estado, equipoId, cambios) {
@@ -76,6 +88,8 @@ export function motorReducer(estado, accion) {
       return manejarCancelarModoAdivinar(estado);
     case 'ENVIAR_RESPUESTA':
       return manejarEnviarRespuesta(estado, accion);
+    case 'CONFIRMAR_DERROTA':
+      return manejarConfirmarDerrota(estado);
     default:
       throw new MotorError('ACCION_DESCONOCIDA', `Acción no reconocida: ${accion.type}`);
   }
@@ -86,7 +100,7 @@ export function motorReducer(estado, accion) {
 // ---------------------------------------------------------------------
 
 function manejarElegirCarta(estado, { cartaId }) {
-  if (estado.fase === 'CIERRE') {
+  if (estado.fase === FASES.CIERRE) {
     throw new MotorError('PARTIDA_CERRADA', 'La partida ya terminó');
   }
   if (estado.modoRobo) {
@@ -119,9 +133,10 @@ function manejarPedirLetraLibre(estado, { letra }) {
   if (!estado.cartaActualId) {
     throw new MotorError('SIN_CARTA', 'El equipo debe elegir una carta antes de pedir letras');
   }
+  exigirSinDerrotaPendiente(estado);
 
   const letraNorm = normalizarLetra(letra);
-  if (!/^[A-ZÑ]$/.test(letraNorm)) {
+  if (!esLetra(letraNorm)) {
     throw new MotorError('LETRA_INVALIDA', 'Letra inválida');
   }
   if (estado.letrasUsadas[letraNorm]) {
@@ -165,6 +180,13 @@ function manejarPedirLetraLibre(estado, { letra }) {
   siguiente = actualizarEquipo(siguiente, equipoId, { panteraEstado: panteraActualizada });
 
   if (panteraActualizada >= PANTERA_ESTADO_DERROTA) {
+    // Ronda 1: se abre el Robo, que el Tablero muestra al terminar el
+    // zarpazo. Ronda 2 no tiene Robo (3.7): la carta queda abierta
+    // (hayDerrotaPendiente) hasta que el Tablero termina el zarpazo y la
+    // cierra con CONFIRMAR_DERROTA. Si se resolviera aquí mismo, el turno
+    // avanzaría en este commit y el Tablero ya no podría mostrar la
+    // secuencia de la pantera del equipo que perdió.
+    if (estado.ronda === 2) return { ...siguiente, modoAdivinarActivo: false };
     return resolverFalloDeTurno(siguiente, equipoId);
   }
 
@@ -189,25 +211,14 @@ function manejarComprarAciertoSeguro(estado, { categoria }) {
   const equipoId = equipoEnTurno(estado);
   const equipo = estado.equipos[equipoId];
   const clave = claveIntento(categoria);
-
-  if (equipo.intentos[clave] <= 0) {
-    throw new MotorError('SIN_INTENTOS', `El equipo no tiene intentos de ${categoria} disponibles`);
-  }
-  if (equipo.saldo < COSTO_ACIERTO_SEGURO[categoria]) {
-    throw new MotorError('SALDO_INSUFICIENTE', 'El equipo no tiene saldo suficiente');
-  }
-
   const carta = estado.mazo[estado.cartaActualId];
+
+  const impedimento = impedimentoAciertoSeguro(equipo, categoria, carta.texto, estado.letrasUsadas);
+  if (impedimento) throw impedimento;
+
   const disponibles = letrasUnicasPorCategoria(carta.texto, categoria).filter(
     (letra) => !estado.letrasUsadas[letra],
   );
-
-  if (disponibles.length === 0) {
-    throw new MotorError(
-      'SIN_LETRAS_DISPONIBLES',
-      `No quedan letras de tipo ${categoria} por descubrir en esta frase`,
-    );
-  }
 
   // Determinístico (primera letra sin descubrir, en orden de aparición)
   // en vez de aleatorio: mantiene el motor predecible y fácil de testear,
@@ -239,6 +250,7 @@ function manejarActivarModoAdivinar(estado) {
   if (!estado.cartaActualId && !estado.modoRobo) {
     throw new MotorError('SIN_CARTA', 'No hay una carta activa para adivinar');
   }
+  exigirSinDerrotaPendiente(estado);
   return { ...estado, modoAdivinarActivo: true };
 }
 
@@ -261,12 +273,12 @@ function manejarEnviarRespuesta(estado, { intento }) {
   if (!estado.cartaActualId) {
     throw new MotorError('SIN_CARTA', 'El equipo debe elegir una carta antes de adivinar');
   }
+  exigirSinDerrotaPendiente(estado);
 
   const equipoId = equipoEnTurno(estado);
   const carta = estado.mazo[estado.cartaActualId];
-  const acierto = normalizarTexto(intento) === normalizarTexto(carta.texto);
 
-  if (acierto) {
+  if (respuestaCorrecta(intento, carta)) {
     return resolverAciertoDeTurno(estado, equipoId);
   }
 
@@ -277,6 +289,17 @@ function manejarEnviarRespuesta(estado, { intento }) {
 
   // Ronda 1: fallo en Modo Adivinar activa el Robo de Frase (3.6).
   return resolverFalloDeTurno(estado, equipoId);
+}
+
+// ---------------------------------------------------------------------
+// CONFIRMAR_DERROTA (Ronda 2: cierra la carta tras el zarpazo)
+// ---------------------------------------------------------------------
+
+function manejarConfirmarDerrota(estado) {
+  if (!hayDerrotaPendiente(estado)) {
+    throw new MotorError('SIN_DERROTA_PENDIENTE', 'No hay una derrota pendiente de confirmar');
+  }
+  return resolverFalloDirectoSinRobo(estado, equipoEnTurno(estado));
 }
 
 function resolverAciertoDeTurno(estado, equipoId) {
@@ -323,11 +346,10 @@ function resolverFalloDirectoSinRobo(estado, equipoId) {
 function resolverIntentoRobo(estado, intento) {
   const { equipoId, cartaId } = estado.modoRobo;
   const carta = estado.mazo[cartaId];
-  const acierto = normalizarTexto(intento) === normalizarTexto(carta.texto);
 
   let siguiente = estado;
 
-  if (acierto) {
+  if (respuestaCorrecta(intento, carta)) {
     const equipo = estado.equipos[equipoId];
     siguiente = actualizarEquipo(siguiente, equipoId, { saldo: equipo.saldo + carta.valor });
     siguiente = actualizarCarta(siguiente, cartaId, { jugada: true, ganadorId: equipoId });
@@ -376,7 +398,7 @@ function avanzarTurno(estado) {
 }
 
 function transicionarFase(estado) {
-  if (estado.fase === 'RONDA1') {
+  if (estado.fase === FASES.RONDA1) {
     const perdedores = estado.ordenTurnoRonda1.filter((id) => estado.equipos[id].gano === false);
 
     if (perdedores.length === 0) {
@@ -395,7 +417,7 @@ function transicionarFase(estado) {
 
     return {
       ...estado,
-      fase: 'REPECHAJE',
+      fase: FASES.REPECHAJE,
       ronda: 2,
       equipos: equiposActualizados,
       ordenTurnoActual: perdedores,
@@ -404,7 +426,7 @@ function transicionarFase(estado) {
     };
   }
 
-  if (estado.fase === 'REPECHAJE') {
+  if (estado.fase === FASES.REPECHAJE) {
     return entrarACierre(estado);
   }
 
@@ -432,7 +454,7 @@ function entrarACierre(estado) {
 
   return {
     ...estado,
-    fase: 'CIERRE',
+    fase: FASES.CIERRE,
     mazo: mazoActualizado,
     cartaActualId: null,
     modoRobo: null,

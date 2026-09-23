@@ -20,8 +20,29 @@ import {
   serverTimestamp,
 } from 'firebase/firestore/lite';
 import { auth, db } from './firebase.js';
+import { normalizarFrases, frasesConId } from './frases.js';
 
 const COL = 'sets';
+
+// Mismo criterio que AuthContext: el docente nunca ve el mensaje crudo
+// (en inglés) de Firebase. Los errores propios de este módulo (sin
+// `code`) ya vienen redactados y pasan tal cual.
+const MENSAJES_ERROR = {
+  'permission-denied': 'No tienes permiso para acceder a este set.',
+  unauthenticated: 'Tu sesión expiró. Vuelve a iniciar sesión.',
+  unavailable: 'No se pudo conectar. Revisa tu conexión a internet.',
+  'deadline-exceeded': 'El servidor tardó demasiado en responder. Inténtalo de nuevo.',
+  'not-found': 'No se encontró el set.',
+};
+
+async function conErroresTraducidos(operacion) {
+  try {
+    return await operacion();
+  } catch (error) {
+    if (!error?.code) throw error;
+    throw new Error(MENSAJES_ERROR[error.code] || 'No se pudo completar la operación. Inténtalo de nuevo.');
+  }
+}
 
 function uidActual() {
   const u = auth.currentUser;
@@ -31,13 +52,6 @@ function uidActual() {
 
 function aFecha(valor) {
   return valor && typeof valor.toDate === 'function' ? valor.toDate() : null;
-}
-
-// Deja las frases como exactamente [{ orden, texto }] ordenadas por orden.
-function normalizarFrases(frases) {
-  return [...(frases ?? [])]
-    .map((f) => ({ orden: Number(f.orden), texto: String(f.texto ?? '').trim() }))
-    .sort((a, b) => a.orden - b.orden);
 }
 
 async function leerPropio(id) {
@@ -52,55 +66,62 @@ async function leerPropio(id) {
 // Lista los sets del docente actual, más recientes primero. Se ordena en
 // el cliente para no necesitar un índice compuesto en Firestore (un
 // docente tiene pocos sets).
-export async function listarSets() {
-  const q = query(collection(db, COL), where('ownerUid', '==', uidActual()));
-  const snap = await getDocs(q);
-  return snap.docs
-    .map((d) => {
-      const data = d.data();
-      return { id: d.id, nombre: data.nombre, updatedAt: aFecha(data.updatedAt) };
-    })
-    .sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
-}
-
-// Set completo (nombre + las 8 frases). Lo usan el formulario de edición
-// y la pantalla de Configuración de partida.
-//
-// A cada frase se le añade un `id` estable derivado del orden (1–8, único
-// y garantizado): el motor de juego indexa el mazo por `frase.id`
-// (motor/mazo.js). En Firestore solo se guardan `{ orden, texto }`.
-export async function obtenerSet(id) {
-  const { snap } = await leerPropio(id);
-  const data = snap.data();
-  return {
-    id: snap.id,
-    nombre: data.nombre,
-    frases: normalizarFrases(data.frases).map((f) => ({ ...f, id: `f${f.orden}` })),
-    updatedAt: aFecha(data.updatedAt),
-  };
-}
-
-export async function crearSet({ nombre, frases }) {
-  const ref = await addDoc(collection(db, COL), {
-    ownerUid: uidActual(),
-    nombre: nombre.trim(),
-    frases: normalizarFrases(frases),
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  return ref.id;
-}
-
-export async function actualizarSet(id, { nombre, frases }) {
-  const { ref } = await leerPropio(id);
-  await updateDoc(ref, {
-    nombre: nombre.trim(),
-    frases: normalizarFrases(frases),
-    updatedAt: serverTimestamp(),
+export function listarSets() {
+  return conErroresTraducidos(async () => {
+    const q = query(collection(db, COL), where('ownerUid', '==', uidActual()));
+    const snap = await getDocs(q);
+    return snap.docs
+      .map((d) => {
+        const data = d.data();
+        return { id: d.id, nombre: data.nombre, updatedAt: aFecha(data.updatedAt) };
+      })
+      .sort((a, b) => (b.updatedAt?.getTime() ?? 0) - (a.updatedAt?.getTime() ?? 0));
   });
 }
 
-export async function eliminarSet(id) {
-  const { ref } = await leerPropio(id);
-  await deleteDoc(ref);
+// Set completo (nombre + las 8 frases, con su `id` sintetizado; ver
+// lib/frases.js). Lo usan el formulario de edición y la pantalla de
+// Configuración de partida.
+export function obtenerSet(id) {
+  return conErroresTraducidos(async () => {
+    const { snap } = await leerPropio(id);
+    const data = snap.data();
+    return {
+      id: snap.id,
+      nombre: data.nombre,
+      frases: frasesConId(data.frases),
+      updatedAt: aFecha(data.updatedAt),
+    };
+  });
+}
+
+export function crearSet({ nombre, frases }) {
+  return conErroresTraducidos(async () => {
+    const ref = await addDoc(collection(db, COL), {
+      ownerUid: uidActual(),
+      nombre: nombre.trim(),
+      frases: normalizarFrases(frases),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return ref.id;
+  });
+}
+
+export function actualizarSet(id, { nombre, frases }) {
+  return conErroresTraducidos(async () => {
+    const { ref } = await leerPropio(id);
+    await updateDoc(ref, {
+      nombre: nombre.trim(),
+      frases: normalizarFrases(frases),
+      updatedAt: serverTimestamp(),
+    });
+  });
+}
+
+export function eliminarSet(id) {
+  return conErroresTraducidos(async () => {
+    const { ref } = await leerPropio(id);
+    await deleteDoc(ref);
+  });
 }

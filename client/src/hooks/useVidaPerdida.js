@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { equipoDelTurnoNormal } from '../motor/index.js';
 
 // Detecta el instante en que la pantera del equipo en turno avanza de
 // estado (se perdió una vida, estados 1-4, o se llegó a la derrota,
@@ -10,9 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 // useEffect, no durante el render — ese es el patrón seguro bajo
 // React.StrictMode.
 export function useVidaPerdida(estado) {
-  const equipoTurnoId = estado.ordenTurnoActual[estado.turnoActualIndex];
-  const equipoTurno = estado.equipos[equipoTurnoId];
-  const panteraActual = equipoTurno?.panteraEstado ?? 0;
+  const panteraActual = equipoDelTurnoNormal(estado)?.panteraEstado ?? 0;
 
   const prevRef = useRef(panteraActual);
   const [estadoAnunciando, setEstadoAnunciando] = useState(null);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePartida } from '../context/PartidaContext.jsx';
 import { usePartidaEngine } from '../hooks/usePartidaEngine.js';
@@ -7,8 +7,16 @@ import { useVidaPerdida } from '../hooks/useVidaPerdida.js';
 import { useAnuncioRepechaje } from '../hooks/useAnuncioRepechaje.js';
 import { useSonido } from '../hooks/useSonido.js';
 import { useEfectosSonido } from '../hooks/useEfectosSonido.js';
-import { debeAdivinar, hayLetrasDisponiblesAciertoSeguro, letrasUnicasDeTexto } from '../motor/index.js';
-import { COSTO_ACIERTO_SEGURO, LIMITES_INTENTOS } from '../motor/constantes.js';
+import {
+  debeAdivinar,
+  impedimentoAciertoSeguro,
+  letrasUnicasDeTexto,
+  equipoEnTurnoActual,
+  equipoDelTurnoNormal,
+  cartaEnJuego,
+  hayDerrotaPendiente,
+} from '../motor/index.js';
+import { COSTO_ACIERTO_SEGURO, LIMITES_INTENTOS, FASES, PANTERA_ESTADO_DERROTA } from '../motor/constantes.js';
 import EquipoPanel from '../components/tablero/EquipoPanel.jsx';
 import Teclado from '../components/tablero/Teclado.jsx';
 import MazoCartas from '../components/tablero/MazoCartas.jsx';
@@ -26,10 +34,12 @@ import HojasDecorativas from '../components/tablero/HojasDecorativas.jsx';
 import './TableroJuegoPage.css';
 
 const NOMBRE_FASE = {
-  RONDA1: 'Ronda 1',
-  REPECHAJE: 'Ronda de Repechaje',
-  CIERRE: 'Cierre',
+  [FASES.RONDA1]: 'Ronda 1',
+  [FASES.REPECHAJE]: 'Ronda de Repechaje',
+  [FASES.CIERRE]: 'Cierre',
 };
+
+const ETIQUETA_CATEGORIA = { vocal: 'Vocal', consonante: 'Consonante' };
 
 export default function TableroJuegoPage() {
   const { set, salirPartida } = usePartida();
@@ -68,19 +78,25 @@ export default function TableroJuegoPage() {
 
   // Fin del video del anuncio de la pantera. En los estados 1-4 termina
   // ahí; en el estado 5 (derrota) dispara el zarpazo a PANTALLA COMPLETA
-  // y recién cuando ese termina se continúa hacia el Robo.
-  function manejarFinAnuncioVideo() {
-    if (estadoAnunciando === 5) {
+  // y recién cuando ese termina se continúa hacia el Robo (Ronda 1) o se
+  // cierra la carta sin ganador (Ronda 2, que no tiene Robo).
+  //
+  // Ambos manejadores se memorizan: ZarpazoOverlay reinicia su
+  // temporizador si cambia la identidad de `onCompleta`.
+  const manejarFinAnuncioVideo = useCallback(() => {
+    if (estadoAnunciando === PANTERA_ESTADO_DERROTA) {
       setMostrarZarpazo(true);
     } else {
       completarAnuncio();
     }
-  }
+  }, [estadoAnunciando, completarAnuncio]);
 
-  function manejarFinZarpazo() {
+  const derrotaPendiente = hayDerrotaPendiente(estado);
+  const manejarFinZarpazo = useCallback(() => {
     setMostrarZarpazo(false);
     completarAnuncio();
-  }
+    if (derrotaPendiente) dispatch({ type: 'CONFIRMAR_DERROTA' });
+  }, [derrotaPendiente, completarAnuncio, dispatch]);
 
   const haySecuenciaPendiente =
     Boolean(estadoAnunciando) || mostrarZarpazo || mostrarVictoria || mostrarRevelacion || mostrarAnuncioRepechaje;
@@ -88,7 +104,7 @@ export default function TableroJuegoPage() {
   // Aunque ya se haya llegado a Cierre, si la ÚLTIMA carta de la
   // partida todavía no terminó su secuencia, seguimos mostrando el
   // tablero normal hasta que el docente presione "Continuar".
-  if (estado.fase === 'CIERRE' && !haySecuenciaPendiente) {
+  if (estado.fase === FASES.CIERRE && !haySecuenciaPendiente) {
     return (
       <div className="tablero">
         <HojasDecorativas />
@@ -97,14 +113,9 @@ export default function TableroJuegoPage() {
     );
   }
 
-  const equipoTurnoId = estado.ordenTurnoActual[estado.turnoActualIndex];
-  const equipoOriginal = estado.equipos[equipoTurnoId];
-  const equipoActual = estado.modoRobo ? estado.equipos[estado.modoRobo.equipoId] : equipoOriginal;
-  const cartaActual = estado.modoRobo
-    ? estado.mazo[estado.modoRobo.cartaId]
-    : estado.cartaActualId
-      ? estado.mazo[estado.cartaActualId]
-      : null;
+  const equipoOriginal = equipoDelTurnoNormal(estado);
+  const equipoActual = equipoEnTurnoActual(estado);
+  const cartaActual = cartaEnJuego(estado);
 
   const forzarAdivinar = !estado.modoRobo && cartaActual ? debeAdivinar(equipoActual) : false;
   const mostrandoAdivinar = estado.modoAdivinarActivo || forzarAdivinar;
@@ -136,7 +147,7 @@ export default function TableroJuegoPage() {
   // (teclado incluido) sigue visible, solo deshabilitado durante el
   // "beat". El estado 5 añade encima el zarpazo a pantalla completa; al
   // terminar ese, se pasa al Robo (ahí sí desaparece el teclado).
-  const esDerrota = estadoAnunciando === 5;
+  const esDerrota = estadoAnunciando === PANTERA_ESTADO_DERROTA;
   const anunciando = Boolean(estadoAnunciando);
 
   const mostrandoControlesNormales =
@@ -244,13 +255,13 @@ export default function TableroJuegoPage() {
 
         <div className="tablero-equipos">
           {Object.values(estado.equipos)
-            .filter((e) => estado.ordenTurnoActual.includes(e.id) || estado.fase === 'RONDA1')
+            .filter((e) => estado.ordenTurnoActual.includes(e.id) || estado.fase === FASES.RONDA1)
             .map((equipo) => (
               <EquipoPanel
                 key={equipo.id}
                 equipo={equipo}
                 limites={limites}
-                esTurnoActual={equipo.id === equipoTurnoId}
+                esTurnoActual={equipo.id === equipoOriginal?.id}
                 esQuienRoba={estado.modoRobo?.equipoId === equipo.id}
               />
             ))}
@@ -268,38 +279,28 @@ export default function TableroJuegoPage() {
 
               {estado.ronda === 1 && (
                 <div className="acierto-seguro">
-                  <button
-                    type="button"
-                    className="btn-secundario"
-                    disabled={
-                      anunciando ||
-                      equipoActual.intentos.vocales <= 0 ||
-                      equipoActual.saldo < COSTO_ACIERTO_SEGURO.vocal ||
-                      !hayLetrasDisponiblesAciertoSeguro(cartaActual.texto, 'vocal', estado.letrasUsadas)
-                    }
-                    onClick={() => comprarAciertoSeguro('vocal')}
-                  >
-                    Acierto Seguro · Vocal ({COSTO_ACIERTO_SEGURO.vocal} 🪙)
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-secundario"
-                    disabled={
-                      anunciando ||
-                      equipoActual.intentos.consonantes <= 0 ||
-                      equipoActual.saldo < COSTO_ACIERTO_SEGURO.consonante ||
-                      !hayLetrasDisponiblesAciertoSeguro(cartaActual.texto, 'consonante', estado.letrasUsadas)
-                    }
-                    onClick={() => comprarAciertoSeguro('consonante')}
-                  >
-                    Acierto Seguro · Consonante ({COSTO_ACIERTO_SEGURO.consonante} 🪙)
-                  </button>
+                  {['vocal', 'consonante'].map((categoria) => (
+                    <button
+                      key={categoria}
+                      type="button"
+                      className="btn-secundario"
+                      disabled={
+                        anunciando ||
+                        Boolean(
+                          impedimentoAciertoSeguro(equipoActual, categoria, cartaActual.texto, estado.letrasUsadas),
+                        )
+                      }
+                      onClick={() => comprarAciertoSeguro(categoria)}
+                    >
+                      Acierto Seguro · {ETIQUETA_CATEGORIA[categoria]} ({COSTO_ACIERTO_SEGURO[categoria]} 🪙)
+                    </button>
+                  ))}
                 </div>
               )}
 
               <button
                 type="button"
-                className="btn-primario btn-grande"
+                className="btn-primario"
                 disabled={anunciando}
                 onClick={() => dispatch({ type: 'ACTIVAR_MODO_ADIVINAR' })}
               >

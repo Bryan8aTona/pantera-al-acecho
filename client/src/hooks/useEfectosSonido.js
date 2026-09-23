@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { reproducirSonido } from '../sonido/gestorSonido.js';
+import { FASES } from '../motor/constantes.js';
 
 function contarAciertos(letrasUsadas) {
   return Object.values(letrasUsadas).filter((v) => v === 'acierto').length;
@@ -63,9 +64,9 @@ export function useEfectosSonido(
   }, [repechajeVisible]);
 
   // Marcador final.
-  const prevCierre = useRef(estado.fase === 'CIERRE');
+  const prevCierre = useRef(estado.fase === FASES.CIERRE);
   useEffect(() => {
-    const enCierre = estado.fase === 'CIERRE';
+    const enCierre = estado.fase === FASES.CIERRE;
     if (enCierre && !prevCierre.current) reproducirSonido('cierre');
     prevCierre.current = enCierre;
   }, [estado.fase]);

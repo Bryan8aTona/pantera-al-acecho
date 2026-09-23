@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import '../styles/campo.css';
 import './LoginPage.css';
 
 export default function LoginPage() {

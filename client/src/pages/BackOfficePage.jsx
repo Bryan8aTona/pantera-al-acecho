@@ -8,15 +8,19 @@ export default function BackOfficePage() {
   const { usuario, cerrarSesion } = useAuth();
   const navigate = useNavigate();
 
-  async function manejarCerrarSesion() {
-    await cerrarSesion();
-    navigate('/');
-  }
-
   const [sets, setSets] = useState(null); // null = cargando
   const [error, setError] = useState(null);
   const [confirmando, setConfirmando] = useState(null); // id del set a eliminar
   const [eliminandoId, setEliminandoId] = useState(null);
+
+  async function manejarCerrarSesion() {
+    try {
+      await cerrarSesion();
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'No se pudo cerrar la sesión');
+    }
+  }
 
   const cargarSets = useCallback(async () => {
     try {

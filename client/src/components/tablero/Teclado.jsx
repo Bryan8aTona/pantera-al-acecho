@@ -1,10 +1,6 @@
-import { categoriaDeLetra } from '../../motor/index.js';
+import { categoriaDeLetra, claveIntento } from '../../motor/index.js';
 
 const ALFABETO = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
-
-function claveIntento(categoria) {
-  return categoria === 'vocal' ? 'vocales' : 'consonantes';
-}
 
 export default function Teclado({ letrasUsadas, equipo, onPedirLetra, deshabilitado }) {
   return (

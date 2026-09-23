@@ -143,7 +143,7 @@ El motor se construyó como módulos JavaScript puros, sin dependencia de React,
 | `sorteo.js` | Barajado Fisher-Yates del orden de equipos (misma inyección de aleatoriedad) |
 | `estadoInicial.js` | Construye el estado completo de una partida nueva a partir de un set de 8 frases |
 | `reducer.js` | La máquina de estados en sí: un reducer puro `(estado, accion) => nuevoEstado`, que lanza `MotorError` ante acciones inválidas |
-| `selectores.js` | Datos derivados para la UI (progreso de la frase revelada, si debe forzarse el Modo Adivinar, disponibilidad de Acierto Seguro) |
+| `selectores.js` | Datos derivados, compartidos por el reducer y la UI (progreso de la frase revelada, si debe forzarse el Modo Adivinar, por qué no se puede comprar un Acierto Seguro, equipo y carta en juego, derrota pendiente en Ronda 2) |
 | `errores.js` | Clase `MotorError` |
 
 Este reducer se conecta a React mediante un hook dedicado, `usePartidaEngine` (`client/src/hooks/`), que envuelve `useReducer` con un `reducerSeguro` que atrapa `MotorError` y lo guarda como `estado.error` en vez de dejarlo tumbar el render.
@@ -222,7 +222,7 @@ El motor de reglas (lógica pura, sin React) se prueba con Vitest directamente: 
 
 Los componentes de React que orquestan las secuencias dramáticas (derrota, victoria, revelación, repechaje) se prueban con Vitest + Testing Library + jsdom, montando el `TableroJuegoPage` completo dentro de `React.StrictMode` (para que las pruebas atrapen el mismo tipo de problema descrito en 3.5.1) y simulando eventos reales (clics, el evento `ended` de un `<video>`, avance de temporizadores).
 
-La capa de datos (Firebase Auth y Firestore) no tiene pruebas automatizadas: es una integración fina con un servicio externo que se verifica manualmente. Ningún archivo de prueba importa `client/src/lib/firebase.js`.
+La capa de datos (Firebase Auth y Firestore) no tiene pruebas automatizadas: es una integración fina con un servicio externo que se verifica manualmente. Ningún archivo de prueba importa `client/src/lib/firebase.js`; las transformaciones puras de las frases (`client/src/lib/frases.js`) viven aparte justamente para poder probarlas. Las reglas de `firestore.rules` se pueden verificar contra el emulador (`firebase emulators:exec --only firestore …`).
 
 **Limitaciones del entorno de pruebas:**
 - `jsdom` no implementa `<canvas>`, que `lottie-web` (usado por `lottie-react`) necesita al cargar. Se resuelve simulando (`vi.mock`) `lottie-react` globalmente en `client/src/test-setup.js`, en vez de instalar el paquete nativo `canvas` (frágil de compilar, sobre todo en Windows).

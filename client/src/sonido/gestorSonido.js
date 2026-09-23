@@ -19,9 +19,12 @@ export const ARCHIVOS_SONIDO = {
   comprar: 'comprar-letra.mp3', // se pulsa un botón de Acierto Seguro
   victoria: 'victoria.mp3', // un equipo adivina la frase
   derrota: 'derrota.mp3', // la pantera llega al estado 5 (zarpazo)
-  robo: 'robo.mp3', // se abre el panel de Robo  (sin cablear aún, opcional)
-  repechaje: 'inicio-repechaje.mp3', // arranca la Ronda de Repechaje
-  cierre: 'marcador-final.mp3', // se llega al marcador final
+  // Cableados pero aún SIN archivo en public/assets/sonidos/: en null no
+  // se precargan ni se piden (suenan en silencio). Al agregar el audio,
+  // basta con poner aquí su nombre ('inicio-repechaje.mp3',
+  // 'marcador-final.mp3').
+  repechaje: null, // arranca la Ronda de Repechaje
+  cierre: null, // se llega al marcador final
 };
 
 const CLAVE_SILENCIO = 'pantera:sonido:silenciado';

@@ -12,7 +12,7 @@ export default function PanelRevelacion({ carta, equipoGanador, onContinuar }) {
         <p className="panel-revelacion-resultado">Nadie ganó esta frase</p>
       )}
 
-      <button type="button" className="btn-primario btn-grande" onClick={onContinuar}>
+      <button type="button" className="btn-primario" onClick={onContinuar}>
         Continuar
       </button>
     </div>
