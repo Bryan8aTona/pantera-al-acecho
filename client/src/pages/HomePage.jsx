@@ -114,21 +114,6 @@ export default function HomePage() {
             equipos ven un tablero de alta visibilidad con la selva, la pantera al acecho, el teclado
             virtual y el saldo de cada equipo.
           </p>
-
-          <ul className="home-datos">
-            <li>
-              <strong>4</strong>
-              equipos: Rojo, Azul, Amarillo y Verde
-            </li>
-            <li>
-              <strong>8</strong>
-              frases por partida (4 por ronda)
-            </li>
-            <li>
-              <strong>2</strong>
-              rondas: juego y repechaje
-            </li>
-          </ul>
         </section>
 
         <section className="home-seccion">
