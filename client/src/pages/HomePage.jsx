@@ -140,7 +140,7 @@ const MANUAL = [
     alt: 'Formulario “Nuevo set” con el nombre del set y las frases numeradas del 1 al 8.',
     titulo: 'Prepara un set de 8 frases',
     detalle:
-      'En el panel, crea un set, ponle nombre y escribe sus 8 frases. En la partida, cada frase va en una carta boca abajo: en la Ronda 1 cada equipo elige la suya y las que nadie eligió quedan para el Repechaje. Puedes editar o eliminar tus sets cuando quieras; se guardan en tu cuenta para reutilizarlos en otras clases.',
+      'En el panel, crea un set, ponle nombre y escribe sus 8 frases. En cada partida las frases se barajan en cartas boca abajo: en la Ronda 1 cada equipo elige la suya y las que nadie eligió quedan para el Repechaje. Puedes editar o eliminar tus sets cuando quieras; se guardan en tu cuenta para reutilizarlos en otras clases.',
   },
   {
     imagen: '/assets/home/manual-3-partida.webp',
