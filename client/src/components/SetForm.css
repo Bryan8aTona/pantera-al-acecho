@@ -76,10 +76,8 @@
   outline: none;
 }
 
+/* Fondo, color y borde compartidos: styles/global.css */
 .set-form-error {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-  border-radius: var(--radius-sm);
   padding: 8px 10px;
   font-size: 13px;
   margin: 10px 0 0;

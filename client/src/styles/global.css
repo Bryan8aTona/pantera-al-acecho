@@ -84,6 +84,18 @@ button {
   background: var(--color-bg);
 }
 
+/* Aviso de error de las pantallas administrativas. Cada pantalla ajusta
+   su propio espaciado (padding / margin) en su CSS. */
+.login-error,
+.backoffice-error,
+.config-partida-error,
+.set-form-page-error,
+.set-form-error {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-radius: var(--radius-sm);
+}
+
 button:focus-visible,
 input:focus-visible,
 a:focus-visible {
