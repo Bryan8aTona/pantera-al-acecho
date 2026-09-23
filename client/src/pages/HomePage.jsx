@@ -111,7 +111,7 @@ const PASOS = [
     icono: <IconoAdivinar />,
     titulo: 'Modo Adivinar para declarar la frase',
     detalle:
-      'En cualquier momento el equipo puede intentar la frase completa. El docente escribe la respuesta que el equipo declara en voz alta y el sistema la valida ignorando mayúsculas y acentos.',
+      'En cualquier momento el equipo puede intentar la frase completa. El docente escribe la respuesta que el equipo declara en voz alta y el sistema la valida.',
   },
   {
     icono: <IconoRepechaje />,
@@ -140,7 +140,7 @@ const MANUAL = [
     alt: 'Formulario “Nuevo set” con el nombre del set y las frases numeradas del 1 al 8.',
     titulo: 'Prepara un set de 8 frases',
     detalle:
-      'En el panel, crea un set, ponle nombre y escribe exactamente 8 frases en el orden en que quieres jugarlas: las 4 primeras son la Ronda 1 y las 4 siguientes quedan disponibles para el Repechaje. Puedes editar o eliminar tus sets cuando quieras; se guardan en tu cuenta para reutilizarlos en otras clases.',
+      'En el panel, crea un set, ponle nombre y escribe sus 8 frases. En la partida, cada frase va en una carta boca abajo: en la Ronda 1 cada equipo elige la suya y las que nadie eligió quedan para el Repechaje. Puedes editar o eliminar tus sets cuando quieras; se guardan en tu cuenta para reutilizarlos en otras clases.',
   },
   {
     imagen: '/assets/home/manual-3-partida.webp',
@@ -158,7 +158,7 @@ const MANUAL = [
     puntos: [
       'Pedir una letra: púlsala en el teclado virtual. Si la letra no está en la frase, la pantera avanza un estado.',
       'Acierto Seguro: los botones de vocal / consonante gastan monedas del equipo y revelan una letra sin arriesgar a la pantera.',
-      'Modo Adivinar: escribe la frase completa que el equipo declara; el sistema la valida ignorando mayúsculas y acentos.',
+      'Modo Adivinar: escribe la frase completa que el equipo declara y el sistema la valida.',
       'A los 5 fallos la pantera ataca: el equipo pierde el turno y el equipo siguiente puede robar la frase con un único intento.',
     ],
   },
@@ -209,8 +209,8 @@ export default function HomePage() {
           </p>
           <p>
             Está pensada para proyectarse en el aula: el docente opera desde su computadora y los
-            equipos ven un tablero de alta visibilidad con la selva, la pantera al acecho, el teclado
-            virtual y el saldo de cada equipo.
+            equipos ven en la proyección el tablero con la pantera al acecho, el teclado virtual y el
+            saldo de cada equipo.
           </p>
         </section>
 
