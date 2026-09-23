@@ -1,4 +1,13 @@
+/* Portada pública. Paleta naranja UAM de global.css. El naranja --color-primary
+   (#F08200) no llega a AA sobre blanco en texto normal, así que se usa para
+   rellenos, bordes e íconos; los textos van en --color-text o sobre un
+   naranja más profundo (--home-naranja-profundo, ~6:1 con blanco). */
+
 .home {
+  --home-naranja-tenue: #FFF4E6;
+  --home-naranja-borde: #F6C995;
+  --home-naranja-profundo: #9A4E00;
+
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -9,41 +18,56 @@
 
 .home-hero {
   text-align: center;
-  padding: 64px 24px 56px;
-  background: linear-gradient(180deg, #fff 0%, var(--color-bg) 100%);
-  border-bottom: 1px solid var(--color-border);
+  padding: 64px 24px 60px;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 0%, #fff 0%, transparent 70%),
+    linear-gradient(180deg, #fff 0%, var(--home-naranja-tenue) 100%);
+  border-bottom: 1px solid var(--home-naranja-borde);
 }
 
 .home-hero-logo {
   width: 260px;
   max-width: 70%;
   height: auto;
-  margin: 0 auto 20px;
+  margin: 0 auto 22px;
   display: block;
 }
 
 .home-hero-titulo {
-  font-size: clamp(30px, 6vw, 46px);
+  font-size: clamp(34px, 7vw, 56px);
   margin: 0;
-  color: var(--color-primary);
-  letter-spacing: -0.01em;
+  color: var(--color-primary-dark);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
 }
 
 .home-hero-tagline {
-  margin: 6px 0 0;
+  margin: 10px 0 0;
   font-family: var(--font-display);
   font-size: 15px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-secondary);
 }
 
-.home-hero-cta {
+/* Dos clases para ganarle a .btn-primario, que global.css carga después. */
+.home-hero .home-hero-cta {
   display: inline-block;
-  margin-top: 28px;
+  margin-top: 30px;
   text-decoration: none;
-  padding: 13px 34px;
-  font-size: 15px;
+  padding: 15px 40px;
+  font-size: 16px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: var(--home-naranja-profundo);
+  box-shadow: 0 6px 18px rgba(154, 78, 0, 0.28);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-hero .home-hero-cta:hover:not(:disabled) {
+  background: #7F4000;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(154, 78, 0, 0.34);
 }
 
 /* Contenido */
@@ -51,13 +75,13 @@
 .home-contenido {
   flex: 1;
   width: 100%;
-  max-width: 760px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 48px 24px 64px;
+  padding: 56px 24px 72px;
 }
 
 .home-seccion {
-  margin-bottom: 48px;
+  margin-bottom: 64px;
 }
 
 .home-seccion:last-child {
@@ -65,11 +89,11 @@
 }
 
 .home-seccion h2 {
-  font-size: 22px;
+  font-size: 26px;
   color: var(--color-text);
-  margin: 0 0 14px;
+  margin: 0 0 18px;
   padding-bottom: 8px;
-  border-bottom: 3px solid var(--color-accent);
+  border-bottom: 3px solid var(--color-primary);
   display: inline-block;
 }
 
@@ -80,64 +104,136 @@
   font-size: 15px;
 }
 
-/* Pasos */
+/* Número de paso: insignia naranja con texto oscuro (6:1). */
 
-.home-pasos {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: paso;
-}
-
-.home-pasos li {
-  position: relative;
-  padding: 0 0 20px 52px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.home-pasos li:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-.home-pasos li::before {
-  counter-increment: paso;
-  content: counter(paso);
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 34px;
-  height: 34px;
+.home-num {
+  flex: none;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-text);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 15px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.home-pasos h3 {
-  margin: 4px 0 6px;
+/* ¿Qué es? */
+
+.home-intro {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  border-top: 4px solid var(--color-primary);
+  padding: 32px 36px 22px;
+}
+
+.home-intro p {
+  max-width: 72ch;
   font-size: 16px;
+}
+
+/* ¿Cómo se juega? */
+
+.home-juego {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.home-juego-paso {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 22px 24px 24px;
+}
+
+/* El último paso (7) ocupa las dos columnas para no dejar un hueco. */
+.home-juego-paso:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.home-juego-cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.home-juego-icono {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--home-naranja-tenue);
+  color: var(--color-primary-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-juego-paso h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.3;
   color: var(--color-text);
 }
 
-.home-pasos p {
+.home-juego-paso p {
   margin: 0;
-  font-size: 14px;
+  font-size: 14.5px;
   color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
-/* Subpuntos dentro de un paso del manual */
+/* Manual para el docente */
+
+.home-manual {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.home-manual-paso {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 32px;
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 28px;
+}
+
+.home-manual-texto .home-num {
+  margin-bottom: 12px;
+}
+
+.home-manual-texto h3 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  color: var(--color-text);
+}
+
+.home-manual-texto p {
+  margin: 0;
+  font-size: 14.5px;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+}
 
 .home-subpuntos {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   padding-left: 20px;
 }
 
@@ -145,35 +241,75 @@
   font-size: 14px;
   color: var(--color-text-secondary);
   line-height: 1.6;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+}
+
+.home-subpuntos li::marker {
+  color: var(--color-primary);
 }
 
 .home-subpuntos li:last-child {
   margin-bottom: 0;
 }
 
+/* Captura dentro de un marco tipo ventana del navegador. */
+
+.home-captura {
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-bg);
+  box-shadow: 0 10px 28px rgba(28, 35, 31, 0.1);
+}
+
+.home-captura-barra {
+  display: flex;
+  gap: 6px;
+  padding: 9px 12px;
+  background: #EEF1ED;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.home-captura-barra span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #CDD4CC;
+}
+
+.home-captura-barra span:first-child {
+  background: var(--color-primary);
+}
+
+.home-captura img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* Aviso destacado */
 
 .home-seccion .home-aviso {
   margin: 24px 0 0;
-  padding: 14px 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-accent);
+  padding: 16px 20px;
+  background: var(--home-naranja-tenue);
+  border: 1px solid var(--home-naranja-borde);
+  border-left: 5px solid var(--color-primary);
   border-radius: var(--radius);
-  font-size: 13.5px;
-  color: var(--color-text-secondary);
+  font-size: 14.5px;
+  color: var(--color-text);
   line-height: 1.6;
 }
 
 /* Cierre */
 
 .home-cierre {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: linear-gradient(135deg, var(--home-naranja-profundo) 0%, #7A3E00 100%);
   border-radius: var(--radius);
-  padding: 32px;
+  padding: 44px 32px;
   text-align: center;
+  color: #fff;
 }
 
 .home-cierre h2 {
@@ -181,12 +317,87 @@
   display: block;
   padding: 0;
   margin-bottom: 8px;
+  color: #fff;
+}
+
+.home-seccion.home-cierre p {
+  color: #fff;
+  margin: 0;
 }
 
 .home-cierre .btn-primario {
   display: inline-block;
-  margin-top: 16px;
+  margin-top: 22px;
   text-decoration: none;
-  padding: 12px 30px;
-  font-size: 14px;
+  padding: 13px 34px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  background: #fff;
+  color: var(--home-naranja-profundo);
+}
+
+.home-cierre .btn-primario:hover:not(:disabled) {
+  background: var(--home-naranja-tenue);
+}
+
+.home-cierre .btn-primario:focus-visible {
+  outline-color: #fff;
+}
+
+/* Celular */
+
+@media (max-width: 760px) {
+  .home-hero {
+    padding: 48px 20px 44px;
+  }
+
+  .home-hero-tagline {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+  }
+
+  .home-contenido {
+    padding: 40px 16px 56px;
+  }
+
+  .home-seccion {
+    margin-bottom: 48px;
+  }
+
+  .home-seccion h2 {
+    font-size: 22px;
+  }
+
+  .home-intro {
+    padding: 24px 20px 14px;
+  }
+
+  .home-intro p {
+    font-size: 15px;
+  }
+
+  .home-juego {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-manual-paso {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .home-cierre {
+    padding: 36px 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero .home-hero-cta {
+    transition: none;
+  }
+
+  .home-hero .home-hero-cta:hover:not(:disabled) {
+    transform: none;
+  }
 }
