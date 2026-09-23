@@ -71,22 +71,40 @@ Ejemplo de documento:
 
 ## 4. Reglas de seguridad (`firestore.rules`)
 
-Toda la autorización vive en las reglas; no hay servidor intermediario. Un set solo es accesible por su dueño, y solo puede crearse/actualizarse con exactamente 8 frases.
+Toda la autorización vive en las reglas; no hay servidor intermediario. Un set solo es accesible por su dueño, y solo puede crearse/actualizarse si cumple los mismos límites que el formulario del back-office: nombre de 1–100 caracteres y exactamente 8 frases, cada una de 1–500 caracteres, con `orden` 1..8 sin repetir (el cliente las guarda ordenadas, así que basta con `frases[i].orden == i + 1`).
 
 ```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function fraseValida(frase, orden) {
+      return frase.orden == orden
+          && frase.texto is string
+          && frase.texto.size() > 0
+          && frase.texto.size() <= 500;
+    }
+
+    function setValido(data) {
+      return data.nombre is string
+          && data.nombre.size() > 0
+          && data.nombre.size() <= 100
+          && data.frases is list
+          && data.frases.size() == 8
+          && fraseValida(data.frases[0], 1)
+          && …                               // una por cada posición
+          && fraseValida(data.frases[7], 8);
+    }
+
     match /sets/{setId} {
       allow read: if request.auth != null
                   && resource.data.ownerUid == request.auth.uid;
       allow create: if request.auth != null
                     && request.resource.data.ownerUid == request.auth.uid
-                    && request.resource.data.frases.size() == 8;
+                    && setValido(request.resource.data);
       allow update: if request.auth != null
                     && resource.data.ownerUid == request.auth.uid
                     && request.resource.data.ownerUid == request.auth.uid
-                    && request.resource.data.frases.size() == 8;
+                    && setValido(request.resource.data);
       allow delete: if request.auth != null
                     && resource.data.ownerUid == request.auth.uid;
     }
