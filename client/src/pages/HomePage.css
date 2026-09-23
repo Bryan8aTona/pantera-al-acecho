@@ -1,12 +1,9 @@
-/* Portada pública. Paleta naranja UAM de global.css. El naranja --color-primary
-   (#F08200) no llega a AA sobre blanco en texto normal, así que se usa para
-   rellenos, bordes e íconos; los textos van en --color-text o sobre un
-   naranja más profundo (--home-naranja-profundo, ~6:1 con blanco). */
+/* Portada pública. Paleta naranja UAM de global.css: el título, los botones
+   y el bloque de cierre van en el naranja UAM (--color-primary). */
 
 .home {
   --home-naranja-tenue: #FFF4E6;
   --home-naranja-borde: #F6C995;
-  --home-naranja-profundo: #9A4E00;
 
   min-height: 100%;
   display: flex;
@@ -36,7 +33,7 @@
 .home-hero-titulo {
   font-size: clamp(34px, 7vw, 56px);
   margin: 0;
-  color: var(--color-primary-dark);
+  color: var(--color-primary);
   letter-spacing: -0.02em;
   line-height: 1.05;
 }
@@ -59,15 +56,15 @@
   font-size: 16px;
   font-family: var(--font-display);
   font-weight: 700;
-  background: var(--home-naranja-profundo);
-  box-shadow: 0 6px 18px rgba(154, 78, 0, 0.28);
+  background: var(--color-primary);
+  box-shadow: 0 6px 18px rgba(240, 130, 0, 0.3);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .home-hero .home-hero-cta:hover:not(:disabled) {
-  background: #7F4000;
+  background: var(--color-primary-dark);
   transform: translateY(-1px);
-  box-shadow: 0 8px 22px rgba(154, 78, 0, 0.34);
+  box-shadow: 0 8px 22px rgba(240, 130, 0, 0.36);
 }
 
 /* Contenido */
@@ -305,7 +302,7 @@
 /* Cierre */
 
 .home-cierre {
-  background: linear-gradient(135deg, var(--home-naranja-profundo) 0%, #7A3E00 100%);
+  background: var(--color-primary);
   border-radius: var(--radius);
   padding: 44px 32px;
   text-align: center;
@@ -334,7 +331,7 @@
   font-weight: 700;
   font-family: var(--font-display);
   background: #fff;
-  color: var(--home-naranja-profundo);
+  color: var(--color-primary);
 }
 
 .home-cierre .btn-primario:hover:not(:disabled) {
