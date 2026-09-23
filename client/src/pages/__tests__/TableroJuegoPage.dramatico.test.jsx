@@ -5,14 +5,18 @@ import { StrictMode, useEffect } from 'react';
 import { PartidaProvider, usePartida } from '../../context/PartidaContext.jsx';
 import TableroJuegoPage from '../TableroJuegoPage.jsx';
 
+// El mazo se baraja en cada partida (motor/mazo.js). Aquí se deja el
+// barajado fijo —y con él el sorteo de equipos, que usa la misma función—
+// para que la carta número 1 sea siempre GATO. Los premios siguen siendo
+// aleatorios.
+vi.mock('../../motor/sorteo.js', () => ({ sortearOrden: (items) => [...items] }));
+
 const DURACION_CLICK_CARTA_MS = 450;
 const DURACION_IMPACTO_MS = 600;
 const DURACION_ENCOGER_MS = 400;
 
-// Set determinístico: los IDs y el orden de las frases están fijos, así
-// que la carta de "orden 1" siempre es GATO sin importar qué equipo le
-// toque jugar (el orden de equipos SÍ es aleatorio, y no nos importa
-// para esta prueba).
+// Set determinístico: con el barajado fijo (ver vi.mock arriba), la
+// carta número 1 siempre es GATO sin importar qué equipo le toque jugar.
 const SET_PRUEBA = {
   id: 'set-1',
   nombre: 'Set de prueba',

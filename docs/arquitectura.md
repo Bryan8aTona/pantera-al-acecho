@@ -139,8 +139,8 @@ El motor se construyó como módulos JavaScript puros, sin dependencia de React,
 | `constantes.js` | Todos los valores numéricos de `requerimientos.md` (saldos, costos, límites de intentos, premios) en un solo lugar |
 | `normalizacion.js` | Normalización de texto/letras (con el manejo especial de la Ñ descrito arriba) |
 | `letras.js` | Clasificación vocal/consonante, búsqueda de posiciones y letras únicas de una frase |
-| `mazo.js` | Construcción del mazo con premios aleatorios (función aleatoria inyectable, para pruebas determinísticas) |
-| `sorteo.js` | Barajado Fisher-Yates del orden de equipos (misma inyección de aleatoriedad) |
+| `mazo.js` | Construcción del mazo: baraja las frases (el número de carta es la posición en el mazo, no en el set) y asigna premios aleatorios (función aleatoria inyectable, para pruebas determinísticas) |
+| `sorteo.js` | Barajado Fisher-Yates, usado para el orden de equipos y para el mazo (misma inyección de aleatoriedad) |
 | `estadoInicial.js` | Construye el estado completo de una partida nueva a partir de un set de 8 frases |
 | `reducer.js` | La máquina de estados en sí: un reducer puro `(estado, accion) => nuevoEstado`, que lanza `MotorError` ante acciones inválidas |
 | `selectores.js` | Datos derivados, compartidos por el reducer y la UI (progreso de la frase revelada, si debe forzarse el Modo Adivinar, por qué no se puede comprar un Acierto Seguro, equipo y carta en juego, derrota pendiente en Ronda 2) |

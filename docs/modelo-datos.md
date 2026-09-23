@@ -65,7 +65,7 @@ Ejemplo de documento:
 
 > **Nota sobre ortografía.** El texto se guarda con ortografía correcta para mostrarse al revelar la frase al final de cada turno. La normalización (sin tildes, sin mayúsculas) se aplica solo en el motor de reglas del cliente — y preserva la Ñ como letra distinta, no como una "N acentuada". Ver `arquitectura.md` sección 3.5.
 
-> **`id` de frase.** Las frases se guardan solo como `{ orden, texto }`. El cliente (`client/src/lib/sets.js`) sintetiza un `id` estable por frase al leer el set (`f1`…`f8`, derivado de `orden`), porque el motor de juego indexa el mazo por `frase.id`. No se persiste.
+> **`id` de frase.** Las frases se guardan solo como `{ orden, texto }`. El cliente (`client/src/lib/sets.js`) sintetiza un `id` estable por frase al leer el set (`f1`…`f8`, derivado de `orden`), porque el motor de juego indexa el mazo por `frase.id`. No se persiste. El `orden` solo ordena las frases en el formulario: en la partida el mazo se baraja y el número de cada carta es su posición en el mazo barajado (`motor/mazo.js`).
 
 ---
 

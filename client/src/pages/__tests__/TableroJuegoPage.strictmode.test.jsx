@@ -5,6 +5,12 @@ import { StrictMode, useEffect } from 'react';
 import { PartidaProvider, usePartida } from '../../context/PartidaContext.jsx';
 import TableroJuegoPage from '../TableroJuegoPage.jsx';
 
+// El mazo se baraja en cada partida (motor/mazo.js). Aquí se deja el
+// barajado fijo —y con él el sorteo de equipos, que usa la misma función—
+// para que la carta número 1 sea siempre GATO. Los premios siguen siendo
+// aleatorios.
+vi.mock('../../motor/sorteo.js', () => ({ sortearOrden: (items) => [...items] }));
+
 // Regresión: la primera versión de useSecuenciasDramaticas usaba una
 // ref mutada a mano para detectar "se resolvió una carta". Bajo
 // React.StrictMode (que main.jsx SÍ activa, a diferencia de una prueba
