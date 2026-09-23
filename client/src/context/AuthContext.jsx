@@ -70,8 +70,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   const cerrarSesion = useCallback(async () => {
-    await signOut(auth);
-    setUsuario(null);
+    try {
+      await signOut(auth);
+      setUsuario(null);
+    } catch (error) {
+      throw traducirError(error);
+    }
   }, []);
 
   return (

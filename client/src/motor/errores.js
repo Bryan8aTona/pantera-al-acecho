@@ -1,6 +1,6 @@
 // Se lanza ante cualquier acción inválida dada la fase/turno actual.
-// El Tablero (Fase 4) la captura para mostrar el mensaje al docente
-// sin corromper el estado de la partida.
+// reducerSeguro (hooks/) la captura y la guarda en `estado.error`, para
+// que el Tablero muestre el mensaje al docente sin corromper la partida.
 export class MotorError extends Error {
   constructor(codigo, mensaje) {
     super(mensaje);

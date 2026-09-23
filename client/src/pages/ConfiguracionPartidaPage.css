@@ -23,10 +23,8 @@
   font-size: 13px;
 }
 
+/* Fondo, color y borde compartidos: styles/global.css */
 .config-partida-error {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-  border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 16px;
@@ -104,11 +102,6 @@
 .config-partida-acciones {
   display: flex;
   justify-content: center;
-}
-
-.btn-grande {
-  padding: 14px 32px;
-  font-size: 15px;
 }
 
 .config-partida-header a.btn-secundario,

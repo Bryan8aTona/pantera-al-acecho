@@ -23,10 +23,8 @@
   align-items: center;
 }
 
+/* Fondo, color y borde compartidos: styles/global.css */
 .set-form-page-error {
-  background: var(--color-danger-bg);
-  color: var(--color-danger);
-  border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 13px;
   margin-bottom: 16px;

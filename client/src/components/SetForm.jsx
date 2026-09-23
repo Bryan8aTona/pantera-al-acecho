@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { FRASES_POR_SET } from '../motor/constantes.js';
+import '../styles/campo.css';
 import './SetForm.css';
 
-const POSICIONES = [1, 2, 3, 4, 5, 6, 7, 8];
+const POSICIONES = Array.from({ length: FRASES_POR_SET }, (_, i) => i + 1);
 
 function crearFrasesVacias() {
   return POSICIONES.map((orden) => ({ orden, texto: '' }));
@@ -36,7 +38,7 @@ export default function SetForm({ valorInicial, onGuardar, onCancelar, guardando
     setError(null);
 
     if (faltanCampos) {
-      setError('Completa el nombre y las 8 frases antes de guardar.');
+      setError(`Completa el nombre y las ${FRASES_POR_SET} frases antes de guardar.`);
       return;
     }
 

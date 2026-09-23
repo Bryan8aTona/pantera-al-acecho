@@ -1,11 +1,37 @@
 rules_version = '2';
 
 // Cada set pertenece a un docente (ownerUid). Solo su dueño lo lee o lo
-// modifica. Un set siempre tiene exactamente 8 frases (misma regla de
-// negocio que validaba el servidor Express antes de la migración).
+// modifica. Un set siempre tiene exactamente 8 frases, y se validan los
+// mismos límites que impone el formulario del back-office (SetForm.jsx):
+// nombre de 1–100 caracteres, cada frase de 1–500, y `orden` 1..8 sin
+// repetir. El cliente (lib/sets.js) guarda las frases ya ordenadas por
+// `orden`, por eso basta con exigir frases[i].orden == i + 1.
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function fraseValida(frase, orden) {
+      return frase.orden == orden
+          && frase.texto is string
+          && frase.texto.size() > 0
+          && frase.texto.size() <= 500;
+    }
+
+    function setValido(data) {
+      return data.nombre is string
+          && data.nombre.size() > 0
+          && data.nombre.size() <= 100
+          && data.frases is list
+          && data.frases.size() == 8
+          && fraseValida(data.frases[0], 1)
+          && fraseValida(data.frases[1], 2)
+          && fraseValida(data.frases[2], 3)
+          && fraseValida(data.frases[3], 4)
+          && fraseValida(data.frases[4], 5)
+          && fraseValida(data.frases[5], 6)
+          && fraseValida(data.frases[6], 7)
+          && fraseValida(data.frases[7], 8);
+    }
 
     match /sets/{setId} {
       allow read: if request.auth != null
@@ -13,12 +39,12 @@ service cloud.firestore {
 
       allow create: if request.auth != null
                     && request.resource.data.ownerUid == request.auth.uid
-                    && request.resource.data.frases.size() == 8;
+                    && setValido(request.resource.data);
 
       allow update: if request.auth != null
                     && resource.data.ownerUid == request.auth.uid
                     && request.resource.data.ownerUid == request.auth.uid
-                    && request.resource.data.frases.size() == 8;
+                    && setValido(request.resource.data);
 
       allow delete: if request.auth != null
                     && resource.data.ownerUid == request.auth.uid;

@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { normalizarLetra } from '../../motor/index.js';
-
-function esLetra(caracter) {
-  return /[A-ZÑa-zñ]/i.test(caracter);
-}
+import { esLetra, normalizarLetra } from '../../motor/index.js';
 
 // Copia SOLO el caso (mayúscula/minúscula) del carácter correspondiente
 // de la frase objetivo: si en la frase esa posición va en minúscula, lo
@@ -101,7 +97,16 @@ export default function RellenoInteligente({ texto, letrasUsadas = {}, onEnviar,
       <div className="relleno-celdas">
         {celdas.map((celda, i) => {
           if (celda.tipo === 'fijo') {
-            return <span key={i} className="progreso-espacio" aria-hidden="true" />;
+            // Igual que ProgresoFrase: el espacio separa palabras y los
+            // signos de puntuación se muestran tal cual, sin ser editables.
+            if (celda.valor === ' ') {
+              return <span key={i} className="progreso-espacio" aria-hidden="true" />;
+            }
+            return (
+              <span key={i} className="progreso-celda revelada">
+                {celda.valor}
+              </span>
+            );
           }
           if (celda.tipo === 'bloqueada') {
             return (

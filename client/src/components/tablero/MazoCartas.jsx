@@ -45,12 +45,20 @@ export default function MazoCartas({ mazo, interactivo, cartaElegidaId, onElegir
     };
   }, [interactivo]);
 
+  // Si el mazo se desmonta durante la animación de reacción (p. ej. el
+  // docente sale de la partida), la elección ya no se despacha.
+  const eleccionPendiente = useRef(null);
+  useEffect(() => () => clearTimeout(eleccionPendiente.current), []);
+
   function manejarClick(cartaId) {
     if (!interactivo || seleccionandoId) return;
     reproducirSonido('elegirCarta');
     setSeleccionandoId(cartaId);
     // Deja ver la animación de reacción antes de disparar la acción real.
-    setTimeout(() => onElegir(cartaId), DURACION_CLICK_MS);
+    eleccionPendiente.current = setTimeout(() => {
+      eleccionPendiente.current = null;
+      onElegir(cartaId);
+    }, DURACION_CLICK_MS);
   }
 
   return (

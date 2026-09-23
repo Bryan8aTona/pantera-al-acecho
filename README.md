@@ -30,7 +30,7 @@ navegador.
 - **Persistencia:** Cloud Firestore (`firebase/firestore/lite`), una sola
   colección `sets`. La autorización vive en `firestore.rules`.
 - **Hosting:** Firebase Hosting (sitio estático).
-- **Pruebas:** Vitest + Testing Library (jsdom) en el cliente — 74 pruebas.
+- **Pruebas:** Vitest + Testing Library (jsdom) en el cliente — 109 pruebas.
 
 ## Estructura del repositorio
 
@@ -93,7 +93,7 @@ cuenta** de la propia aplicación (nombre, email, contraseña de 8+ caracteres).
 | Ubicación | Comando | Efecto |
 | --- | --- | --- |
 | `client/` | `npm run dev` | Servidor de desarrollo Vite. |
-| `client/` | `npm test` | Ejecuta las 74 pruebas (Vitest). |
+| `client/` | `npm test` | Ejecuta las 109 pruebas (Vitest). |
 | `client/` | `npm run build` | Build de producción en `client/dist/`. |
 | `client/` | `npm run preview` | Sirve el build de producción localmente. |
 | raíz | `firebase deploy` | Publica Hosting + reglas de Firestore. |

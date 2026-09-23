@@ -1,11 +1,14 @@
 import { COLORES_EQUIPO } from './coloresEquipo.js';
+import { PANTERA_ESTADO_DERROTA } from '../../motor/constantes.js';
+
+const ESTADOS_PANTERA = Array.from({ length: PANTERA_ESTADO_DERROTA }, (_, i) => i + 1);
 
 // La animación real de la pantera vive en su propio componente; aquí
 // solo un indicador compacto de cuántas vidas lleva perdidas el equipo.
 function PuntosPantera({ estado }) {
   return (
-    <div className="pantera-puntos" aria-label={`Pantera en estado ${estado} de 5`}>
-      {[1, 2, 3, 4, 5].map((n) => (
+    <div className="pantera-puntos" aria-label={`Pantera en estado ${estado} de ${PANTERA_ESTADO_DERROTA}`}>
+      {ESTADOS_PANTERA.map((n) => (
         <span key={n} className={n <= estado ? 'punto lleno' : 'punto'} />
       ))}
     </div>

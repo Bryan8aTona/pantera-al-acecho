@@ -87,7 +87,7 @@ export default function ConfiguracionPartidaPage() {
           <div className="config-partida-acciones">
             <button
               type="button"
-              className="btn-primario btn-grande"
+              className="btn-primario"
               disabled={!seleccionId || iniciando}
               onClick={manejarInicio}
             >
