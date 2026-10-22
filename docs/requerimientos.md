@@ -94,7 +94,7 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 
 **Envío:** El docente presiona Enter o el botón "Adivinar" para que el sistema valide.
 
-**Rendirse:** Cuando el equipo está obligado a declarar la frase (agotó sus intentos de letras, o le toca robar) y no la sabe, el docente presiona "Rendirse". Se resuelve exactamente igual que una respuesta incorrecta: en Ronda 1 activa el Robo (o, si ya era el robo, nadie gana la carta) y en Ronda 2 es derrota directa.
+**Rendirse:** Cuando el equipo está declarando la frase (en el Modo Adivinar, voluntario u obligatorio por haber agotado sus intentos, o al robar) y no la sabe, el docente presiona "Rendirse". Se resuelve exactamente igual que una respuesta incorrecta: en Ronda 1 activa el Robo (o, si ya era el robo, nadie gana la carta) y en Ronda 2 es derrota directa.
 
 **Validación Algorítmica:** El sistema normaliza el texto (ignora mayúsculas, minúsculas y acentos) y compara el intento con la frase objetivo.
 

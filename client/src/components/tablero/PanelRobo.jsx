@@ -16,9 +16,11 @@ export default function PanelRobo({ equipoQueRoba, equipoOriginal, carta, letras
         textoBoton="Declarar frase"
       />
 
-      <button type="button" className="btn-secundario panel-rendirse" onClick={onRendirse}>
-        Rendirse
-      </button>
+      <div className="panel-adivinar-acciones">
+        <button type="button" className="btn-secundario panel-rendirse" onClick={onRendirse}>
+          Rendirse
+        </button>
+      </div>
     </div>
   );
 }

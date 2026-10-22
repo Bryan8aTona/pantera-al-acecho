@@ -271,14 +271,17 @@ function manejarEnviarRespuesta(estado, { intento }) {
   return resolverRespuesta(estado, (carta) => respuestaCorrecta(intento, carta));
 }
 
-// RENDIRSE: el equipo que debe declarar la frase (Modo Adivinar
-// obligatorio o Robo) no la sabe. Se resuelve exactamente igual que una
+// RENDIRSE: el equipo que está declarando la frase (Modo Adivinar,
+// obligatorio o voluntario, o Robo) no la sabe. Se resuelve exactamente igual que una
 // respuesta incorrecta, sin que el docente tenga que escribir una frase
 // inventada.
 function manejarRendirse(estado) {
-  const obligado = estado.modoRobo || (estado.cartaActualId && debeAdivinar(estado.equipos[equipoEnTurno(estado)]));
-  if (!obligado) {
-    throw new MotorError('NO_PUEDE_RENDIRSE', 'Solo se puede rendir quien debe declarar la frase');
+  const declarando =
+    estado.modoRobo ||
+    estado.modoAdivinarActivo ||
+    (estado.cartaActualId && debeAdivinar(estado.equipos[equipoEnTurno(estado)]));
+  if (!declarando) {
+    throw new MotorError('NO_PUEDE_RENDIRSE', 'Solo se puede rendir quien está declarando la frase');
   }
   return resolverRespuesta(estado, () => false);
 }

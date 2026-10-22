@@ -463,7 +463,15 @@ describe('RENDIRSE', () => {
     expect(estado.modoRobo).toBeNull();
   });
 
-  it('no se puede rendir un equipo que todavía puede pedir letras', () => {
+  it('en el Modo Adivinar voluntario también se puede rendir (activa el Robo)', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = motorReducer(estado, { type: 'ACTIVAR_MODO_ADIVINAR' });
+    estado = motorReducer(estado, { type: 'RENDIRSE' });
+
+    expect(estado.modoRobo).toEqual({ equipoId: 'azul', cartaId: 'c1' });
+  });
+
+  it('fuera del Modo Adivinar y del Robo no se puede rendir', () => {
     const estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
     expect(() => motorReducer(estado, { type: 'RENDIRSE' })).toThrow(MotorError);
   });
