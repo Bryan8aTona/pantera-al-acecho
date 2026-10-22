@@ -123,14 +123,20 @@
 
 /* Rejilla principal: mitad/mitad arriba (jugada | equipos), controles
    abajo ocupando todo el ancho — pensado para caber en la pantalla sin
-   necesitar scroll. */
+   necesitar scroll.
+
+   Los tamaños verticales (pantera, cartas, teclas, celdas) usan
+   min(vw, vh) para encogerse también en pantallas bajas (laptop 1366×768,
+   o 1920×1080 con escala 150%). Si aun así no cabe, la fila de arriba
+   NUNCA baja de su contenido (minmax(min-content, …)) y el cuerpo no se
+   encoge (flex-shrink 0): el .tablero hace scroll en vez de encimar los
+   paneles de equipo o la frase sobre el teclado. */
 
 .tablero-cuerpo {
-  flex: 1;
-  min-height: 0;
+  flex: 1 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: minmax(min-content, 1fr) auto;
   gap: 14px;
 }
 
@@ -177,9 +183,8 @@
   grid-row: 1;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-rows: repeat(2, minmax(min-content, 1fr));
   gap: 12px;
-  min-height: 0;
 }
 
 .equipo-panel-v2 {
@@ -367,8 +372,8 @@
 
 .carta-boca-abajo {
   position: relative;
-  width: clamp(56px, 6vw, 78px);
-  height: clamp(79px, 8.5vw, 110px);
+  height: clamp(62px, min(8.5vw, 12.5vh), 110px);
+  aspect-ratio: 78 / 110;
   border-radius: 10px;
   border: none;
   padding: 0;
@@ -478,7 +483,7 @@
 
 .progreso-celda {
   width: clamp(28px, 3vw, 38px);
-  height: clamp(36px, 3.8vw, 46px);
+  height: clamp(32px, min(3.8vw, 6vh), 46px);
   border-bottom: 3px solid var(--color-accent);
   display: flex;
   align-items: center;
@@ -525,8 +530,8 @@
 }
 
 .tecla {
-  width: clamp(40px, 4.2vw, 54px);
-  height: clamp(40px, 4.2vw, 54px);
+  width: clamp(34px, min(4.2vw, 6.4vh), 54px);
+  height: clamp(34px, min(4.2vw, 6.4vh), 54px);
   border-radius: var(--radius-sm);
   border: 1px solid rgba(46, 107, 71, 0.5);
   background: rgba(46, 107, 71, 0.28);
@@ -757,8 +762,8 @@
 
 .pantera-display {
   position: relative;
-  width: clamp(240px, 26vw, 340px);
-  height: clamp(134px, 14.5vw, 190px);
+  height: clamp(110px, min(14.5vw, 22vh), 190px);
+  aspect-ratio: 340 / 190;
   flex-shrink: 0;
   border-radius: var(--radius);
   overflow: hidden;
@@ -1018,4 +1023,79 @@
 .panel-revelacion-resultado.ganador {
   color: var(--color-accent);
   font-weight: 600;
+}
+
+/* Pantallas bajas: paneles de equipo, cabecera y área de jugada más
+   compactos (mismo contenido, menos aire). */
+@media (max-height: 760px) {
+  .tablero {
+    padding-top: 10px;
+    padding-bottom: 12px;
+  }
+
+  .tablero-header {
+    margin-bottom: 8px;
+  }
+
+  .tablero-header h1 {
+    font-size: 18px;
+  }
+
+  .tablero-cuerpo {
+    gap: 10px;
+  }
+
+  .tablero-jugada {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .tablero-equipos {
+    gap: 14px 10px;
+  }
+
+  .equipo-panel-v2 {
+    padding: 12px 10px 6px;
+  }
+
+  .equipo-panel-v2-fila {
+    margin-top: 0;
+    gap: 1px;
+  }
+
+  .equipo-panel-v2-divisor {
+    margin: 3px 4px;
+  }
+
+  .pantera-puntos,
+  .equipo-panel-v2-etiqueta {
+    margin-top: 3px;
+  }
+
+  .tablero-controles {
+    gap: 6px;
+  }
+}
+
+@media (max-height: 640px) {
+  .tablero-equipos {
+    gap: 12px 10px;
+  }
+
+  .equipo-panel-v2 {
+    padding: 10px 8px 4px;
+  }
+
+  .equipo-panel-v2-saldo {
+    font-size: 17px;
+  }
+
+  .equipo-panel-v2-label {
+    font-size: 8px;
+  }
+
+  .equipo-panel-v2-contadores {
+    font-size: 10px;
+    gap: 0;
+  }
 }
