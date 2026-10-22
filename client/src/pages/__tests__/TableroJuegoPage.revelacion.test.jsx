@@ -53,7 +53,7 @@ function renderTablero() {
     </StrictMode>,
   );
   // Al arrancar, la demostración de cómo se juega tapa el tablero.
-  fireEvent.click(screen.getByRole('button', { name: '¡A jugar!' }));
+  fireEvent.click(screen.getByRole('button', { name: '¡Iniciar partida!' }));
   return resultado;
 }
 

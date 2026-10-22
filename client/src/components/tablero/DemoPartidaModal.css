@@ -500,8 +500,12 @@
   color: var(--color-primary-dark);
 }
 
-.demo-acciones .btn-primario:hover {
-  background: #f3d27e;
+/* :not(:disabled) para empatar la especificidad de
+   .btn-primario:hover:not(:disabled) de global.css (que va después en la
+   cascada y si no lo pintaría de verde). Amarillo oscuro, no claro, para
+   que el cambio se note. */
+.demo-acciones .btn-primario:hover:not(:disabled) {
+  background: #C9971F;
 }
 
 /* --- Animaciones --- */

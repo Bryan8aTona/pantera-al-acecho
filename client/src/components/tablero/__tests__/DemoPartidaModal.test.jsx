@@ -22,7 +22,7 @@ describe('DemoPartidaModal', () => {
 
   it('se cierra con el botón principal y con la ✕', () => {
     const onCerrar = montar();
-    fireEvent.click(screen.getByRole('button', { name: '¡A jugar!' }));
+    fireEvent.click(screen.getByRole('button', { name: '¡Iniciar partida!' }));
     fireEvent.click(screen.getByRole('button', { name: /cerrar demostración/i }));
     expect(onCerrar).toHaveBeenCalledTimes(2);
   });
