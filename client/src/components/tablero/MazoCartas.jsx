@@ -84,7 +84,7 @@ export default function MazoCartas({ mazo, interactivo, cartaElegidaId, onElegir
               }}
               onClick={() => manejarClick(carta.id)}
             >
-              <img src="/assets/cartas/carta-reverso.png" alt="" className="carta-imagen" />
+              <img src="/assets/cartas/carta-reverso.webp" alt="" className="carta-imagen" />
               <span className="carta-boca-abajo-num">{carta.orden}</span>
             </button>
           );

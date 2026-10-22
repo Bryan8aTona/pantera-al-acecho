@@ -9,6 +9,19 @@ export const RUTA_VIDEOS = {
   5: '/assets/pantera/pantera-estado-5-zarpazo.mp4',
 };
 
+// Descarga en segundo plano los videos de la pantera y la garra al abrir
+// el Tablero (mientras la demostración está abierta), para que el primer
+// fallo de cada estado no tenga que esperar a la red. Quedan en la caché
+// HTTP del navegador; se hace una sola vez por carga de la app.
+let panteraPrecargada = false;
+export function precargarPantera() {
+  if (panteraPrecargada || typeof fetch !== 'function') return;
+  panteraPrecargada = true;
+  [...Object.values(RUTA_VIDEOS), '/assets/zarpazo-garra.png'].forEach((ruta) => {
+    fetch(ruta).catch(() => {});
+  });
+}
+
 // Dos modos de uso, siempre dentro de la misma cajita:
 //
 // - Ambiente (`reproducir=false`): el video queda fijo, sin sonido.

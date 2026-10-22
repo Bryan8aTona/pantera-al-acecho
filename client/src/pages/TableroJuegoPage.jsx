@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePartida } from '../context/PartidaContext.jsx';
 import { usePartidaEngine } from '../hooks/usePartidaEngine.js';
@@ -25,7 +25,7 @@ import PanelRobo from '../components/tablero/PanelRobo.jsx';
 import PanelCierre from '../components/tablero/PanelCierre.jsx';
 import PanelAdivinar from '../components/tablero/PanelAdivinar.jsx';
 import PanelRevelacion from '../components/tablero/PanelRevelacion.jsx';
-import PanteraDisplay from '../components/tablero/PanteraDisplay.jsx';
+import PanteraDisplay, { precargarPantera } from '../components/tablero/PanteraDisplay.jsx';
 import EfectoImpacto from '../components/tablero/EfectoImpacto.jsx';
 import ZarpazoOverlay from '../components/tablero/ZarpazoOverlay.jsx';
 import AnimacionVictoria from '../components/tablero/AnimacionVictoria.jsx';
@@ -61,6 +61,10 @@ export default function TableroJuegoPage() {
   // partida no se puede operar hasta que el docente la cierra.
   const [mostrarDemo, setMostrarDemo] = useState(true);
   const cerrarDemo = useCallback(() => setMostrarDemo(false), []);
+
+  useEffect(() => {
+    precargarPantera();
+  }, []);
   const navigate = useNavigate();
 
   // El mensaje "Comienza la Ronda de Repechaje" solo se ve realmente
