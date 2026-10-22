@@ -215,7 +215,7 @@ La autorización vive por completo en `firestore.rules`: cada set solo es legibl
 | Persistencia | Cloud Firestore (`firebase/firestore/lite`) |
 | Animaciones | lottie-react |
 | Pruebas (cliente) | Vitest, Testing Library, jsdom |
-| Hosting | Firebase Hosting |
+| Hosting | Firebase Hosting (caché en `firebase.json`: los JS/CSS con hash de Vite, un año e `immutable`; imágenes, videos y sonidos, una semana; el HTML, `no-cache` para que cada deploy se vea de inmediato) |
 
 ### 7.1 Estrategia de pruebas
 

@@ -201,7 +201,7 @@ export default function DemoPartidaModal({ onCerrar }) {
               <div className="demo-mazo">
                 {[1, 2, 3, 4].map((n) => (
                   <div key={n} className={n === 3 ? 'demo-carta elegida' : 'demo-carta'}>
-                    <img src="/assets/cartas/carta-reverso.png" alt="" />
+                    <img src="/assets/cartas/carta-reverso.webp" alt="" />
                     <span>{n}</span>
                   </div>
                 ))}
