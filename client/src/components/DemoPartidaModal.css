@@ -1,0 +1,568 @@
+/* Modal de demostración previo a la partida. El marco (cabecera, botón,
+   leyenda) usa la paleta naranja UAM de la pantalla de configuración; el
+   escenario de dentro imita el Tablero, así que lleva su verde selva. */
+
+.demo-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(28, 35, 31, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: demo-aparecer 0.2s ease-out;
+}
+
+.demo-modal {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  padding: 20px 24px 22px;
+  animation: demo-entrar 0.25s ease-out;
+}
+
+.demo-cabecera {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.demo-cabecera h2 {
+  margin: 0 0 2px;
+  font-size: 22px;
+  color: var(--color-primary);
+}
+
+.demo-cabecera p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.demo-cerrar {
+  background: none;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+}
+
+.demo-cerrar:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* --- Escenario (verde selva, como .tablero) --- */
+
+.demo-escenario {
+  --selva: #1F5138;
+  --selva-oscura: #0E2A1F;
+  --canopy: #2E6B47;
+  --dorado: #ECC15A;
+
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  color: white;
+  padding: 16px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 330px;
+  background-color: var(--selva-oscura);
+  background-image:
+    radial-gradient(ellipse 70% 45% at 50% -8%, rgba(150, 220, 150, 0.16), transparent 70%),
+    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.35) 100%),
+    linear-gradient(180deg, #17402E 0%, #0E2A1F 55%, #0A211A 100%);
+}
+
+.demo-sacudida {
+  animation: demo-sacudir 0.4s ease-in-out;
+}
+
+.demo-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.demo-equipo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 150px;
+  padding: 18px 14px 10px;
+  border: 3px solid var(--color-equipo);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 14px 2px var(--color-equipo);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.demo-equipo-robo {
+  box-shadow: 0 0 0 2px var(--dorado), 0 0 16px 3px var(--dorado);
+  animation: demo-entrar-lado 0.4s ease-out;
+}
+
+.demo-equipo-tab {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: var(--color-equipo);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
+.demo-equipo-saldo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dorado);
+}
+
+.demo-equipo-saldo.cambia {
+  animation: demo-latido 0.6s ease-out;
+}
+
+.demo-etiqueta {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.demo-etiqueta-turno {
+  background: #39FF6A;
+  color: #0E2A1F;
+}
+
+.demo-etiqueta-robo {
+  background: var(--dorado);
+  color: #0E2A1F;
+}
+
+/* Pantera: caja oscura que se va "llenando" con cada fallo. */
+.demo-pantera-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.demo-pantera {
+  width: 120px;
+  height: 78px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--canopy);
+  background: radial-gradient(circle at 50% 60%, #12301f, #050d09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.demo-pantera-ojos {
+  display: flex;
+  gap: 14px;
+  animation: demo-aparecer 0.6s ease-out;
+}
+
+.demo-pantera-ojos span {
+  width: 12px;
+  height: 7px;
+  border-radius: 50%;
+  background: #F6E05E;
+  box-shadow: 0 0 10px 3px rgba(246, 224, 94, 0.7);
+  animation: demo-parpadeo 2.4s infinite;
+}
+
+.demo-pantera-figura {
+  font-size: 30px;
+  line-height: 1;
+  filter: brightness(0.55) drop-shadow(0 0 6px rgba(246, 224, 94, 0.5));
+  transition: font-size 0.4s, filter 0.4s;
+  animation: demo-acechar 1.6s ease-in-out infinite alternate;
+}
+
+.demo-pantera-3 .demo-pantera-figura {
+  font-size: 42px;
+  filter: brightness(0.75) drop-shadow(0 0 6px rgba(246, 224, 94, 0.5));
+}
+
+.demo-pantera-4 .demo-pantera-figura,
+.demo-pantera-5 .demo-pantera-figura {
+  font-size: 56px;
+  filter: brightness(1) drop-shadow(0 0 8px rgba(255, 80, 60, 0.7));
+}
+
+.demo-puntos {
+  display: flex;
+  gap: 5px;
+}
+
+.demo-punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.demo-punto.lleno {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* Centro: mazo o frase, con la "burbuja" de lo que pidió el equipo. */
+.demo-centro {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 110px;
+}
+
+.demo-mazo {
+  display: flex;
+  gap: 10px;
+}
+
+.demo-carta {
+  position: relative;
+  width: 54px;
+  height: 76px;
+}
+
+.demo-carta img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.demo-carta span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.demo-carta.elegida {
+  animation: demo-elegir 2.4s ease-in-out forwards;
+}
+
+.demo-frase {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+}
+
+.demo-palabra {
+  display: flex;
+  gap: 6px;
+}
+
+.demo-celda {
+  width: 36px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 3px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px 4px 0 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.demo-celda.nueva {
+  animation: demo-revelar 0.5s ease-out;
+  color: #8CF0A8;
+}
+
+.demo-celda.tecleada {
+  color: var(--dorado);
+  animation: demo-teclear 0.3s ease-out both;
+}
+
+.demo-celda.robo {
+  border-bottom-color: var(--dorado);
+  box-shadow: inset 0 -6px 10px -6px var(--dorado);
+}
+
+.demo-frase-intento .demo-celda {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.demo-burbuja {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  animation: demo-latido 0.5s ease-out;
+}
+
+.demo-burbuja-acierto {
+  background: var(--color-success);
+}
+
+.demo-burbuja-fallo {
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.demo-burbuja-compra {
+  background: var(--dorado);
+  color: #0E2A1F;
+}
+
+.demo-burbuja-adivinar {
+  background: var(--color-primary);
+}
+
+/* Teclado virtual en miniatura: verde = acierto, negro = fallo. */
+.demo-teclado {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.demo-tecla {
+  width: 24px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: var(--selva);
+  border: 1px solid var(--canopy);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  transition: background 0.3s;
+}
+
+.demo-tecla.acierto {
+  background: var(--color-success);
+  border-color: #46A86C;
+}
+
+.demo-tecla.fallo {
+  background: #111;
+  border-color: #333;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.demo-tecla.pulsada {
+  animation: demo-pulsar 0.5s ease-out;
+}
+
+/* Efectos: tesoro y zarpazo, encima de todo el escenario. */
+.demo-victoria {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: radial-gradient(circle, rgba(70, 58, 20, 0.92), rgba(14, 42, 31, 0.94) 70%);
+  font-family: var(--font-display);
+  color: var(--dorado);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  animation: demo-aparecer 0.4s ease-out;
+}
+
+.demo-victoria strong {
+  font-size: 26px;
+}
+
+.demo-victoria span:last-child {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.demo-victoria-icono {
+  font-size: 56px;
+  animation: demo-tesoro 0.7s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.demo-zarpazo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(200, 20, 20, 0.55), rgba(60, 0, 0, 0.75));
+  animation: demo-destello 0.9s ease-out both;
+}
+
+.demo-zarpazo img {
+  width: 75%;
+  max-height: 90%;
+  object-fit: contain;
+  animation: demo-garra 0.5s ease-out both;
+}
+
+/* --- Pie: leyenda, progreso y botón --- */
+
+.demo-leyenda {
+  min-height: 2.6em;
+  margin: 14px 0 8px;
+  font-size: 15px;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--color-text);
+  animation: demo-aparecer 0.35s ease-out;
+}
+
+.demo-progreso {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.demo-progreso span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 0.3s, transform 0.3s;
+}
+
+.demo-progreso span.hecho {
+  background: var(--color-accent);
+}
+
+.demo-progreso span.activo {
+  background: var(--color-primary);
+  transform: scale(1.3);
+}
+
+.demo-acciones {
+  display: flex;
+  justify-content: center;
+}
+
+.demo-acciones .btn-primario {
+  font-size: 15px;
+  padding: 12px 28px;
+}
+
+/* --- Animaciones --- */
+
+@keyframes demo-aparecer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes demo-entrar {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes demo-entrar-lado {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes demo-sacudir {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@keyframes demo-latido {
+  0% { transform: scale(0.6); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes demo-pulsar {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.6); }
+  100% { transform: scale(1); }
+}
+
+@keyframes demo-revelar {
+  from { transform: rotateY(90deg); }
+  to { transform: rotateY(0); }
+}
+
+@keyframes demo-teclear {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes demo-elegir {
+  0%, 25% { transform: none; }
+  55%, 100% { transform: translateY(-14px) scale(1.12); box-shadow: 0 0 16px 4px rgba(236, 193, 90, 0.8); border-radius: 6px; }
+}
+
+@keyframes demo-parpadeo {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes demo-acechar {
+  from { transform: translateX(-4px); }
+  to { transform: translateX(4px); }
+}
+
+@keyframes demo-tesoro {
+  from { transform: scale(0) rotate(-20deg); }
+  to { transform: scale(1) rotate(0); }
+}
+
+@keyframes demo-destello {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  100% { opacity: 0.9; }
+}
+
+@keyframes demo-garra {
+  from { opacity: 0; transform: translate(-30px, -30px) scale(1.4) rotate(-8deg); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-escenario *,
+  .demo-sacudida {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
