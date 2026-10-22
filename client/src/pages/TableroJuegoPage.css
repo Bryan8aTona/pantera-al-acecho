@@ -985,15 +985,22 @@
 
 /* Prefijo .tablero: con una sola clase pierden el empate contra
    .btn-secundario de global.css, que va después en la cascada. */
-.tablero .panel-rendirse {
-  margin-top: 12px;
-}
-
-.tablero .panel-adivinar-cancelar,
-.tablero .panel-rendirse {
+.tablero .panel-adivinar-cancelar {
   background: rgba(255, 255, 255, 0.08);
   color: white;
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.tablero .panel-rendirse {
+  margin-top: 12px;
+  background: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
+}
+
+.tablero .panel-rendirse:hover {
+  background: #8f3422;
+  border-color: #8f3422;
 }
 
 /* Revelación de la frase — pausa obligatoria para el docente */

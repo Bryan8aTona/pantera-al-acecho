@@ -296,7 +296,7 @@ export default function DemoPartidaModal({ onCerrar }) {
 
         <footer className="demo-acciones">
           <button ref={botonRef} type="button" className="btn-primario" onClick={onCerrar}>
-            ¡A jugar!
+            ¡Iniciar partida!
           </button>
         </footer>
       </div>
