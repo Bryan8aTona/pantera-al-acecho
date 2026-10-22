@@ -40,7 +40,7 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Barajado de Frases:** Al iniciar cada partida el sistema baraja las 8 frases del set. El número que muestra cada tarjeta boca abajo es su posición en el mazo barajado, no la posición de la frase en el set, así que un mismo set no reparte siempre la misma frase detrás del mismo número.
 
-**Demostración previa:** Al abrir el Tablero, antes de que empiece el juego, se muestra encima de él una ventana emergente con una demostración animada de cómo se juega (un equipo que pide letras, falla, compra un Acierto Seguro y adivina la frase; y otro que llega al zarpazo y deja la frase en Robo), con los mismos videos de la pantera y la misma animación de victoria del juego. Avanza sola en bucle; el docente puede pausarla o ir a cualquier paso (bolitas, flechas del teclado o botones) para explicar algo de nuevo. La cierra con su botón, con Esc o con un clic fuera de ella; el tablero no se puede operar hasta entonces.
+**Demostración previa:** Al abrir el Tablero, antes de que empiece el juego, se muestra encima de él una ventana emergente con una demostración animada de cómo se juega (un equipo que pide letras, falla, compra un Acierto Seguro y adivina la frase; y otro que llega al zarpazo y deja la frase en Robo), con los mismos videos de la pantera y la misma animación de victoria del juego. No avanza sola: el docente pasa de un paso a otro, o regresa a cualquiera, con las bolitas, las flechas del teclado o los botones, al ritmo de su explicación. La cierra con su botón, con Esc o con un clic fuera de ella; el tablero no se puede operar hasta entonces.
 
 **Selección de Tarjetas:** En la Ronda 1, cada equipo elige una tarjeta del mazo boca abajo al inicio de su turno. En la Ronda 2, los equipos participantes reciben una tarjeta nueva del mazo sobrante (las 4 frases no jugadas en Ronda 1). Una vez elegida su tarjeta, el equipo no puede cambiarla ni elegir otra durante ese turno.
 
@@ -93,6 +93,8 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 **Confirmación oral:** Una vez escrita la respuesta, el docente le pregunta al equipo si esa es su respuesta final. El equipo confirma verbalmente.
 
 **Envío:** El docente presiona Enter o el botón "Adivinar" para que el sistema valide.
+
+**Rendirse:** Cuando el equipo está obligado a declarar la frase (agotó sus intentos de letras, o le toca robar) y no la sabe, el docente presiona "Rendirse". Se resuelve exactamente igual que una respuesta incorrecta: en Ronda 1 activa el Robo (o, si ya era el robo, nadie gana la carta) y en Ronda 2 es derrota directa.
 
 **Validación Algorítmica:** El sistema normaliza el texto (ignora mayúsculas, minúsculas y acentos) y compara el intento con la frase objetivo.
 

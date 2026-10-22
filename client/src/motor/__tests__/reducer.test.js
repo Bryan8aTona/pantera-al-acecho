@@ -422,3 +422,49 @@ describe('Cierre', () => {
     expect(estado.cierre.cartasReveladas.every((c) => c.jugada)).toBe(true);
   });
 });
+
+describe('RENDIRSE', () => {
+  const sinIntentos = (equipo) => ({ ...equipo, intentos: { vocales: 0, consonantes: 0 } });
+
+  it('con los intentos agotados, rendirse activa el Robo igual que un fallo', () => {
+    const base = estadoBase();
+    let estado = estadoBase({ equipos: { ...base.equipos, rojo: sinIntentos(base.equipos.rojo) } });
+    estado = motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = motorReducer(estado, { type: 'RENDIRSE' });
+
+    expect(estado.equipos.rojo.gano).toBe(false);
+    expect(estado.modoRobo).toEqual({ equipoId: 'azul', cartaId: 'c1' });
+  });
+
+  it('en Ronda 2 rendirse es derrota directa: la carta se cierra sin ganador', () => {
+    const base = estadoBase();
+    let estado = estadoBase({
+      fase: 'REPECHAJE',
+      ronda: 2,
+      ordenTurnoActual: ['rojo'],
+      equipos: { ...base.equipos, rojo: sinIntentos(base.equipos.rojo) },
+    });
+    estado = motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = motorReducer(estado, { type: 'RENDIRSE' });
+
+    expect(estado.mazo.c1.jugada).toBe(true);
+    expect(estado.mazo.c1.ganadorId).toBeNull();
+    expect(estado.modoRobo).toBeNull();
+  });
+
+  it('el equipo que roba puede rendirse: nadie se lleva el premio', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'fallo' });
+    estado = motorReducer(estado, { type: 'RENDIRSE' });
+
+    expect(estado.equipos.azul.saldo).toBe(200);
+    expect(estado.mazo.c1.jugada).toBe(true);
+    expect(estado.mazo.c1.ganadorId).toBeNull();
+    expect(estado.modoRobo).toBeNull();
+  });
+
+  it('no se puede rendir un equipo que todavía puede pedir letras', () => {
+    const estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    expect(() => motorReducer(estado, { type: 'RENDIRSE' })).toThrow(MotorError);
+  });
+});

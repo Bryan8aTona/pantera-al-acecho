@@ -477,18 +477,19 @@
 .progreso-frase {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   justify-content: center;
 }
 
 .progreso-celda {
-  width: clamp(28px, 3vw, 38px);
-  height: clamp(32px, min(3.8vw, 6vh), 46px);
+  /* Más chicas que las teclas: las frases largas ocupaban demasiado. */
+  width: clamp(22px, 2.3vw, 30px);
+  height: clamp(28px, min(3vw, 5vh), 36px);
   border-bottom: 3px solid var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(19px, 2.4vw, 26px);
+  font-size: clamp(16px, 1.85vw, 21px);
   font-weight: 700;
   font-family: var(--font-display);
 }
@@ -513,7 +514,7 @@
 }
 
 .progreso-espacio {
-  width: 18px;
+  width: 14px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -956,7 +957,7 @@
 .relleno-celdas {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   justify-content: center;
 }
 
@@ -982,7 +983,14 @@
   color: var(--color-success);
 }
 
-.panel-adivinar-cancelar {
+/* Prefijo .tablero: con una sola clase pierden el empate contra
+   .btn-secundario de global.css, que va después en la cascada. */
+.tablero .panel-rendirse {
+  margin-top: 12px;
+}
+
+.tablero .panel-adivinar-cancelar,
+.tablero .panel-rendirse {
   background: rgba(255, 255, 255, 0.08);
   color: white;
   border-color: rgba(255, 255, 255, 0.3);

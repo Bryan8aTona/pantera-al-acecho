@@ -19,7 +19,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <p className="site-footer-firma">Pantera al Acecho — Proyecto de Servicio Social</p>
+      <p className="site-footer-firma">Pantera al Acecho · Proyecto de Servicio Social</p>
     </footer>
   );
 }

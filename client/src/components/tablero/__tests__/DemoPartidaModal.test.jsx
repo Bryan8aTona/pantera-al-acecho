@@ -42,32 +42,21 @@ describe('DemoPartidaModal', () => {
     expect(onCerrar).toHaveBeenCalledTimes(1);
   });
 
-  it('recorre el guion solo y vuelve a empezar en bucle', () => {
+  it('no avanza solo: se queda en el paso hasta que el docente lo cambia', () => {
     vi.useFakeTimers();
     montar();
-    expect(leyenda(0)).toBeInTheDocument();
-
-    for (let i = 1; i < PASOS.length; i++) {
-      act(() => vi.advanceTimersByTime(PASOS[i - 1].ms));
-      expect(leyenda(i)).toBeInTheDocument();
-    }
-
-    act(() => vi.advanceTimersByTime(PASOS[PASOS.length - 1].ms));
+    act(() => vi.advanceTimersByTime(120_000));
     expect(leyenda(0)).toBeInTheDocument();
   });
 
-  it('las bolitas llevan a cualquier paso y lo dejan en pausa', () => {
-    vi.useFakeTimers();
+  it('las bolitas y los botones llevan a cualquier paso', () => {
     montar();
     fireEvent.click(screen.getByRole('button', { name: 'Paso 5' }));
     expect(leyenda(4)).toBeInTheDocument();
-
-    act(() => vi.advanceTimersByTime(60_000));
-    expect(leyenda(4)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Reanudar' }));
-    act(() => vi.advanceTimersByTime(PASOS[4].ms));
+    fireEvent.click(screen.getByRole('button', { name: 'Paso siguiente' }));
     expect(leyenda(5)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Paso anterior' }));
+    expect(leyenda(4)).toBeInTheDocument();
   });
 
   it('las flechas del teclado mueven entre pasos, de forma circular', () => {
@@ -77,6 +66,5 @@ describe('DemoPartidaModal', () => {
     fireEvent.keyDown(document, { key: 'ArrowLeft' });
     fireEvent.keyDown(document, { key: 'ArrowLeft' });
     expect(leyenda(PASOS.length - 1)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Reanudar' })).toBeInTheDocument();
   });
 });

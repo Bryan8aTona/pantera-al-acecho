@@ -230,6 +230,7 @@ export default function TableroJuegoPage() {
               carta={cartaActual}
               letrasUsadas={estado.letrasUsadas}
               onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
+              onRendirse={() => dispatch({ type: 'RENDIRSE' })}
             />
           ) : (
             <>
@@ -258,6 +259,7 @@ export default function TableroJuegoPage() {
                     obligatorio={forzarAdivinar}
                     onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
                     onCancelar={() => dispatch({ type: 'CANCELAR_MODO_ADIVINAR' })}
+                    onRendirse={() => dispatch({ type: 'RENDIRSE' })}
                   />
                 ) : (
                   <ProgresoFrase texto={cartaActual.texto} letrasUsadas={estado.letrasUsadas} />

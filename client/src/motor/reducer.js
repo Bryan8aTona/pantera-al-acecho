@@ -9,7 +9,7 @@ import {
   letrasUnicasPorCategoria,
   letrasUnicasDeTexto,
 } from './letras.js';
-import { equipoEnTurnoActual, hayDerrotaPendiente, impedimentoAciertoSeguro } from './selectores.js';
+import { debeAdivinar, equipoEnTurnoActual, hayDerrotaPendiente, impedimentoAciertoSeguro } from './selectores.js';
 
 // ---------------------------------------------------------------------
 // Helpers internos
@@ -88,6 +88,8 @@ export function motorReducer(estado, accion) {
       return manejarCancelarModoAdivinar(estado);
     case 'ENVIAR_RESPUESTA':
       return manejarEnviarRespuesta(estado, accion);
+    case 'RENDIRSE':
+      return manejarRendirse(estado);
     case 'CONFIRMAR_DERROTA':
       return manejarConfirmarDerrota(estado);
     default:
@@ -266,8 +268,24 @@ function manejarCancelarModoAdivinar(estado) {
 // ---------------------------------------------------------------------
 
 function manejarEnviarRespuesta(estado, { intento }) {
+  return resolverRespuesta(estado, (carta) => respuestaCorrecta(intento, carta));
+}
+
+// RENDIRSE: el equipo que debe declarar la frase (Modo Adivinar
+// obligatorio o Robo) no la sabe. Se resuelve exactamente igual que una
+// respuesta incorrecta, sin que el docente tenga que escribir una frase
+// inventada.
+function manejarRendirse(estado) {
+  const obligado = estado.modoRobo || (estado.cartaActualId && debeAdivinar(estado.equipos[equipoEnTurno(estado)]));
+  if (!obligado) {
+    throw new MotorError('NO_PUEDE_RENDIRSE', 'Solo se puede rendir quien debe declarar la frase');
+  }
+  return resolverRespuesta(estado, () => false);
+}
+
+function resolverRespuesta(estado, esCorrecta) {
   if (estado.modoRobo) {
-    return resolverIntentoRobo(estado, intento);
+    return resolverIntentoRobo(estado, esCorrecta);
   }
 
   if (!estado.cartaActualId) {
@@ -278,7 +296,7 @@ function manejarEnviarRespuesta(estado, { intento }) {
   const equipoId = equipoEnTurno(estado);
   const carta = estado.mazo[estado.cartaActualId];
 
-  if (respuestaCorrecta(intento, carta)) {
+  if (esCorrecta(carta)) {
     return resolverAciertoDeTurno(estado, equipoId);
   }
 
@@ -343,13 +361,13 @@ function resolverFalloDirectoSinRobo(estado, equipoId) {
 // monedas, una sola oportunidad. Acierta → se lleva el premio. Falla →
 // nadie suma monedas. En ambos casos la carta queda resuelta y el turno
 // avanza al equipo que acaba de robar (ver nota de diseño más abajo).
-function resolverIntentoRobo(estado, intento) {
+function resolverIntentoRobo(estado, esCorrecta) {
   const { equipoId, cartaId } = estado.modoRobo;
   const carta = estado.mazo[cartaId];
 
   let siguiente = estado;
 
-  if (respuestaCorrecta(intento, carta)) {
+  if (esCorrecta(carta)) {
     const equipo = estado.equipos[equipoId];
     siguiente = actualizarEquipo(siguiente, equipoId, { saldo: equipo.saldo + carta.valor });
     siguiente = actualizarCarta(siguiente, cartaId, { jugada: true, ganadorId: equipoId });

@@ -9,8 +9,8 @@ import './DemoPartidaModal.css';
 // partida (TableroJuegoPage). No usa el motor real: es un guion fijo de
 // "fotos" del tablero, una por paso, con un turno ganado (letras, fallo,
 // Acierto Seguro, Modo Adivinar) y uno perdido (pantera hasta el zarpazo
-// y Robo). Avanza sola en bucle; el docente puede pausarla o moverse
-// entre pasos (bolitas, flechas del teclado o botones) para explicar.
+// y Robo). No avanza sola: el docente pasa de un paso a otro (bolitas,
+// flechas del teclado o botones) al ritmo de su explicación.
 
 const TECLADO = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
 
@@ -18,33 +18,33 @@ const NOMBRE_EQUIPO = { rojo: 'Rojo', azul: 'Azul', amarillo: 'Amarillo' };
 
 export const PASOS = [
   // Turno ganado
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, eligiendo: true, ms: 4500,
+  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, eligiendo: true,
     leyenda: 'Cuando es tu turno, eliges una carta del mazo. Detrás hay una frase escondida y un premio en monedas.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'A', pedida: 'A', tipo: 'acierto', ms: 4500,
+  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'A', pedida: 'A', tipo: 'acierto',
     leyenda: 'Si pides la A y está en la frase, aparece en todos los lugares donde va.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'A', fallos: 'T', pantera: 1, pedida: 'T', tipo: 'fallo', ms: 5500,
+  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'A', fallos: 'T', pantera: 1, pedida: 'T', tipo: 'fallo',
     leyenda: 'Si pides la T y no está, la pantera se acerca un poco más.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'AS', fallos: 'T', pantera: 1, pedida: 'S', tipo: 'acierto', ms: 4000,
+  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'AS', fallos: 'T', pantera: 1, pedida: 'S', tipo: 'acierto',
     leyenda: 'Pides la S y también está. ¡Vas bien!' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 180, aciertos: 'ASL', fallos: 'T', pantera: 1, pedida: 'L', tipo: 'compra', ms: 5500,
+  { equipo: 'rojo', frase: 'LA SELVA', saldo: 180, aciertos: 'ASL', fallos: 'T', pantera: 1, pedida: 'L', tipo: 'compra',
     leyenda: '¿No se te ocurre ninguna? Con Acierto Seguro pagas 20 monedas y el juego te da una consonante que sí está.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 180, aciertos: 'ASL', fallos: 'T', pantera: 1, intento: 'LA SELVA', ms: 5000,
-    leyenda: 'Cuando creas que ya sabes la frase, dísela a tu profesor para que la escriba en Modo Adivinar.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 270, aciertos: 'ASLEV', fallos: 'T', pantera: 1, efecto: 'victoria', ms: 5500,
+  { equipo: 'rojo', frase: 'LA SELVA', saldo: 180, aciertos: 'ASL', fallos: 'T', pantera: 1, intento: 'LA SELVA',
+    leyenda: '¿Ya sabes cuál es la frase? Pide adivinarla y dila completa.' },
+  { equipo: 'rojo', frase: 'LA SELVA', saldo: 270, aciertos: 'ASLEV', fallos: 'T', pantera: 1, efecto: 'victoria',
     leyenda: '¡Le atinaste! Te llevas el premio de la carta: 90 monedas más.' },
 
   // Turno perdido
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'O', pantera: 1, pedida: 'O', tipo: 'fallo', ms: 5000,
+  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'O', pantera: 1, pedida: 'O', tipo: 'fallo',
     leyenda: 'Ahora juega el Equipo Azul. Si pides la O y no está, la pantera empieza a acercarse.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OI', pantera: 2, pedida: 'I', tipo: 'fallo', ms: 4000,
+  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OI', pantera: 2, pedida: 'I', tipo: 'fallo',
     leyenda: 'Otro fallo y la pantera ya asoma la cabeza.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIR', pantera: 3, pedida: 'R', tipo: 'fallo', ms: 4000,
+  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIR', pantera: 3, pedida: 'R', tipo: 'fallo',
     leyenda: 'Con cada fallo se acerca más.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRS', pantera: 4, pedida: 'S', tipo: 'fallo', ms: 4500,
+  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRS', pantera: 4, pedida: 'S', tipo: 'fallo',
     leyenda: '¡Cuidado! Está lista para saltar. Un fallo más y te ataca.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRSL', pantera: 5, pedida: 'L', tipo: 'fallo', efecto: 'zarpazo', ms: 5000,
+  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRSL', pantera: 5, pedida: 'L', tipo: 'fallo', efecto: 'zarpazo',
     leyenda: 'Al quinto fallo, ¡zarpazo! Pierdes la carta.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRSL', pantera: 5, efecto: 'robo', ms: 6500,
+  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRSL', pantera: 5, efecto: 'robo',
     leyenda: 'Cuando un equipo pierde, el siguiente puede robar la frase: tiene una sola oportunidad de decirla completa y quedarse con el premio.' },
 ];
 
@@ -95,7 +95,6 @@ function PanteraDemo({ estado, reproducir, pasoId, onFin }) {
 
 export default function DemoPartidaModal({ onCerrar }) {
   const [indice, setIndice] = useState(0);
-  const [enPausa, setEnPausa] = useState(false);
   // Índice del paso cuyo zarpazo ya terminó su video (la garra se ve
   // solo en ese paso; comparar con `indice` evita un fotograma de garra
   // al salir de él).
@@ -103,17 +102,10 @@ export default function DemoPartidaModal({ onCerrar }) {
   const botonRef = useRef(null);
   const paso = PASOS[indice];
 
+  // Circular: después del último paso vuelve al primero, y viceversa.
   const irA = useCallback((i) => {
     setIndice((i + PASOS.length) % PASOS.length);
-    setEnPausa(true);
   }, []);
-
-  // Avanza el guion en bucle mientras no esté en pausa.
-  useEffect(() => {
-    if (enPausa) return undefined;
-    const temporizador = setTimeout(() => setIndice((i) => (i + 1) % PASOS.length), paso.ms);
-    return () => clearTimeout(temporizador);
-  }, [indice, enPausa, paso.ms]);
 
   useEffect(() => {
     setGarraEn(null);
@@ -300,19 +292,7 @@ export default function DemoPartidaModal({ onCerrar }) {
           <button type="button" className="demo-nav-btn" onClick={() => irA(indice + 1)} aria-label="Paso siguiente">
             ›
           </button>
-          <button
-            type="button"
-            className="demo-nav-btn demo-nav-pausa"
-            onClick={() => setEnPausa((p) => !p)}
-            aria-label={enPausa ? 'Reanudar' : 'Pausar'}
-            title={enPausa ? 'Reanudar' : 'Pausar'}
-          >
-            {enPausa ? '▶' : '❚❚'}
-          </button>
         </nav>
-        <p className="demo-ayuda">
-          {enPausa ? 'En pausa. ' : ''}Usa las flechas ← → o las bolitas para ir a cualquier paso.
-        </p>
 
         <footer className="demo-acciones">
           <button ref={botonRef} type="button" className="btn-primario" onClick={onCerrar}>

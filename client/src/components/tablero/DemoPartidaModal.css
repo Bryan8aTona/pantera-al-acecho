@@ -426,6 +426,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin-bottom: 14px;
 }
 
 .demo-nav-btn {
@@ -445,11 +446,6 @@
 
 .demo-nav-btn:hover {
   background: rgba(255, 255, 255, 0.18);
-}
-
-.demo-nav-pausa {
-  font-size: 11px;
-  margin-left: 4px;
 }
 
 .demo-progreso {
@@ -491,12 +487,6 @@
   transform: scale(1.4);
 }
 
-.demo-ayuda {
-  margin: 6px 0 14px;
-  font-size: 12px;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.55);
-}
 
 .demo-acciones {
   display: flex;
@@ -620,10 +610,6 @@
   .demo-leyenda {
     margin: 8px 0 6px;
     font-size: 16px;
-  }
-
-  .demo-ayuda {
-    margin: 4px 0 8px;
   }
 
   .demo-acciones .btn-primario {
