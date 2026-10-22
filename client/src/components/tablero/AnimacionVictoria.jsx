@@ -16,7 +16,7 @@ export default function AnimacionVictoria({ carta, onCompleta }) {
       className="animacion-victoria"
       role="button"
       tabIndex={0}
-      aria-label="Ganó la carta — clic para continuar"
+      aria-label="Ganó la carta. Clic para continuar"
       onClick={onCompleta}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') onCompleta?.();

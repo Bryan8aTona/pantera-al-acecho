@@ -162,7 +162,7 @@ Dos hooks adicionales orquestan las pausas visuales que no son parte de la lógi
 - `ZarpazoOverlay` — la imagen de garra superpuesta a pantalla completa al llegar al estado 5.
 - `EfectoImpacto` — la vibración de pantalla y el destello rojo al perder una vida.
 - `Teclado`, `ProgresoFrase`, `RellenoInteligente` — el teclado virtual y las dos formas de mostrar/completar la frase (solo lectura y editable).
-- `PanelRobo`, `PanelRevelacion`, `AnimacionVictoria`, `PanelCierre`, `PanelAdivinar`, `PanelRepechaje` — los distintos paneles que reemplazan el área de juego según el momento de la partida.
+- `PanelRobo`, `PanelRevelacion`, `AnimacionVictoria`, `PanelCierre`, `PanelAdivinar`, `PanelRepechaje` — los distintos paneles que reemplazan el área de juego según el momento de la partida. `PanelAdivinar` (cuando es obligatorio) y `PanelRobo` tienen un botón "Rendirse" que despacha `RENDIRSE`: el reducer lo resuelve igual que una respuesta incorrecta.
 - `EquipoPanel` — el panel de cada equipo.
 - `HojasDecorativas` — el follaje de fondo del tablero (SVG inline).
 - `DemoPartidaModal` — la demostración de cómo se juega que tapa el tablero al arrancar (`TableroJuegoPage` la monta con `mostrarDemo` y deja el resto del tablero `inert` mientras está abierta). Es un guion fijo de pasos (`PASOS`), no usa el motor real; reutiliza los videos de la pantera (`RUTA_VIDEOS` de `PanteraDisplay`) y la animación Lottie de victoria.
