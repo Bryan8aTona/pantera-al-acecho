@@ -49,7 +49,7 @@ function ArrancarPartida({ children }) {
 }
 
 function renderTablero() {
-  return render(
+  const resultado = render(
     <StrictMode>
       <MemoryRouter>
         <PartidaProvider>
@@ -60,6 +60,9 @@ function renderTablero() {
       </MemoryRouter>
     </StrictMode>,
   );
+  // Al arrancar, la demostración de cómo se juega tapa el tablero.
+  fireEvent.click(screen.getByRole('button', { name: '¡A jugar!' }));
+  return resultado;
 }
 
 function elegirCarta(numero) {
@@ -142,6 +145,31 @@ describe('Secuencias dramáticas bajo StrictMode (regresión)', () => {
     expect(screen.getByText(/nadie ganó/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+    expect(screen.getByText(/Elige una carta boca abajo/i)).toBeInTheDocument();
+  });
+});
+
+describe('Demostración al arrancar la partida', () => {
+  it('tapa el tablero, lo deja inerte y al cerrarla se puede jugar', () => {
+    const { container } = render(
+      <StrictMode>
+        <MemoryRouter>
+          <PartidaProvider>
+            <ArrancarPartida>
+              <TableroJuegoPage />
+            </ArrancarPartida>
+          </PartidaProvider>
+        </MemoryRouter>
+      </StrictMode>,
+    );
+
+    expect(screen.getByRole('dialog', { name: '¿Cómo se juega?' })).toBeInTheDocument();
+    expect(container.querySelector('.tablero-cuerpo')).toHaveAttribute('inert');
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(container.querySelector('.tablero-cuerpo')).not.toHaveAttribute('inert');
     expect(screen.getByText(/Elige una carta boca abajo/i)).toBeInTheDocument();
   });
 });

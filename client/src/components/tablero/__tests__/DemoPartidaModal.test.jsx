@@ -13,6 +13,8 @@ function montar() {
   return onCerrar;
 }
 
+const leyenda = (i) => screen.getByText(PASOS[i].leyenda);
+
 describe('DemoPartidaModal', () => {
   afterEach(() => {
     vi.useRealTimers();
@@ -20,7 +22,7 @@ describe('DemoPartidaModal', () => {
 
   it('se cierra con el botón principal y con la ✕', () => {
     const onCerrar = montar();
-    fireEvent.click(screen.getByRole('button', { name: /a jugar/i }));
+    fireEvent.click(screen.getByRole('button', { name: '¡A jugar!' }));
     fireEvent.click(screen.getByRole('button', { name: /cerrar demostración/i }));
     expect(onCerrar).toHaveBeenCalledTimes(2);
   });
@@ -40,17 +42,41 @@ describe('DemoPartidaModal', () => {
     expect(onCerrar).toHaveBeenCalledTimes(1);
   });
 
-  it('recorre el guion y vuelve a empezar en bucle', () => {
+  it('recorre el guion solo y vuelve a empezar en bucle', () => {
     vi.useFakeTimers();
     montar();
-    expect(screen.getByText(PASOS[0].leyenda)).toBeInTheDocument();
+    expect(leyenda(0)).toBeInTheDocument();
 
     for (let i = 1; i < PASOS.length; i++) {
       act(() => vi.advanceTimersByTime(PASOS[i - 1].ms));
-      expect(screen.getByText(PASOS[i].leyenda)).toBeInTheDocument();
+      expect(leyenda(i)).toBeInTheDocument();
     }
 
     act(() => vi.advanceTimersByTime(PASOS[PASOS.length - 1].ms));
-    expect(screen.getByText(PASOS[0].leyenda)).toBeInTheDocument();
+    expect(leyenda(0)).toBeInTheDocument();
+  });
+
+  it('las bolitas llevan a cualquier paso y lo dejan en pausa', () => {
+    vi.useFakeTimers();
+    montar();
+    fireEvent.click(screen.getByRole('button', { name: 'Paso 5' }));
+    expect(leyenda(4)).toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(60_000));
+    expect(leyenda(4)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reanudar' }));
+    act(() => vi.advanceTimersByTime(PASOS[4].ms));
+    expect(leyenda(5)).toBeInTheDocument();
+  });
+
+  it('las flechas del teclado mueven entre pasos, de forma circular', () => {
+    montar();
+    fireEvent.keyDown(document, { key: 'ArrowRight' });
+    expect(leyenda(1)).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    fireEvent.keyDown(document, { key: 'ArrowLeft' });
+    expect(leyenda(PASOS.length - 1)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reanudar' })).toBeInTheDocument();
   });
 });

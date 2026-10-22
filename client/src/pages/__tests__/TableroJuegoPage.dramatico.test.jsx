@@ -42,7 +42,7 @@ function ArrancarPartida({ children }) {
 }
 
 function renderTablero() {
-  return render(
+  const resultado = render(
     <StrictMode>
       <MemoryRouter>
         <PartidaProvider>
@@ -53,6 +53,9 @@ function renderTablero() {
       </MemoryRouter>
     </StrictMode>,
   );
+  // Al arrancar, la demostración de cómo se juega tapa el tablero.
+  fireEvent.click(screen.getByRole('button', { name: '¡A jugar!' }));
+  return resultado;
 }
 
 function elegirCarta(numero) {

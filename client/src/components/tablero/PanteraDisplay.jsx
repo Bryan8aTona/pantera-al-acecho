@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 // Nombres exactos documentados en client/public/assets/pantera/README.md
-const RUTA_VIDEOS = {
+export const RUTA_VIDEOS = {
   1: '/assets/pantera/pantera-estado-1.mp4',
   2: '/assets/pantera/pantera-estado-2.mp4',
   3: '/assets/pantera/pantera-estado-3.mp4',

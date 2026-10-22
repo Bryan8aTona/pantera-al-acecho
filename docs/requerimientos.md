@@ -40,7 +40,7 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Barajado de Frases:** Al iniciar cada partida el sistema baraja las 8 frases del set. El número que muestra cada tarjeta boca abajo es su posición en el mazo barajado, no la posición de la frase en el set, así que un mismo set no reparte siempre la misma frase detrás del mismo número.
 
-**Demostración previa:** Al iniciar la partida, antes de que empiece el juego, se muestra una ventana emergente con una demostración animada en bucle de cómo se juega (un equipo que pide letras, falla, compra un Acierto Seguro y adivina la frase; y otro que llega al zarpazo y deja la frase en Robo). El docente la cierra con su botón, con Esc o con un clic fuera de ella; la partida no empieza hasta entonces.
+**Demostración previa:** Al abrir el Tablero, antes de que empiece el juego, se muestra encima de él una ventana emergente con una demostración animada de cómo se juega (un equipo que pide letras, falla, compra un Acierto Seguro y adivina la frase; y otro que llega al zarpazo y deja la frase en Robo), con los mismos videos de la pantera y la misma animación de victoria del juego. Avanza sola en bucle; el docente puede pausarla o ir a cualquier paso (bolitas, flechas del teclado o botones) para explicar algo de nuevo. La cierra con su botón, con Esc o con un clic fuera de ella; el tablero no se puede operar hasta entonces.
 
 **Selección de Tarjetas:** En la Ronda 1, cada equipo elige una tarjeta del mazo boca abajo al inicio de su turno. En la Ronda 2, los equipos participantes reciben una tarjeta nueva del mazo sobrante (las 4 frases no jugadas en Ronda 1). Una vez elegida su tarjeta, el equipo no puede cambiarla ni elegir otra durante ese turno.
 

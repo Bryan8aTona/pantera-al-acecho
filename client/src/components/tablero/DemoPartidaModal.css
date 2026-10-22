@@ -1,12 +1,14 @@
-/* Modal de demostración previo a la partida. El marco (cabecera, botón,
-   leyenda) usa la paleta naranja UAM de la pantalla de configuración; el
-   escenario de dentro imita el Tablero, así que lleva su verde selva. */
+/* Demostración de cómo se juega, encima del Tablero al arrancar la
+   partida. Vive dentro de .tablero, así que hereda su paleta verde selva
+   (--color-primary, --color-accent, etc. redefinidas en
+   TableroJuegoPage.css). */
 
 .demo-fondo {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(28, 35, 31, 0.6);
+  background: rgba(4, 14, 10, 0.72);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,13 +17,15 @@
 }
 
 .demo-modal {
-  width: min(760px, 100%);
+  width: min(780px, 100%);
   max-height: calc(100vh - 32px);
   overflow-y: auto;
-  background: var(--color-surface);
-  border-radius: var(--radius);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-  padding: 20px 24px 22px;
+  color: white;
+  background: linear-gradient(170deg, #1d4a34 0%, #0e2a1f 60%, #0a211a 100%);
+  border: 2px solid var(--verde-canopy);
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 18px 50px rgba(0, 0, 0, 0.6);
+  padding: 18px 24px 20px;
   animation: demo-entrar 0.25s ease-out;
 }
 
@@ -30,19 +34,23 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
+}
+
+.demo-kicker {
+  margin: 0 0 2px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .demo-cabecera h2 {
-  margin: 0 0 2px;
-  font-size: 22px;
-  color: var(--color-primary);
-}
-
-.demo-cabecera p {
   margin: 0;
-  font-size: 13px;
-  color: var(--color-text-secondary);
+  font-size: 26px;
+  color: var(--color-accent);
 }
 
 .demo-cerrar {
@@ -52,19 +60,18 @@
   line-height: 1;
   padding: 6px 8px;
   border-radius: var(--radius-sm);
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .demo-cerrar:hover {
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
-/* --- Escenario (verde selva, como .tablero) --- */
+/* --- Escenario: una versión en miniatura del Tablero --- */
 
 .demo-escenario {
   --selva: #1F5138;
-  --selva-oscura: #0E2A1F;
   --canopy: #2E6B47;
   --dorado: #ECC15A;
 
@@ -76,12 +83,9 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  min-height: 330px;
-  background-color: var(--selva-oscura);
-  background-image:
-    radial-gradient(ellipse 70% 45% at 50% -8%, rgba(150, 220, 150, 0.16), transparent 70%),
-    radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.35) 100%),
-    linear-gradient(180deg, #17402E 0%, #0E2A1F 55%, #0A211A 100%);
+  min-height: 340px;
+  border: 1px solid rgba(46, 107, 71, 0.5);
+  background: linear-gradient(160deg, rgba(46, 107, 71, 0.28), rgba(0, 0, 0, 0.3));
 }
 
 .demo-sacudida {
@@ -108,6 +112,10 @@
   background: rgba(0, 0, 0, 0.25);
   box-shadow: 0 0 14px 2px var(--color-equipo);
   transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.demo-equipo-hueco {
+  visibility: hidden;
 }
 
 .demo-equipo-robo {
@@ -160,7 +168,7 @@
   color: #0E2A1F;
 }
 
-/* Pantera: caja oscura que se va "llenando" con cada fallo. */
+/* Pantera: los mismos videos del Tablero, en una cajita. */
 .demo-pantera-caja {
   display: flex;
   flex-direction: column;
@@ -169,49 +177,19 @@
 }
 
 .demo-pantera {
-  width: 120px;
-  height: 78px;
+  width: 220px;
+  aspect-ratio: 340 / 190;
   border-radius: var(--radius-sm);
   border: 2px solid var(--canopy);
-  background: radial-gradient(circle at 50% 60%, #12301f, #050d09);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: #0a1f16;
   overflow: hidden;
 }
 
-.demo-pantera-ojos {
-  display: flex;
-  gap: 14px;
-  animation: demo-aparecer 0.6s ease-out;
-}
-
-.demo-pantera-ojos span {
-  width: 12px;
-  height: 7px;
-  border-radius: 50%;
-  background: #F6E05E;
-  box-shadow: 0 0 10px 3px rgba(246, 224, 94, 0.7);
-  animation: demo-parpadeo 2.4s infinite;
-}
-
-.demo-pantera-figura {
-  font-size: 30px;
-  line-height: 1;
-  filter: brightness(0.55) drop-shadow(0 0 6px rgba(246, 224, 94, 0.5));
-  transition: font-size 0.4s, filter 0.4s;
-  animation: demo-acechar 1.6s ease-in-out infinite alternate;
-}
-
-.demo-pantera-3 .demo-pantera-figura {
-  font-size: 42px;
-  filter: brightness(0.75) drop-shadow(0 0 6px rgba(246, 224, 94, 0.5));
-}
-
-.demo-pantera-4 .demo-pantera-figura,
-.demo-pantera-5 .demo-pantera-figura {
-  font-size: 56px;
-  filter: brightness(1) drop-shadow(0 0 8px rgba(255, 80, 60, 0.7));
+.demo-pantera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .demo-puntos {
@@ -388,7 +366,8 @@
   animation: demo-pulsar 0.5s ease-out;
 }
 
-/* Efectos: tesoro y zarpazo, encima de todo el escenario. */
+/* Efectos: tesoro (la misma animación Lottie del Tablero) y zarpazo,
+   encima de todo el escenario. */
 .demo-victoria {
   position: absolute;
   inset: 0;
@@ -396,7 +375,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   background: radial-gradient(circle, rgba(70, 58, 20, 0.92), rgba(14, 42, 31, 0.94) 70%);
   font-family: var(--font-display);
   color: var(--dorado);
@@ -404,18 +382,14 @@
   animation: demo-aparecer 0.4s ease-out;
 }
 
+.demo-victoria-lottie {
+  width: 230px;
+  height: 230px;
+  margin: -20px 0 -30px;
+}
+
 .demo-victoria strong {
   font-size: 26px;
-}
-
-.demo-victoria span:last-child {
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.demo-victoria-icono {
-  font-size: 56px;
-  animation: demo-tesoro 0.7s cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 
 .demo-zarpazo {
@@ -435,40 +409,93 @@
   animation: demo-garra 0.5s ease-out both;
 }
 
-/* --- Pie: leyenda, progreso y botón --- */
+/* --- Pie: leyenda, navegación y botón --- */
 
 .demo-leyenda {
-  min-height: 2.6em;
-  margin: 14px 0 8px;
-  font-size: 15px;
+  min-height: 2.8em;
+  margin: 14px 0 10px;
+  font-size: 18px;
   line-height: 1.4;
   text-align: center;
-  color: var(--color-text);
+  color: white;
   animation: demo-aparecer 0.35s ease-out;
+}
+
+.demo-navegacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.demo-nav-btn {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
+}
+
+.demo-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.demo-nav-pausa {
+  font-size: 11px;
+  margin-left: 4px;
 }
 
 .demo-progreso {
   display: flex;
-  justify-content: center;
-  gap: 5px;
-  margin-bottom: 16px;
+  gap: 4px;
 }
 
-.demo-progreso span {
-  width: 8px;
-  height: 8px;
+/* Cada bolita es un botón; el área de clic es mayor que el punto. */
+.demo-progreso button {
+  width: 20px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.demo-progreso button::before {
+  content: '';
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--color-border);
+  background: rgba(255, 255, 255, 0.25);
   transition: background 0.3s, transform 0.3s;
 }
 
-.demo-progreso span.hecho {
-  background: var(--color-accent);
+.demo-progreso button:hover::before {
+  background: rgba(255, 255, 255, 0.55);
 }
 
-.demo-progreso span.activo {
-  background: var(--color-primary);
-  transform: scale(1.3);
+.demo-progreso button.hecho::before {
+  background: rgba(236, 193, 90, 0.55);
+}
+
+.demo-progreso button.activo::before {
+  background: var(--color-accent);
+  transform: scale(1.4);
+}
+
+.demo-ayuda {
+  margin: 6px 0 14px;
+  font-size: 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .demo-acciones {
@@ -477,8 +504,14 @@
 }
 
 .demo-acciones .btn-primario {
-  font-size: 15px;
-  padding: 12px 28px;
+  font-size: 16px;
+  padding: 12px 36px;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+}
+
+.demo-acciones .btn-primario:hover {
+  background: #f3d27e;
 }
 
 /* --- Animaciones --- */
@@ -533,21 +566,6 @@
   55%, 100% { transform: translateY(-14px) scale(1.12); box-shadow: 0 0 16px 4px rgba(236, 193, 90, 0.8); border-radius: 6px; }
 }
 
-@keyframes demo-parpadeo {
-  0%, 90%, 100% { transform: scaleY(1); }
-  95% { transform: scaleY(0.1); }
-}
-
-@keyframes demo-acechar {
-  from { transform: translateX(-4px); }
-  to { transform: translateX(4px); }
-}
-
-@keyframes demo-tesoro {
-  from { transform: scale(0) rotate(-20deg); }
-  to { transform: scale(1) rotate(0); }
-}
-
 @keyframes demo-destello {
   0% { opacity: 0; }
   15% { opacity: 1; }
@@ -557,6 +575,60 @@
 @keyframes demo-garra {
   from { opacity: 0; transform: translate(-30px, -30px) scale(1.4) rotate(-8deg); }
   to { opacity: 1; transform: none; }
+}
+
+/* Pantallas bajas (laptop 1366×768, 1920×1080 al 150%): misma
+   demostración, más compacta, para que quepa sin scroll. */
+@media (max-height: 700px) {
+  .demo-modal {
+    padding: 12px 20px 14px;
+  }
+
+  .demo-cabecera {
+    margin-bottom: 8px;
+  }
+
+  .demo-cabecera h2 {
+    font-size: 22px;
+  }
+
+  .demo-escenario {
+    min-height: 0;
+    padding: 12px 14px 10px;
+    gap: 10px;
+  }
+
+  .demo-pantera {
+    width: 170px;
+  }
+
+  .demo-centro {
+    min-height: 90px;
+  }
+
+  .demo-celda {
+    width: 30px;
+    height: 38px;
+    font-size: 22px;
+  }
+
+  .demo-carta {
+    width: 46px;
+    height: 64px;
+  }
+
+  .demo-leyenda {
+    margin: 8px 0 6px;
+    font-size: 16px;
+  }
+
+  .demo-ayuda {
+    margin: 4px 0 8px;
+  }
+
+  .demo-acciones .btn-primario {
+    padding: 10px 32px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

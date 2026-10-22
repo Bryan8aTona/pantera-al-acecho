@@ -31,6 +31,7 @@ import ZarpazoOverlay from '../components/tablero/ZarpazoOverlay.jsx';
 import AnimacionVictoria from '../components/tablero/AnimacionVictoria.jsx';
 import PanelRepechaje from '../components/tablero/PanelRepechaje.jsx';
 import HojasDecorativas from '../components/tablero/HojasDecorativas.jsx';
+import DemoPartidaModal from '../components/tablero/DemoPartidaModal.jsx';
 import './TableroJuegoPage.css';
 
 const NOMBRE_FASE = {
@@ -56,6 +57,10 @@ export default function TableroJuegoPage() {
   const { mostrarAnuncioRepechaje, completarAnuncioRepechaje } = useAnuncioRepechaje(estado);
   const { reproducir, silenciado, alternarSilencio } = useSonido();
   const [mostrarZarpazo, setMostrarZarpazo] = useState(false);
+  // Demostración de cómo se juega: tapa el tablero al arrancar y la
+  // partida no se puede operar hasta que el docente la cierra.
+  const [mostrarDemo, setMostrarDemo] = useState(true);
+  const cerrarDemo = useCallback(() => setMostrarDemo(false), []);
   const navigate = useNavigate();
 
   // El mensaje "Comienza la Ronda de Repechaje" solo se ve realmente
@@ -157,10 +162,16 @@ export default function TableroJuegoPage() {
     Boolean(cartaActual) &&
     (anunciando || (!estado.modoRobo && !mostrandoAdivinar));
 
+  // Mientras la demostración está abierta, el tablero de fondo queda
+  // inerte (ni clic ni Tab llegan a él). React 18 no conoce `inert`,
+  // así que se pasa como atributo de texto.
+  const fondoInerte = mostrarDemo ? { inert: '' } : {};
+
   return (
     <div className="tablero">
       <HojasDecorativas />
-      <header className="tablero-header">
+      {mostrarDemo && <DemoPartidaModal onCerrar={cerrarDemo} />}
+      <header className="tablero-header" {...fondoInerte}>
         <div>
           <p className="tablero-titulo">Pantera al Acecho</p>
           <p className="tablero-fase">{NOMBRE_FASE[estado.fase]}</p>
@@ -194,7 +205,10 @@ export default function TableroJuegoPage() {
       {anunciando && <EfectoImpacto />}
       {mostrarZarpazo && <ZarpazoOverlay onCompleta={manejarFinZarpazo} />}
 
-      <div className={anunciando && !esDerrota ? 'tablero-cuerpo tablero-cuerpo-shake' : 'tablero-cuerpo'}>
+      <div
+        className={anunciando && !esDerrota ? 'tablero-cuerpo tablero-cuerpo-shake' : 'tablero-cuerpo'}
+        {...fondoInerte}
+      >
         <div className="tablero-jugada">
           {mostrarVictoria ? (
             <AnimacionVictoria carta={cartaGanadora} onCompleta={completarVictoria} />
