@@ -108,7 +108,7 @@ Pantalla de acceso al sistema. Permite a los docentes nuevos crear una cuenta (n
 Módulo privado accesible solo tras autenticación. Permite al docente crear, nombrar, editar y eliminar sets de frases, guardados en Firestore y vinculados a su cuenta. Crear y editar un set son páginas completas propias.
 
 ### 3.3 Configuración de partida
-Pantalla previa al juego donde el docente selecciona el set de frases a usar e inicia la partida. Al iniciar, el cliente descarga de Firestore el set seleccionado completo (nombre + las 8 frases) y lo mantiene en memoria durante toda la sesión.
+Pantalla previa al juego donde el docente selecciona el set de frases a usar e inicia la partida. Al iniciar, el cliente descarga de Firestore el set seleccionado completo (nombre + las 8 frases) y lo mantiene en memoria durante toda la sesión. Con el set ya descargado se abre `DemoPartidaModal` (`client/src/components/`), una demostración animada en bucle de cómo se juega; recién al cerrarla se llama a `iniciarPartida` y se navega a `/partida`, así que el motor no se monta antes. La demostración es un guion fijo de pasos (`PASOS`), no usa el motor real.
 
 ### 3.4 Tablero de juego
 Interfaz de alta visibilidad optimizada para proyección en aula. Muestra el estado de los 4 equipos, el teclado virtual, la animación de la pantera y los controles del docente. Toda la lógica del juego, como la validación de letras y frases, corre aquí en memoria.

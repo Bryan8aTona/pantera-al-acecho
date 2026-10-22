@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { listarSets, obtenerSet } from '../lib/sets.js';
 import { usePartida } from '../context/PartidaContext.jsx';
+import DemoPartidaModal from '../components/DemoPartidaModal.jsx';
 import './ConfiguracionPartidaPage.css';
 
 const formateador = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium' });
@@ -11,6 +12,9 @@ export default function ConfiguracionPartidaPage() {
   const [seleccionId, setSeleccionId] = useState(null);
   const [error, setError] = useState(null);
   const [iniciando, setIniciando] = useState(false);
+  // Set ya descargado, en espera de que el docente cierre la
+  // demostración. La partida no arranca hasta entonces.
+  const [setListo, setSetListo] = useState(null);
 
   const { iniciarPartida } = usePartida();
   const navigate = useNavigate();
@@ -29,16 +33,22 @@ export default function ConfiguracionPartidaPage() {
       // Descarga completa del set elegido: nombre + las 8 frases.
       // A partir de aquí toda la partida corre en memoria del cliente.
       const set = await obtenerSet(seleccionId);
-      iniciarPartida(set);
-      navigate('/partida');
+      setSetListo(set);
     } catch (err) {
       setError(err.message || 'No se pudo iniciar la partida');
       setIniciando(false);
     }
   }
 
+  const cerrarDemo = useCallback(() => {
+    iniciarPartida(setListo);
+    navigate('/partida');
+  }, [iniciarPartida, navigate, setListo]);
+
   return (
     <div className="config-partida">
+      {setListo && <DemoPartidaModal onCerrar={cerrarDemo} />}
+
       <header className="config-partida-header">
         <div>
           <h1>Configurar partida</h1>

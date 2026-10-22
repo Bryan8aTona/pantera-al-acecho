@@ -8,11 +8,6 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="site-footer-cols">
         <div className="site-footer-col">
-          <h3>Universidad</h3>
-          <p>Copyright © Universidad Autónoma Metropolitana 2026</p>
-        </div>
-
-        <div className="site-footer-col">
           <h3>Responsables</h3>
           <p>Dra. María del Carmen Gómez Fuentes</p>
           <p>Dr. Jorge Cervantes Ojeda</p>
