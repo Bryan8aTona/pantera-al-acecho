@@ -11,15 +11,16 @@ export default function PanelAdivinar({ texto, letrasUsadas, obligatorio, onEnvi
 
       <RellenoInteligente texto={texto} letrasUsadas={letrasUsadas} onEnviar={onEnviar} textoBoton="Adivinar" />
 
-      {obligatorio ? (
+      <div className="panel-adivinar-acciones">
+        {!obligatorio && (
+          <button type="button" className="btn-secundario" onClick={onCancelar}>
+            Cancelar
+          </button>
+        )}
         <button type="button" className="btn-secundario panel-rendirse" onClick={onRendirse}>
           Rendirse
         </button>
-      ) : (
-        <button type="button" className="btn-secundario panel-adivinar-cancelar" onClick={onCancelar}>
-          Cancelar
-        </button>
-      )}
+      </div>
     </div>
   );
 }

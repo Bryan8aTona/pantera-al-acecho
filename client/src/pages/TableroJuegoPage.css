@@ -81,10 +81,30 @@
   font-size: 22px;
 }
 
-.tablero-header .btn-secundario {
+/* Botones dentro del Tablero. global.css va después en la cascada y su
+   .btn-secundario:hover:not(:disabled) (fondo casi blanco) le ganaba a
+   cualquier ajuste de una o dos clases: con texto blanco, el botón se
+   "borraba" al pasar el ratón. Por eso aquí todo lleva el prefijo
+   .tablero y el hover repite :not(:disabled), para ganar el empate. */
+.tablero .btn-secundario {
   background: rgba(255, 255, 255, 0.08);
   color: white;
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.tablero .btn-secundario:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.tablero .btn-secundario:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Aclara al pasar el ratón; oscurecerlo lo confundía con el fondo. */
+.tablero .btn-primario:hover:not(:disabled) {
+  background: var(--verde-canopy);
 }
 
 .tablero-header-acciones {
@@ -573,12 +593,6 @@
   justify-content: center;
 }
 
-.acierto-seguro .btn-secundario {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
 /* Robo */
 
 .panel-robo {
@@ -983,22 +997,21 @@
   color: var(--color-success);
 }
 
-/* Prefijo .tablero: con una sola clase pierden el empate contra
-   .btn-secundario de global.css, que va después en la cascada. */
-.tablero .panel-adivinar-cancelar {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.3);
+/* Cancelar / Rendirse debajo del relleno (Modo Adivinar y Robo). */
+.panel-adivinar-acciones {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 12px;
 }
 
-.tablero .panel-rendirse {
-  margin-top: 12px;
+.tablero .btn-secundario.panel-rendirse {
   background: var(--color-danger);
   color: white;
   border-color: var(--color-danger);
 }
 
-.tablero .panel-rendirse:hover {
+.tablero .btn-secundario.panel-rendirse:hover:not(:disabled) {
   background: #8f3422;
   border-color: #8f3422;
 }
