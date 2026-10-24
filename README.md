@@ -1,5 +1,7 @@
 # Pantera al Acecho
 
+![CI](https://github.com/Bryan8aTona/pantera-al-acecho/actions/workflows/ci.yml/badge.svg)
+
 Videojuego educativo para el repaso en clase. Es una versión gamificada del
 juego del ahorcado: cuatro equipos compiten adivinando frases que arma el
 docente, administrando monedas y turnos. La aplicación la opera **un solo
@@ -30,7 +32,7 @@ navegador.
 - **Persistencia:** Cloud Firestore (`firebase/firestore/lite`), una sola
   colección `sets`. La autorización vive en `firestore.rules`.
 - **Hosting:** Firebase Hosting (sitio estático).
-- **Pruebas:** Vitest + Testing Library (jsdom) en el cliente — 109 pruebas.
+- **Pruebas:** Vitest + Testing Library (jsdom) en el cliente — 124 pruebas.
 
 ## Estructura del repositorio
 
@@ -93,7 +95,7 @@ cuenta** de la propia aplicación (nombre, email, contraseña de 8+ caracteres).
 | Ubicación | Comando | Efecto |
 | --- | --- | --- |
 | `client/` | `npm run dev` | Servidor de desarrollo Vite. |
-| `client/` | `npm test` | Ejecuta las 109 pruebas (Vitest). |
+| `client/` | `npm test` | Ejecuta las 124 pruebas (Vitest). |
 | `client/` | `npm run build` | Build de producción en `client/dist/`. |
 | `client/` | `npm run preview` | Sirve el build de producción localmente. |
 | raíz | `firebase deploy` | Publica Hosting + reglas de Firestore. |
