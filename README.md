@@ -2,6 +2,10 @@
 
 ![CI](https://github.com/Bryan8aTona/pantera-al-acecho/actions/workflows/ci.yml/badge.svg)
 
+**[▶ Jugar en línea](https://pantera-al-acecho.web.app)** · Para entrar como docente, crea una cuenta en *Iniciar sesión → Crear cuenta*.
+
+![Partida de ejemplo: el equipo elige una carta, pide letras, la pantera acecha tras un fallo y el equipo resuelve la frase](docs/img/partida.gif)
+
 Videojuego educativo para el repaso en clase. Es una versión gamificada del
 juego del ahorcado: cuatro equipos compiten adivinando frases que arma el
 docente, administrando monedas y turnos. La aplicación la opera **un solo
