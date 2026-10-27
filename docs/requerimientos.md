@@ -86,7 +86,7 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 
 ### 3.5 Modo Adivinar Frase e Interfaz de Validación
 
-**Activación:** El docente activa este modo mediante un botón dedicado. Puede activarse en tres situaciones: (a) el equipo elige intentarlo voluntariamente en cualquier momento de su turno, (b) el equipo ha agotado todos sus intentos de letras, o (c) el equipo revela todas las letras de la frase mediante la opción gratuita o el Acierto Seguro, en este último caso, el sistema otorga la victoria automáticamente en cuanto la última letra queda descubierta, sin requerir que el docente confirme manualmente a través del botón "Adivinar".
+**Activación:** El docente activa este modo mediante un botón dedicado, ubicado encima del teclado virtual y resaltado en dorado para que se distinga desde lejos. Puede activarse en tres situaciones: (a) el equipo elige intentarlo voluntariamente en cualquier momento de su turno, (b) el equipo ha agotado todos sus intentos de letras, o (c) el equipo revela todas las letras de la frase mediante la opción gratuita o el Acierto Seguro, en este último caso, el sistema otorga la victoria automáticamente en cuanto la última letra queda descubierta, sin requerir que el docente confirme manualmente a través del botón "Adivinar".
 
 **Interfaz (Relleno Inteligente):** El modal replica el tablero. Las letras ya adivinadas aparecen bloqueadas y pre-rellenadas. El cursor se posiciona automáticamente en los espacios vacíos y salta sobre las letras ya reveladas tras cada pulsación. El docente puede hacer clic en cualquier celda específica para corregir o ingresar una letra manualmente.
 

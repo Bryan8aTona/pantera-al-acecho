@@ -290,6 +290,15 @@ export default function TableroJuegoPage() {
         <div className="tablero-controles">
           {mostrandoControlesNormales && (
             <>
+              <button
+                type="button"
+                className="btn-primario tablero-btn-adivinar"
+                disabled={anunciando}
+                onClick={() => dispatch({ type: 'ACTIVAR_MODO_ADIVINAR' })}
+              >
+                Modo Adivinar
+              </button>
+
               <Teclado
                 letrasUsadas={estado.letrasUsadas}
                 equipo={esDerrota ? equipoOriginal : equipoActual}
@@ -317,15 +326,6 @@ export default function TableroJuegoPage() {
                   ))}
                 </div>
               )}
-
-              <button
-                type="button"
-                className="btn-primario"
-                disabled={anunciando}
-                onClick={() => dispatch({ type: 'ACTIVAR_MODO_ADIVINAR' })}
-              >
-                Modo Adivinar
-              </button>
             </>
           )}
         </div>

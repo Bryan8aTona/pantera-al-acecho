@@ -107,6 +107,31 @@
   background: var(--verde-canopy);
 }
 
+/* Modo Adivinar: en verde selva se perdía contra el fondo; en dorado y
+   del ancho del teclado se distingue desde el fondo del salón. */
+.tablero .tablero-btn-adivinar {
+  /* Mismo ancho que .teclado-virtual: 9 teclas y 8 huecos. */
+  width: calc(9 * clamp(34px, min(4.2vw, 6.4vh), 54px) + 8 * clamp(5px, 0.7vw, 8px));
+  max-width: 100%;
+  padding: 8px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--color-accent);
+  color: var(--color-primary-dark);
+  box-shadow: 0 0 14px rgba(236, 193, 90, 0.45);
+}
+
+.tablero .tablero-btn-adivinar:hover:not(:disabled) {
+  background: #f6d685;
+}
+
+.tablero .tablero-btn-adivinar:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
 .tablero-header-acciones {
   display: flex;
   gap: 8px;
@@ -1102,6 +1127,11 @@
 
   .tablero-controles {
     gap: 6px;
+  }
+
+  .tablero .tablero-btn-adivinar {
+    padding: 6px 18px;
+    font-size: 14px;
   }
 }
 
