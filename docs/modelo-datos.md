@@ -97,7 +97,7 @@ service cloud.firestore {
 
     match /sets/{setId} {
       allow read: if request.auth != null
-                  && resource.data.ownerUid == request.auth.uid;
+                  && (resource == null || resource.data.ownerUid == request.auth.uid);
       allow create: if request.auth != null
                     && request.resource.data.ownerUid == request.auth.uid
                     && setValido(request.resource.data);
@@ -111,6 +111,8 @@ service cloud.firestore {
   }
 }
 ```
+
+`resource == null` en la regla `read` permite leer un set **que no existe** (p. ej. borrado en otra pestaña): Firestore responde que no existe y el cliente muestra "No se encontró el set.", en lugar de un permiso negado ("No tienes permiso…"). Sin esa condición, `resource.data` sobre `null` es un error de evaluación que Firestore trata como denegación. No expone datos: solo confirma que ese id no existe, y los ids de Firestore son aleatorios. Sin sesión se sigue negando.
 
 El listado del back-office (`where('ownerUid', '==', uid)`) es coherente con la regla `read`: cada documento devuelto cumple `ownerUid == request.auth.uid`. No se usa `orderBy` en la consulta (el orden por `updatedAt` se hace en el cliente), así que no hace falta un índice compuesto.
 

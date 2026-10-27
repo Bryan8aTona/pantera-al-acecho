@@ -231,7 +231,7 @@ La capa de datos (Firebase Auth y Firestore) se prueba aparte, contra los **emul
 
 Hay dos suites, ambas con usuarios reales del emulador de Auth:
 - `sets.firebase.test.js`: el CRUD de `lib/sets.js` (crear, listar en orden, obtener normalizado, editar, borrar) y que cada docente solo ve sus sets.
-- `reglas.firebase.test.js`: `firestore.rules` probadas con el SDK directamente, sin pasar por `sets.js`, para comprobar que la protección la dan las reglas: el dueño puede todo, otro usuario y un visitante sin sesión no, nadie crea a nombre de otro ni cambia `ownerUid`, y se rechazan los sets mal formados (nombre o frases fuera de límites, 7 o 9 frases, frases fuera de orden). También deja documentado que leer un set **que no existe** se niega (`resource.data` es `null`), por lo que abrir un set ya borrado muestra "No tienes permiso…" en vez de "No se encontró el set.".
+- `reglas.firebase.test.js`: `firestore.rules` probadas con el SDK directamente, sin pasar por `sets.js`, para comprobar que la protección la dan las reglas: el dueño puede todo, otro usuario y un visitante sin sesión no, nadie crea a nombre de otro ni cambia `ownerUid`, y se rechazan los sets mal formados (nombre o frases fuera de límites, 7 o 9 frases, frases fuera de orden). También comprueba que leer un set **que no existe** responde "no existe" con sesión (y se niega sin ella), para que abrir un set ya borrado muestre "No se encontró el set." (ver `modelo-datos.md` §4).
 
 `npm test` las excluye (`*.firebase.test.js`), porque necesitan los emuladores; en CI corren en un job propio. Las transformaciones puras de las frases (`client/src/lib/frases.js`) siguen aparte para poder probarlas sin el SDK.
 
