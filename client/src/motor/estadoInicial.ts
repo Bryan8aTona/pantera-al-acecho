@@ -1,10 +1,18 @@
-import { EQUIPOS_BASE, SALDO_INICIAL, LIMITES_INTENTOS, FRASES_POR_SET, FASES } from './constantes.js';
-import { crearMazo } from './mazo.js';
-import { sortearOrden } from './sorteo.js';
+import { EQUIPOS_BASE, SALDO_INICIAL, LIMITES_INTENTOS, FRASES_POR_SET, FASES } from './constantes.ts';
+import { crearMazo } from './mazo.ts';
+import { sortearOrden } from './sorteo.ts';
+import type { Equipo, EquipoId, EstadoPartida, Frase } from './tipos.ts';
 
 // set: el objeto { id, nombre, frases: [...8] } descargado completo por
 // la pantalla de Configuración de partida (ver ConfiguracionPartidaPage).
-export function crearEstadoInicial({ set, aleatorio = Math.random }) {
+// Del set, el motor solo usa las frases.
+export function crearEstadoInicial({
+  set,
+  aleatorio = Math.random,
+}: {
+  set: { frases: Frase[] };
+  aleatorio?: () => number;
+}): EstadoPartida {
   if (!set?.frases || set.frases.length !== FRASES_POR_SET) {
     throw new Error(`Se requiere un set con exactamente ${FRASES_POR_SET} frases para iniciar la partida`);
   }
@@ -15,7 +23,8 @@ export function crearEstadoInicial({ set, aleatorio = Math.random }) {
   );
   const mazo = crearMazo(set.frases, aleatorio);
 
-  const equipos = {};
+  // Empieza vacío y el ciclo lo llena con los 4 equipos de EQUIPOS_BASE.
+  const equipos = {} as Record<EquipoId, Equipo>;
   for (const equipo of EQUIPOS_BASE) {
     equipos[equipo.id] = {
       id: equipo.id,
@@ -28,7 +37,7 @@ export function crearEstadoInicial({ set, aleatorio = Math.random }) {
   }
 
   return {
-    fase: FASES.RONDA1, // ver FASES en constantes.js
+    fase: FASES.RONDA1, // ver FASES en constantes.ts
     ronda: 1,
     equipos,
     ordenTurnoRonda1: ordenTurno, // fijo: se usa para calcular quién roba

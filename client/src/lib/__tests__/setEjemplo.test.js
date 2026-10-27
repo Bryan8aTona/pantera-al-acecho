@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { SET_EJEMPLO } from '../setEjemplo.js';
-import { FRASES_POR_SET } from '../../motor/constantes.js';
-import { crearEstadoInicial } from '../../motor/estadoInicial.js';
-import { letrasUnicasDeTexto } from '../../motor/letras.js';
+import { FRASES_POR_SET } from '../../motor/constantes.ts';
+import { crearEstadoInicial } from '../../motor/estadoInicial.ts';
+import { letrasUnicasDeTexto } from '../../motor/letras.ts';
 
 describe('Set de ejemplo del modo invitado', () => {
   it('tiene exactamente las frases que pide una partida, con id único', () => {

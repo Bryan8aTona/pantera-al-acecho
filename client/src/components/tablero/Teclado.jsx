@@ -1,4 +1,4 @@
-import { categoriaDeLetra, claveIntento } from '../../motor/index.js';
+import { categoriaDeLetra, claveIntento } from '../../motor/index.ts';
 
 const ALFABETO = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
 

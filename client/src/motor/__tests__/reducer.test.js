@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { motorReducer } from '../reducer.js';
-import { MotorError } from '../errores.js';
+import { motorReducer } from '../reducer.ts';
+import { MotorError } from '../errores.ts';
 
 // Estado base reutilizable para las pruebas. Se construye a mano (sin
 // pasar por crearEstadoInicial/aleatorio) para tener control total y

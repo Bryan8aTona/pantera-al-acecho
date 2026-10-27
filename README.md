@@ -29,7 +29,7 @@ navegador.
 - **Frontend:** React 18 + Vite 5, React Router 6, CSS plano co-localizado + una
   hoja global. El estado de la partida vive **solo en memoria del cliente**;
   recargar el navegador durante el juego pierde la sesión.
-- **Motor de juego:** módulos JavaScript puros en `client/src/motor/` (sin
+- **Motor de juego:** módulos TypeScript puros en `client/src/motor/` (sin
   React), conectados a la UI con un reducer. Toda la lógica de reglas corre en
   el cliente.
 - **Autenticación:** Firebase Authentication (email/contraseña).
@@ -106,6 +106,7 @@ cuenta** de la propia aplicación (nombre, email, contraseña de 8+ caracteres).
 | `client/` | `npm run test:firebase` | Prueba `sets.js` y `firestore.rules` contra los emuladores ya levantados. |
 | `client/` | `npm run dev:emulador` | Servidor de desarrollo contra los emuladores ya levantados. |
 | `client/` | `npm run lint` | Revisa el código con ESLint. |
+| `client/` | `npm run typecheck` | Revisa los tipos del motor de reglas (TypeScript, `tsc --noEmit`). |
 | `client/` | `npm run format` | Formatea el código con Prettier (`format:check` solo revisa). |
 | `client/` | `npm run build` | Build de producción en `client/dist/`. |
 | `client/` | `npm run preview` | Sirve el build de producción localmente. |

@@ -34,6 +34,9 @@ jobs:
       - name: Revisar formato (Prettier)
         run: npm run format:check
 
+      - name: Revisar tipos (TypeScript)
+        run: npm run typecheck
+
       - name: Correr pruebas (Vitest)
         run: npm test
 

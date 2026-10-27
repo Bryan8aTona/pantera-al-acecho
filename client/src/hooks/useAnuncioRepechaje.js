@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FASES } from '../motor/constantes.js';
+import { FASES } from '../motor/constantes.ts';
 
 // Detecta el instante en que la partida pasa de la Ronda 1 a la Ronda
 // de Repechaje para mostrar, una sola vez, un panel que lo anuncie con

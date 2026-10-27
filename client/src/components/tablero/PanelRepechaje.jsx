@@ -1,5 +1,5 @@
 import { COLORES_EQUIPO } from './coloresEquipo.js';
-import { LIMITES_INTENTOS } from '../../motor/constantes.js';
+import { LIMITES_INTENTOS } from '../../motor/constantes.ts';
 
 // Anuncio de arranque de la Ronda de Repechaje: aparece una sola vez,
 // entre la revelación de la última carta de la Ronda 1 y el primer

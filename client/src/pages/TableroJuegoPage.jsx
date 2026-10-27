@@ -15,8 +15,8 @@ import {
   equipoDelTurnoNormal,
   cartaEnJuego,
   hayDerrotaPendiente,
-} from '../motor/index.js';
-import { COSTO_ACIERTO_SEGURO, LIMITES_INTENTOS, FASES, PANTERA_ESTADO_DERROTA } from '../motor/constantes.js';
+} from '../motor/index.ts';
+import { COSTO_ACIERTO_SEGURO, LIMITES_INTENTOS, FASES, PANTERA_ESTADO_DERROTA } from '../motor/constantes.ts';
 import EquipoPanel from '../components/tablero/EquipoPanel.jsx';
 import Teclado from '../components/tablero/Teclado.jsx';
 import MazoCartas from '../components/tablero/MazoCartas.jsx';

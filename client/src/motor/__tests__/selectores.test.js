@@ -7,8 +7,8 @@ import {
   equipoDelTurnoNormal,
   cartaEnJuego,
   hayDerrotaPendiente,
-} from '../selectores.js';
-import { esLetra } from '../letras.js';
+} from '../selectores.ts';
+import { esLetra } from '../letras.ts';
 
 function oculto(texto, letrasUsadas = {}) {
   return progresoDeFrase(texto, letrasUsadas)

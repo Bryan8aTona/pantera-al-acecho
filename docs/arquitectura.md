@@ -132,19 +132,29 @@ Módulo dentro del cliente que contiene toda la lógica de negocio del juego:
 
 #### 3.5.1 Implementación del motor
 
-El motor se construyó como módulos JavaScript puros, sin dependencia de React, en `client/src/motor/`:
+El motor se construyó como módulos puros, sin dependencia de React, en `client/src/motor/`. Es la única parte del cliente escrita en **TypeScript** (el resto sigue en JavaScript):
 
 | Archivo | Responsabilidad |
 | --- | --- |
-| `constantes.js` | Todos los valores numéricos de `requerimientos.md` (saldos, costos, límites de intentos, premios) en un solo lugar |
-| `normalizacion.js` | Normalización de texto/letras (con el manejo especial de la Ñ descrito arriba) |
-| `letras.js` | Clasificación vocal/consonante, búsqueda de posiciones y letras únicas de una frase |
-| `mazo.js` | Construcción del mazo: baraja las frases (el número de carta es la posición en el mazo, no en el set) y asigna premios aleatorios (función aleatoria inyectable, para pruebas determinísticas) |
-| `sorteo.js` | Barajado Fisher-Yates, usado para el orden de equipos y para el mazo (misma inyección de aleatoriedad) |
-| `estadoInicial.js` | Construye el estado completo de una partida nueva a partir de un set de 8 frases |
-| `reducer.js` | La máquina de estados en sí: un reducer puro `(estado, accion) => nuevoEstado`, que lanza `MotorError` ante acciones inválidas |
-| `selectores.js` | Datos derivados, compartidos por el reducer y la UI (progreso de la frase revelada, si debe forzarse el Modo Adivinar, por qué no se puede comprar un Acierto Seguro, equipo y carta en juego, derrota pendiente en Ronda 2) |
-| `errores.js` | Clase `MotorError` |
+| `constantes.ts` | Todos los valores numéricos de `requerimientos.md` (saldos, costos, límites de intentos, premios) en un solo lugar |
+| `normalizacion.ts` | Normalización de texto/letras (con el manejo especial de la Ñ descrito arriba) |
+| `letras.ts` | Clasificación vocal/consonante, búsqueda de posiciones y letras únicas de una frase |
+| `mazo.ts` | Construcción del mazo: baraja las frases (el número de carta es la posición en el mazo, no en el set) y asigna premios aleatorios (función aleatoria inyectable, para pruebas determinísticas) |
+| `sorteo.ts` | Barajado Fisher-Yates, usado para el orden de equipos y para el mazo (misma inyección de aleatoriedad) |
+| `estadoInicial.ts` | Construye el estado completo de una partida nueva a partir de un set de 8 frases |
+| `reducer.ts` | La máquina de estados en sí: un reducer puro `(estado, accion) => nuevoEstado`, que lanza `MotorError` ante acciones inválidas |
+| `selectores.ts` | Datos derivados, compartidos por el reducer y la UI (progreso de la frase revelada, si debe forzarse el Modo Adivinar, por qué no se puede comprar un Acierto Seguro, equipo y carta en juego, derrota pendiente en Ronda 2) |
+| `errores.ts` | Clase `MotorError` |
+| `tipos.ts` | Solo tipos: el estado de la partida (`EstadoPartida`, `Equipo`, `Carta`, `ModoRobo`…) y la unión `AccionMotor` con todas las acciones del reducer |
+| `index.ts` | Reexporta todo lo anterior; la UI importa desde `motor/index.ts` |
+
+**TypeScript.** `client/tsconfig.json` incluye solo `src/motor/` con `strict`. Vite compila los `.ts` directamente (sin paso extra) y `npm run typecheck` (`tsc --noEmit`) revisa los tipos; corre en CI junto con ESLint y Prettier. Lo que los tipos atrapan antes de jugar:
+
+- **Acciones del reducer:** `AccionMotor` es una unión discriminada por `type`. El `switch` de `motorReducer` termina en un `default` que asigna la acción a `never`, así que una acción nueva sin su `case`, o un `type` mal escrito, no compila. El `throw` de `ACCION_DESCONOCIDA` sigue ahí para los `dispatch` que llegan desde JS, que no pasan por el tipo.
+- **Campos del estado:** `actualizarEquipo` y `actualizarCarta` reciben `Partial<Equipo>` / `Partial<Carta>`, así que un campo mal escrito (`saldos` en vez de `saldo`) es un error de tipo.
+- **Valores nulos:** `cartaActualId` y `modoRobo` son `… | null`. Donde el reducer da por hecho que hay carta activa usa `cartaActual(estado)`, que lo hace explícito.
+
+Los archivos de JS importan el motor con la extensión `.ts` (`'../motor/index.ts'`, también en los `vi.mock`), porque Vite solo traduce `.js` → `.ts` cuando quien importa es un archivo TypeScript. Las pruebas del motor (`motor/__tests__/`) siguen en JavaScript y no cambiaron lo que comprueban.
 
 Este reducer se conecta a React mediante un hook dedicado, `usePartidaEngine` (`client/src/hooks/`), que envuelve `useReducer` con un `reducerSeguro` que atrapa `MotorError` y lo guarda como `estado.error` en vez de dejarlo tumbar el render.
 

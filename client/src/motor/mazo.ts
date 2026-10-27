@@ -1,5 +1,6 @@
-import { PREMIOS_DISPONIBLES, FRASES_POR_SET } from './constantes.js';
-import { sortearOrden } from './sorteo.js';
+import { PREMIOS_DISPONIBLES, FRASES_POR_SET } from './constantes.ts';
+import { sortearOrden } from './sorteo.ts';
+import type { Frase, Mazo } from './tipos.ts';
 
 // frases: [{ id, texto, orden }] — exactamente 8, tal como las entrega
 // lib/sets.js (que sintetiza el `id`; ver modelo-datos.md). `aleatorio`
@@ -9,13 +10,13 @@ import { sortearOrden } from './sorteo.js';
 // número 1–8 que ve el grupo boca abajo) es su posición en el mazo
 // barajado, no la posición de la frase en el set. Así un mismo set no
 // reparte siempre la misma frase detrás del mismo número.
-export function crearMazo(frases, aleatorio = Math.random) {
+export function crearMazo(frases: Frase[], aleatorio: () => number = Math.random): Mazo {
   if (!Array.isArray(frases) || frases.length !== FRASES_POR_SET) {
     throw new Error(`El mazo requiere exactamente ${FRASES_POR_SET} frases`);
   }
 
   const barajadas = sortearOrden(frases, aleatorio);
-  const mazo = {};
+  const mazo: Mazo = {};
   barajadas.forEach((frase, i) => {
     const valor = PREMIOS_DISPONIBLES[Math.floor(aleatorio() * PREMIOS_DISPONIBLES.length)];
     mazo[frase.id] = {

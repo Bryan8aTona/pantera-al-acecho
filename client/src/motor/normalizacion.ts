@@ -2,7 +2,7 @@
 // la frase objetivo (requerimientos.md 3.5, arquitectura.md 3.5).
 //
 // IMPORTANTE: no usamos un strip genérico de diacríticos Unicode
-// (texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '')) porque eso
+// (texto.normalize('NFD').replace(/[̀-ͯ]/g, '')) porque eso
 // también le quita la virgulilla a la "Ñ" (que se descompone en NFD
 // como N + U+0303) y la convertiría en "N". En español la Ñ es una
 // letra propia, no una "N con tilde" — deben seguir siendo distintas
@@ -10,7 +10,7 @@
 //
 // En su lugar, mapeamos explícitamente solo las vocales acentuadas.
 
-const MAPA_ACENTOS = {
+const MAPA_ACENTOS: Record<string, string> = {
   Á: 'A',
   É: 'E',
   Í: 'I',
@@ -19,7 +19,8 @@ const MAPA_ACENTOS = {
   Ü: 'U',
 };
 
-export function normalizarTexto(texto) {
+// Acepta cualquier valor: lo que no es texto da ''.
+export function normalizarTexto(texto: unknown): string {
   if (typeof texto !== 'string') return '';
   return texto
     .toUpperCase()
@@ -31,6 +32,6 @@ export function normalizarTexto(texto) {
 
 // Normaliza una sola letra (toma el primer carácter tras normalizar,
 // por si llega con espacios accidentales desde el teclado del docente).
-export function normalizarLetra(letra) {
+export function normalizarLetra(letra: string): string {
   return normalizarTexto(letra).charAt(0);
 }

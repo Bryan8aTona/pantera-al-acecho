@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { crearMazo } from '../mazo.js';
-import { PREMIOS_DISPONIBLES } from '../constantes.js';
+import { crearMazo } from '../mazo.ts';
+import { PREMIOS_DISPONIBLES } from '../constantes.ts';
 
 const FRASES_EJEMPLO = Array.from({ length: 8 }, (_, i) => ({
   id: `frase-${i + 1}`,

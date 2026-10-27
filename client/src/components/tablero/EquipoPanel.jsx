@@ -1,5 +1,5 @@
 import { COLORES_EQUIPO } from './coloresEquipo.js';
-import { PANTERA_ESTADO_DERROTA } from '../../motor/constantes.js';
+import { PANTERA_ESTADO_DERROTA } from '../../motor/constantes.ts';
 
 const ESTADOS_PANTERA = Array.from({ length: PANTERA_ESTADO_DERROTA }, (_, i) => i + 1);
 

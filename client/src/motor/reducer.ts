@@ -1,6 +1,6 @@
-import { MotorError } from './errores.js';
-import { LIMITES_INTENTOS, COSTO_ACIERTO_SEGURO, PANTERA_ESTADO_DERROTA, FASES } from './constantes.js';
-import { normalizarTexto, normalizarLetra } from './normalizacion.js';
+import { MotorError } from './errores.ts';
+import { LIMITES_INTENTOS, COSTO_ACIERTO_SEGURO, PANTERA_ESTADO_DERROTA, FASES } from './constantes.ts';
+import { normalizarTexto, normalizarLetra } from './normalizacion.ts';
 import {
   esLetra,
   categoriaDeLetra,
@@ -8,31 +8,49 @@ import {
   posicionesDeLetra,
   letrasUnicasPorCategoria,
   letrasUnicasDeTexto,
-} from './letras.js';
-import { debeAdivinar, equipoEnTurnoActual, hayDerrotaPendiente, impedimentoAciertoSeguro } from './selectores.js';
+} from './letras.ts';
+import { debeAdivinar, equipoEnTurnoActual, hayDerrotaPendiente, impedimentoAciertoSeguro } from './selectores.ts';
+import type {
+  AccionMotor,
+  Carta,
+  DatosAccion,
+  Equipo,
+  EquipoId,
+  EstadoPartida,
+  LetrasUsadas,
+  Mazo,
+  ModoRobo,
+} from './tipos.ts';
 
 // ---------------------------------------------------------------------
 // Helpers internos
 // ---------------------------------------------------------------------
 
-function equipoEnTurno(estado) {
+function equipoEnTurno(estado: EstadoPartida): EquipoId {
   const equipo = equipoEnTurnoActual(estado);
   if (!equipo) throw new MotorError('SIN_TURNO', 'No hay un equipo en turno');
   return equipo.id;
 }
 
-function exigirSinDerrotaPendiente(estado) {
+// Carta del turno normal. Los manejadores ya comprobaron que hay una
+// antes de llegar aquí; el `throw` solo hace explícito ese supuesto.
+function cartaActual(estado: EstadoPartida): Carta {
+  if (!estado.cartaActualId) throw new MotorError('SIN_CARTA', 'No hay una carta activa');
+  return estado.mazo[estado.cartaActualId];
+}
+
+function exigirSinDerrotaPendiente(estado: EstadoPartida): void {
   if (hayDerrotaPendiente(estado)) {
     throw new MotorError('DERROTA_PENDIENTE', 'El equipo ya perdió esta frase');
   }
 }
 
 // Validación algorítmica de la respuesta (requerimientos.md 3.5).
-function respuestaCorrecta(intento, carta) {
+function respuestaCorrecta(intento: string, carta: Carta): boolean {
   return normalizarTexto(intento) === normalizarTexto(carta.texto);
 }
 
-function actualizarEquipo(estado, equipoId, cambios) {
+function actualizarEquipo(estado: EstadoPartida, equipoId: EquipoId, cambios: Partial<Equipo>): EstadoPartida {
   return {
     ...estado,
     equipos: {
@@ -42,7 +60,7 @@ function actualizarEquipo(estado, equipoId, cambios) {
   };
 }
 
-function actualizarCarta(estado, cartaId, cambios) {
+function actualizarCarta(estado: EstadoPartida, cartaId: string, cambios: Partial<Carta>): EstadoPartida {
   return {
     ...estado,
     mazo: {
@@ -56,7 +74,7 @@ function actualizarCarta(estado, cartaId, cambios) {
 // acertando todas las letras de la frase una por una (bug reportado en
 // playtesting: el juego no lo detectaba). Se revisa después de cada
 // letra correcta y después de cada Acierto Seguro.
-function fraseCompletamenteRevelada(texto, letrasUsadas) {
+function fraseCompletamenteRevelada(texto: string, letrasUsadas: LetrasUsadas): boolean {
   return letrasUnicasDeTexto(texto).every((letra) => letrasUsadas[letra] === 'acierto');
 }
 
@@ -64,7 +82,7 @@ function fraseCompletamenteRevelada(texto, letrasUsadas) {
 // equipos), nunca sobre el subconjunto de la fase actual, porque el
 // robo solo existe en Ronda 1. Es circular: si el equipo que pierde es
 // el último del orden, el "siguiente" es el primero.
-function obtenerEquipoRobo(estado, equipoFalloId) {
+function obtenerEquipoRobo(estado: EstadoPartida, equipoFalloId: EquipoId): EquipoId {
   const orden = estado.ordenTurnoRonda1;
   const idx = orden.indexOf(equipoFalloId);
   return orden[(idx + 1) % orden.length];
@@ -74,7 +92,7 @@ function obtenerEquipoRobo(estado, equipoFalloId) {
 // Reducer
 // ---------------------------------------------------------------------
 
-export function motorReducer(estado, accion) {
+export function motorReducer(estado: EstadoPartida, accion: AccionMotor): EstadoPartida {
   switch (accion.type) {
     case 'ELEGIR_CARTA':
       return manejarElegirCarta(estado, accion);
@@ -92,8 +110,12 @@ export function motorReducer(estado, accion) {
       return manejarRendirse(estado);
     case 'CONFIRMAR_DERROTA':
       return manejarConfirmarDerrota(estado);
-    default:
-      throw new MotorError('ACCION_DESCONOCIDA', `Acción no reconocida: ${accion.type}`);
+    default: {
+      // TypeScript exige que el switch cubra todas las acciones de
+      // AccionMotor; aquí solo llega un dispatch desde JS sin tipar.
+      const desconocida: never = accion;
+      throw new MotorError('ACCION_DESCONOCIDA', `Acción no reconocida: ${(desconocida as AccionMotor).type}`);
+    }
   }
 }
 
@@ -101,7 +123,7 @@ export function motorReducer(estado, accion) {
 // ELEGIR_CARTA
 // ---------------------------------------------------------------------
 
-function manejarElegirCarta(estado, { cartaId }) {
+function manejarElegirCarta(estado: EstadoPartida, { cartaId }: DatosAccion<'ELEGIR_CARTA'>): EstadoPartida {
   if (estado.fase === FASES.CIERRE) {
     throw new MotorError('PARTIDA_CERRADA', 'La partida ya terminó');
   }
@@ -128,7 +150,7 @@ function manejarElegirCarta(estado, { cartaId }) {
 // PEDIR_LETRA_LIBRE (opción gratuita — puede avanzar a la pantera)
 // ---------------------------------------------------------------------
 
-function manejarPedirLetraLibre(estado, { letra }) {
+function manejarPedirLetraLibre(estado: EstadoPartida, { letra }: DatosAccion<'PEDIR_LETRA_LIBRE'>): EstadoPartida {
   if (estado.modoRobo) {
     throw new MotorError('EN_ROBO', 'Durante el robo no se piden letras, solo se declara la frase');
   }
@@ -199,7 +221,10 @@ function manejarPedirLetraLibre(estado, { letra }) {
 // COMPRAR_ACIERTO_SEGURO (solo Ronda 1 — siempre acierta, no mueve a la pantera)
 // ---------------------------------------------------------------------
 
-function manejarComprarAciertoSeguro(estado, { categoria }) {
+function manejarComprarAciertoSeguro(
+  estado: EstadoPartida,
+  { categoria }: DatosAccion<'COMPRAR_ACIERTO_SEGURO'>,
+): EstadoPartida {
   if (estado.ronda !== 1) {
     throw new MotorError('SOLO_RONDA1', 'El Acierto Seguro no está disponible en Ronda 2');
   }
@@ -246,7 +271,7 @@ function manejarComprarAciertoSeguro(estado, { categoria }) {
 // ACTIVAR / CANCELAR MODO_ADIVINAR
 // ---------------------------------------------------------------------
 
-function manejarActivarModoAdivinar(estado) {
+function manejarActivarModoAdivinar(estado: EstadoPartida): EstadoPartida {
   if (!estado.cartaActualId && !estado.modoRobo) {
     throw new MotorError('SIN_CARTA', 'No hay una carta activa para adivinar');
   }
@@ -254,7 +279,7 @@ function manejarActivarModoAdivinar(estado) {
   return { ...estado, modoAdivinarActivo: true };
 }
 
-function manejarCancelarModoAdivinar(estado) {
+function manejarCancelarModoAdivinar(estado: EstadoPartida): EstadoPartida {
   if (estado.modoRobo) {
     throw new MotorError('EN_ROBO', 'El robo siempre se resuelve con una respuesta, no se puede cancelar');
   }
@@ -265,7 +290,7 @@ function manejarCancelarModoAdivinar(estado) {
 // ENVIAR_RESPUESTA
 // ---------------------------------------------------------------------
 
-function manejarEnviarRespuesta(estado, { intento }) {
+function manejarEnviarRespuesta(estado: EstadoPartida, { intento }: DatosAccion<'ENVIAR_RESPUESTA'>): EstadoPartida {
   return resolverRespuesta(estado, (carta) => respuestaCorrecta(intento, carta));
 }
 
@@ -273,7 +298,7 @@ function manejarEnviarRespuesta(estado, { intento }) {
 // obligatorio o voluntario, o Robo) no la sabe. Se resuelve exactamente igual que una
 // respuesta incorrecta, sin que el docente tenga que escribir una frase
 // inventada.
-function manejarRendirse(estado) {
+function manejarRendirse(estado: EstadoPartida): EstadoPartida {
   const declarando =
     estado.modoRobo ||
     estado.modoAdivinarActivo ||
@@ -284,9 +309,9 @@ function manejarRendirse(estado) {
   return resolverRespuesta(estado, () => false);
 }
 
-function resolverRespuesta(estado, esCorrecta) {
+function resolverRespuesta(estado: EstadoPartida, esCorrecta: (carta: Carta) => boolean): EstadoPartida {
   if (estado.modoRobo) {
-    return resolverIntentoRobo(estado, esCorrecta);
+    return resolverIntentoRobo(estado, estado.modoRobo, esCorrecta);
   }
 
   if (!estado.cartaActualId) {
@@ -295,7 +320,7 @@ function resolverRespuesta(estado, esCorrecta) {
   exigirSinDerrotaPendiente(estado);
 
   const equipoId = equipoEnTurno(estado);
-  const carta = estado.mazo[estado.cartaActualId];
+  const carta = cartaActual(estado);
 
   if (esCorrecta(carta)) {
     return resolverAciertoDeTurno(estado, equipoId);
@@ -314,16 +339,16 @@ function resolverRespuesta(estado, esCorrecta) {
 // CONFIRMAR_DERROTA (Ronda 2: cierra la carta tras el zarpazo)
 // ---------------------------------------------------------------------
 
-function manejarConfirmarDerrota(estado) {
+function manejarConfirmarDerrota(estado: EstadoPartida): EstadoPartida {
   if (!hayDerrotaPendiente(estado)) {
     throw new MotorError('SIN_DERROTA_PENDIENTE', 'No hay una derrota pendiente de confirmar');
   }
   return resolverFalloDirectoSinRobo(estado, equipoEnTurno(estado));
 }
 
-function resolverAciertoDeTurno(estado, equipoId) {
+function resolverAciertoDeTurno(estado: EstadoPartida, equipoId: EquipoId): EstadoPartida {
   const equipo = estado.equipos[equipoId];
-  const carta = estado.mazo[estado.cartaActualId];
+  const carta = cartaActual(estado);
 
   let siguiente = actualizarEquipo(estado, equipoId, {
     saldo: equipo.saldo + carta.valor,
@@ -337,8 +362,8 @@ function resolverAciertoDeTurno(estado, equipoId) {
 // Ronda 1 — el equipo pierde su carta: activa el Robo para el equipo
 // siguiente en el orden del sorteo. La carta queda "en juego" hasta que
 // el robo se resuelve (no se marca jugada todavía).
-function resolverFalloDeTurno(estado, equipoId) {
-  const carta = estado.mazo[estado.cartaActualId];
+function resolverFalloDeTurno(estado: EstadoPartida, equipoId: EquipoId): EstadoPartida {
+  const carta = cartaActual(estado);
   const equipoQueRobaId = obtenerEquipoRobo(estado, equipoId);
 
   const siguiente = actualizarEquipo(estado, equipoId, { gano: false });
@@ -351,8 +376,8 @@ function resolverFalloDeTurno(estado, equipoId) {
 }
 
 // Ronda 2 — sin robo: la carta se resuelve de inmediato sin ganador.
-function resolverFalloDirectoSinRobo(estado, equipoId) {
-  const carta = estado.mazo[estado.cartaActualId];
+function resolverFalloDirectoSinRobo(estado: EstadoPartida, equipoId: EquipoId): EstadoPartida {
+  const carta = cartaActual(estado);
   let siguiente = actualizarEquipo(estado, equipoId, { gano: false });
   siguiente = actualizarCarta(siguiente, carta.id, { jugada: true, ganadorId: null });
   return avanzarTurno(siguiente);
@@ -362,8 +387,11 @@ function resolverFalloDirectoSinRobo(estado, equipoId) {
 // monedas, una sola oportunidad. Acierta → se lleva el premio. Falla →
 // nadie suma monedas. En ambos casos la carta queda resuelta y el turno
 // avanza al equipo que acaba de robar (ver nota de diseño más abajo).
-function resolverIntentoRobo(estado, esCorrecta) {
-  const { equipoId, cartaId } = estado.modoRobo;
+function resolverIntentoRobo(
+  estado: EstadoPartida,
+  { equipoId, cartaId }: ModoRobo,
+  esCorrecta: (carta: Carta) => boolean,
+): EstadoPartida {
   const carta = estado.mazo[cartaId];
 
   let siguiente = estado;
@@ -394,11 +422,11 @@ function resolverIntentoRobo(estado, esCorrecta) {
 // (su propia carta), salvo que la fase ya se haya completado (ver
 // `turnosCompletados` más abajo, que maneja el caso límite del último
 // equipo del sorteo robando a un equipo que ya jugó su turno).
-function avanzarTurno(estado) {
+function avanzarTurno(estado: EstadoPartida): EstadoPartida {
   const totalEquiposFase = estado.ordenTurnoActual.length;
   const turnosCompletados = estado.turnosCompletados + 1;
 
-  const siguiente = {
+  const siguiente: EstadoPartida = {
     ...estado,
     cartaActualId: null,
     letrasUsadas: {},
@@ -416,7 +444,7 @@ function avanzarTurno(estado) {
   };
 }
 
-function transicionarFase(estado) {
+function transicionarFase(estado: EstadoPartida): EstadoPartida {
   if (estado.fase === FASES.RONDA1) {
     const perdedores = estado.ordenTurnoRonda1.filter((id) => estado.equipos[id].gano === false);
 
@@ -454,9 +482,9 @@ function transicionarFase(estado) {
 
 // Cierre (3.8): revela automáticamente todas las tarjetas no jugadas y
 // arma el marcador final ordenado por saldo.
-function entrarACierre(estado) {
-  const mazoActualizado = { ...estado.mazo };
-  const cartasReveladas = [];
+function entrarACierre(estado: EstadoPartida): EstadoPartida {
+  const mazoActualizado: Mazo = { ...estado.mazo };
+  const cartasReveladas: Carta[] = [];
 
   for (const cartaId of Object.keys(mazoActualizado)) {
     const carta = mazoActualizado[cartaId];

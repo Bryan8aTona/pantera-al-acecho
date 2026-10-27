@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { motorReducer } from '../reducer.js';
-import { MotorError } from '../errores.js';
+import { motorReducer } from '../reducer.ts';
+import { MotorError } from '../errores.ts';
 
 // Casos de flujo que atraviesan varias cartas/fases. El estado se arma a
 // mano (como en reducer.test.js) para controlar el orden de equipos y el
