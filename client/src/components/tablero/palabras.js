@@ -17,3 +17,13 @@ export function indicesPorPalabra(texto) {
   if (actual.length) palabras.push(actual);
   return palabras;
 }
+
+// Con más caracteres que esto (sin contar espacios), la frase se muestra
+// con celdas un poco más chicas (.progreso-frase-larga) para que no empuje
+// el teclado o los botones fuera de la pantalla. Las frases cortas
+// conservan las celdas grandes.
+const CARACTERES_FRASE_LARGA = 60;
+
+export function esFraseLarga(texto) {
+  return texto.replace(/ /g, '').length > CARACTERES_FRASE_LARGA;
+}

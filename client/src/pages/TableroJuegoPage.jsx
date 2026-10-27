@@ -411,7 +411,8 @@ export default function TableroJuegoPage() {
                     <button
                       key={categoria}
                       type="button"
-                      className="btn-secundario"
+                      className="btn-secundario acierto-seguro-btn"
+                      aria-label={`Acierto Seguro · ${ETIQUETA_CATEGORIA[categoria]} (−${COSTO_ACIERTO_SEGURO[categoria]} monedas a la bolsa)`}
                       disabled={
                         enJugada ||
                         Boolean(
@@ -420,8 +421,11 @@ export default function TableroJuegoPage() {
                       }
                       onClick={() => comprarAciertoSeguro(categoria)}
                     >
-                      Acierto Seguro · {ETIQUETA_CATEGORIA[categoria]} (−{COSTO_ACIERTO_SEGURO[categoria]} 🪙 a la
-                      bolsa)
+                      <span className="acierto-seguro-titulo">Acierto Seguro</span>
+                      <span className="acierto-seguro-detalle">
+                        <span>{ETIQUETA_CATEGORIA[categoria]}</span>
+                        <span className="acierto-seguro-costo">−{COSTO_ACIERTO_SEGURO[categoria]} 🪙</span>
+                      </span>
                     </button>
                   ))}
                 </div>
