@@ -45,7 +45,11 @@ export default function SetFormPage() {
         <h1>{esEdicion ? 'Editar set' : 'Nuevo set'}</h1>
       </header>
 
-      {errorCarga && <p className="set-form-page-error" role="alert">{errorCarga}</p>}
+      {errorCarga && (
+        <p className="set-form-page-error" role="alert">
+          {errorCarga}
+        </p>
+      )}
 
       {/* Si el set a editar no se pudo cargar, no se ofrece un formulario
           vacío: guardarlo sobrescribiría el set original con otro contenido. */}

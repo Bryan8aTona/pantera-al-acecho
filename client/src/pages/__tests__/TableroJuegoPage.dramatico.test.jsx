@@ -186,9 +186,7 @@ describe('Secuencia dramática de derrota (Tablero de juego)', () => {
 
     // Durante el anuncio: el video del estado 1 corre en su cajita y el
     // teclado sigue presente (regresión del bug donde desaparecía).
-    expect(document.querySelector('video').getAttribute('src')).toBe(
-      '/assets/pantera/pantera-estado-1.mp4',
-    );
+    expect(document.querySelector('video').getAttribute('src')).toBe('/assets/pantera/pantera-estado-1.mp4');
     const teclaM = screen.getByRole('button', { name: 'M' });
     expect(teclaM).toBeInTheDocument();
     expect(teclaM).toBeDisabled();
@@ -211,9 +209,7 @@ describe('Secuencia dramática de derrota (Tablero de juego)', () => {
     act(() => {
       vi.advanceTimersByTime(DURACION_IMPACTO_MS);
     });
-    expect(document.querySelector('video').getAttribute('src')).toBe(
-      '/assets/pantera/pantera-estado-1.mp4',
-    );
+    expect(document.querySelector('video').getAttribute('src')).toBe('/assets/pantera/pantera-estado-1.mp4');
 
     act(() => {
       document.querySelector('video').dispatchEvent(new Event('ended'));
@@ -226,9 +222,7 @@ describe('Secuencia dramática de derrota (Tablero de juego)', () => {
     act(() => {
       vi.advanceTimersByTime(DURACION_IMPACTO_MS);
     });
-    expect(document.querySelector('video').getAttribute('src')).toBe(
-      '/assets/pantera/pantera-estado-2.mp4',
-    );
+    expect(document.querySelector('video').getAttribute('src')).toBe('/assets/pantera/pantera-estado-2.mp4');
   });
 
   it('si el video falla al cargar, la secuencia de derrota igual avanza (no deja el juego trabado)', () => {

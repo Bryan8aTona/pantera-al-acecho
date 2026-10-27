@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { listarSets, eliminarSet } from '../lib/sets.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -22,17 +22,20 @@ export default function BackOfficePage() {
     }
   }
 
-  const cargarSets = useCallback(async () => {
+  useEffect(() => {
+    listarSets()
+      .then((lista) => setSets(lista))
+      .catch((err) => setError(err.message || 'No se pudieron cargar los sets'));
+  }, []);
+
+  // Recarga tras eliminar un set.
+  async function cargarSets() {
     try {
       setSets(await listarSets());
     } catch (err) {
       setError(err.message || 'No se pudieron cargar los sets');
     }
-  }, []);
-
-  useEffect(() => {
-    cargarSets();
-  }, [cargarSets]);
+  }
 
   async function confirmarEliminar(id) {
     setEliminandoId(id);
@@ -59,7 +62,11 @@ export default function BackOfficePage() {
         </button>
       </header>
 
-      {error && <p className="backoffice-error" role="alert">{error}</p>}
+      {error && (
+        <p className="backoffice-error" role="alert">
+          {error}
+        </p>
+      )}
 
       <div className="backoffice-toolbar">
         <Link to="/sets/nuevo" className="btn-primario">
@@ -75,9 +82,7 @@ export default function BackOfficePage() {
       {sets && sets.length === 0 && (
         <div className="backoffice-vacio">
           <p>Todavía no tienes sets de frases.</p>
-          <p className="backoffice-vacio-sub">
-            Crea el primero para poder iniciar una partida con tu grupo.
-          </p>
+          <p className="backoffice-vacio-sub">Crea el primero para poder iniciar una partida con tu grupo.</p>
         </div>
       )}
 

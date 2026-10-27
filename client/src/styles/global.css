@@ -1,17 +1,17 @@
 :root {
   /* Color */
-  --color-bg: #F4F7F3;
-  --color-surface: #FFFFFF;
-  --color-primary: #F08200;
-  --color-primary-dark: #C96900;
-  --color-accent: #D9A441;
-  --color-accent-dark: #B8842E;
-  --color-text: #1C231F;
-  --color-text-secondary: #5B6660;
-  --color-border: #DDE3DC;
-  --color-danger: #B3432B;
-  --color-danger-bg: #FBEBE6;
-  --color-success: #2F7D4F;
+  --color-bg: #f4f7f3;
+  --color-surface: #ffffff;
+  --color-primary: #f08200;
+  --color-primary-dark: #c96900;
+  --color-accent: #d9a441;
+  --color-accent-dark: #b8842e;
+  --color-text: #1c231f;
+  --color-text-secondary: #5b6660;
+  --color-border: #dde3dc;
+  --color-danger: #b3432b;
+  --color-danger-bg: #fbebe6;
+  --color-success: #2f7d4f;
 
   /* Tipografía */
   --font-display: 'Space Grotesk', system-ui, sans-serif;
@@ -27,7 +27,9 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
@@ -39,7 +41,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, label, button {
+h1,
+h2,
+h3,
+label,
+button {
   font-family: var(--font-display);
 }
 

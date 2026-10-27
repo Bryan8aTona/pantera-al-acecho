@@ -28,6 +28,12 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Revisar código (ESLint)
+        run: npm run lint
+
+      - name: Revisar formato (Prettier)
+        run: npm run format:check
+
       - name: Correr pruebas (Vitest)
         run: npm test
 

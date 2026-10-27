@@ -18,34 +18,139 @@ const NOMBRE_EQUIPO = { rojo: 'Rojo', azul: 'Azul', amarillo: 'Amarillo' };
 
 export const PASOS = [
   // Turno ganado
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, eligiendo: true,
-    leyenda: 'Cuando es tu turno, eliges una carta del mazo. Detrás hay una frase escondida y un premio en monedas.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'A', pedida: 'A', tipo: 'acierto',
-    leyenda: 'Si pides la A y está en la frase, aparece en todos los lugares donde va.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'A', fallos: 'T', pantera: 1, pedida: 'T', tipo: 'fallo',
-    leyenda: 'Si pides la T y no está, la pantera se acerca un poco más.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 200, aciertos: 'AS', fallos: 'T', pantera: 1, pedida: 'S', tipo: 'acierto',
-    leyenda: 'Pides la S y también está. ¡Vas bien!' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 180, aciertos: 'ASL', fallos: 'T', pantera: 1, pedida: 'L', tipo: 'compra',
-    leyenda: '¿No se te ocurre ninguna? Con Acierto Seguro pagas 20 monedas y el juego te da una consonante que sí está.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 180, aciertos: 'ASL', fallos: 'T', pantera: 1, intento: 'LA SELVA',
-    leyenda: '¿Ya sabes cuál es la frase? Pide adivinarla y dila completa.' },
-  { equipo: 'rojo', frase: 'LA SELVA', saldo: 270, aciertos: 'ASLEV', fallos: 'T', pantera: 1, efecto: 'victoria',
-    leyenda: '¡Le atinaste! Te llevas el premio de la carta: 90 monedas más.' },
+  {
+    equipo: 'rojo',
+    frase: 'LA SELVA',
+    saldo: 200,
+    eligiendo: true,
+    leyenda: 'Cuando es tu turno, eliges una carta del mazo. Detrás hay una frase escondida y un premio en monedas.',
+  },
+  {
+    equipo: 'rojo',
+    frase: 'LA SELVA',
+    saldo: 200,
+    aciertos: 'A',
+    pedida: 'A',
+    tipo: 'acierto',
+    leyenda: 'Si pides la A y está en la frase, aparece en todos los lugares donde va.',
+  },
+  {
+    equipo: 'rojo',
+    frase: 'LA SELVA',
+    saldo: 200,
+    aciertos: 'A',
+    fallos: 'T',
+    pantera: 1,
+    pedida: 'T',
+    tipo: 'fallo',
+    leyenda: 'Si pides la T y no está, la pantera se acerca un poco más.',
+  },
+  {
+    equipo: 'rojo',
+    frase: 'LA SELVA',
+    saldo: 200,
+    aciertos: 'AS',
+    fallos: 'T',
+    pantera: 1,
+    pedida: 'S',
+    tipo: 'acierto',
+    leyenda: 'Pides la S y también está. ¡Vas bien!',
+  },
+  {
+    equipo: 'rojo',
+    frase: 'LA SELVA',
+    saldo: 180,
+    aciertos: 'ASL',
+    fallos: 'T',
+    pantera: 1,
+    pedida: 'L',
+    tipo: 'compra',
+    leyenda:
+      '¿No se te ocurre ninguna? Con Acierto Seguro pagas 20 monedas y el juego te da una consonante que sí está.',
+  },
+  {
+    equipo: 'rojo',
+    frase: 'LA SELVA',
+    saldo: 180,
+    aciertos: 'ASL',
+    fallos: 'T',
+    pantera: 1,
+    intento: 'LA SELVA',
+    leyenda: '¿Ya sabes cuál es la frase? Pide adivinarla y dila completa.',
+  },
+  {
+    equipo: 'rojo',
+    frase: 'LA SELVA',
+    saldo: 270,
+    aciertos: 'ASLEV',
+    fallos: 'T',
+    pantera: 1,
+    efecto: 'victoria',
+    leyenda: '¡Le atinaste! Te llevas el premio de la carta: 90 monedas más.',
+  },
 
   // Turno perdido
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'O', pantera: 1, pedida: 'O', tipo: 'fallo',
-    leyenda: 'Ahora juega el Equipo Azul. Si pides la O y no está, la pantera empieza a acercarse.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OI', pantera: 2, pedida: 'I', tipo: 'fallo',
-    leyenda: 'Otro fallo y la pantera ya asoma la cabeza.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIR', pantera: 3, pedida: 'R', tipo: 'fallo',
-    leyenda: 'Con cada fallo se acerca más.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRS', pantera: 4, pedida: 'S', tipo: 'fallo',
-    leyenda: '¡Cuidado! Está lista para saltar. Un fallo más y te ataca.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRSL', pantera: 5, pedida: 'L', tipo: 'fallo', efecto: 'zarpazo',
-    leyenda: 'Al quinto fallo, ¡zarpazo! Pierdes la carta.' },
-  { equipo: 'azul', frase: 'TUCAN', saldo: 200, fallos: 'OIRSL', pantera: 5, efecto: 'robo',
-    leyenda: 'Cuando un equipo pierde, el siguiente puede robar la frase: tiene una sola oportunidad de decirla completa y quedarse con el premio.' },
+  {
+    equipo: 'azul',
+    frase: 'TUCAN',
+    saldo: 200,
+    fallos: 'O',
+    pantera: 1,
+    pedida: 'O',
+    tipo: 'fallo',
+    leyenda: 'Ahora juega el Equipo Azul. Si pides la O y no está, la pantera empieza a acercarse.',
+  },
+  {
+    equipo: 'azul',
+    frase: 'TUCAN',
+    saldo: 200,
+    fallos: 'OI',
+    pantera: 2,
+    pedida: 'I',
+    tipo: 'fallo',
+    leyenda: 'Otro fallo y la pantera ya asoma la cabeza.',
+  },
+  {
+    equipo: 'azul',
+    frase: 'TUCAN',
+    saldo: 200,
+    fallos: 'OIR',
+    pantera: 3,
+    pedida: 'R',
+    tipo: 'fallo',
+    leyenda: 'Con cada fallo se acerca más.',
+  },
+  {
+    equipo: 'azul',
+    frase: 'TUCAN',
+    saldo: 200,
+    fallos: 'OIRS',
+    pantera: 4,
+    pedida: 'S',
+    tipo: 'fallo',
+    leyenda: '¡Cuidado! Está lista para saltar. Un fallo más y te ataca.',
+  },
+  {
+    equipo: 'azul',
+    frase: 'TUCAN',
+    saldo: 200,
+    fallos: 'OIRSL',
+    pantera: 5,
+    pedida: 'L',
+    tipo: 'fallo',
+    efecto: 'zarpazo',
+    leyenda: 'Al quinto fallo, ¡zarpazo! Pierdes la carta.',
+  },
+  {
+    equipo: 'azul',
+    frase: 'TUCAN',
+    saldo: 200,
+    fallos: 'OIRSL',
+    pantera: 5,
+    efecto: 'robo',
+    leyenda:
+      'Cuando un equipo pierde, el siguiente puede robar la frase: tiene una sola oportunidad de decirla completa y quedarse con el premio.',
+  },
 ];
 
 // Los mismos videos de la pantera que usa el Tablero, sin sonido. En un
@@ -103,13 +208,16 @@ export default function DemoPartidaModal({ onCerrar }) {
   const paso = PASOS[indice];
 
   // Circular: después del último paso vuelve al primero, y viceversa.
-  const irA = useCallback((i) => {
-    setIndice((i + PASOS.length) % PASOS.length);
-  }, []);
-
-  useEffect(() => {
-    setGarraEn(null);
-  }, [indice]);
+  // Al cambiar de paso se quita la garra, para que al volver a un
+  // zarpazo aparezca de nuevo recién al terminar su video.
+  const irA = useCallback(
+    (i) => {
+      const destino = (i + PASOS.length) % PASOS.length;
+      if (destino !== indice) setGarraEn(null);
+      setIndice(destino);
+    },
+    [indice],
+  );
 
   useEffect(() => {
     botonRef.current?.focus();
@@ -249,7 +357,9 @@ export default function DemoPartidaModal({ onCerrar }) {
             {TECLADO.map((letra) => (
               <span
                 key={letra}
-                className={['demo-tecla', estadoTecla(letra), paso.pedida === letra && 'pulsada'].filter(Boolean).join(' ')}
+                className={['demo-tecla', estadoTecla(letra), paso.pedida === letra && 'pulsada']
+                  .filter(Boolean)
+                  .join(' ')}
               >
                 {letra}
               </span>

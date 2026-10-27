@@ -11,12 +11,7 @@ function Fronda({ x, y, rotacion, escala }) {
       {hojas.map((ang) => (
         <g key={ang} transform={`rotate(${ang})`}>
           <path d="M0 0 C 22 -14, 30 -52, 0 -96 C -30 -52, -22 -14, 0 0 Z" />
-          <path
-            d="M0 -6 L0 -88"
-            stroke="rgba(0,0,0,0.25)"
-            strokeWidth="2"
-            fill="none"
-          />
+          <path d="M0 -6 L0 -88" stroke="rgba(0,0,0,0.25)" strokeWidth="2" fill="none" />
         </g>
       ))}
     </g>
@@ -25,12 +20,7 @@ function Fronda({ x, y, rotacion, escala }) {
 
 export default function HojasDecorativas() {
   return (
-    <svg
-      className="tablero-hojas"
-      viewBox="0 0 1000 620"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden="true"
-    >
+    <svg className="tablero-hojas" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <g fill="#0A1F16">
         <Fronda x={-10} y={0} rotacion={150} escala={1.5} />
         <Fronda x={70} y={-20} rotacion={200} escala={1.1} />

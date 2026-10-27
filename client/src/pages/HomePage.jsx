@@ -201,16 +201,14 @@ export default function HomePage() {
         <section className="home-seccion home-intro">
           <h2>¿Qué es Pantera al Acecho?</h2>
           <p>
-            Es una aplicación web que lleva el clásico “juego del ahorcado” al salón de clases y lo
-            convierte en una competencia de gestión de recursos y conocimiento entre cuatro equipos.
-            El sistema automatiza los turnos, el conteo de letras, el límite de intentos, la validación
-            de respuestas y el puntaje, de modo que el docente solo dirige el ritmo de la clase e
-            ingresa las decisiones que los equipos declaran en voz alta.
+            Es una aplicación web que lleva el clásico “juego del ahorcado” al salón de clases y lo convierte en una
+            competencia de gestión de recursos y conocimiento entre cuatro equipos. El sistema automatiza los turnos, el
+            conteo de letras, el límite de intentos, la validación de respuestas y el puntaje, de modo que el docente
+            solo dirige el ritmo de la clase e ingresa las decisiones que los equipos declaran en voz alta.
           </p>
           <p>
-            Está pensada para proyectarse en el aula: el docente opera desde su computadora y los
-            equipos ven en la proyección el tablero con la pantera al acecho, el teclado virtual y el
-            saldo de cada equipo.
+            Está pensada para proyectarse en el aula: el docente opera desde su computadora y los equipos ven en la
+            proyección el tablero con la pantera al acecho, el teclado virtual y el saldo de cada equipo.
           </p>
         </section>
 
@@ -235,8 +233,8 @@ export default function HomePage() {
         <section className="home-seccion">
           <h2>Manual para el docente</h2>
           <p>
-            La partida la operas tú desde tu computadora; los equipos solo miran la proyección y
-            declaran sus decisiones en voz alta. Estos son los pasos de principio a fin.
+            La partida la operas tú desde tu computadora; los equipos solo miran la proyección y declaran sus decisiones
+            en voz alta. Estos son los pasos de principio a fin.
           </p>
           <ol className="home-manual">
             {MANUAL.map((paso, i) => (
@@ -268,9 +266,9 @@ export default function HomePage() {
             ))}
           </ol>
           <p className="home-aviso">
-            No recargues ni cierres la pestaña durante la partida: el juego vive en la memoria del
-            navegador y se perdería (el navegador te pedirá confirmación). El botón 🔊 / 🔇 del
-            encabezado del tablero silencia los efectos de sonido en cualquier momento.
+            No recargues ni cierres la pestaña durante la partida: el juego vive en la memoria del navegador y se
+            perdería (el navegador te pedirá confirmación). El botón 🔊 / 🔇 del encabezado del tablero silencia los
+            efectos de sonido en cualquier momento.
           </p>
         </section>
 

@@ -81,13 +81,7 @@ export default function LoginPage() {
 
           <label className="campo">
             <span>Email</span>
-            <input
-              type="email"
-              value={form.email}
-              onChange={actualizarCampo('email')}
-              required
-              autoComplete="email"
-            />
+            <input type="email" value={form.email} onChange={actualizarCampo('email')} required autoComplete="email" />
           </label>
 
           <label className="campo">
@@ -103,7 +97,11 @@ export default function LoginPage() {
             {modo === 'registro' && <small>Mínimo 8 caracteres</small>}
           </label>
 
-          {error && <p className="login-error" role="alert">{error}</p>}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
 
           <button type="submit" className="login-submit" disabled={enviando}>
             {enviando ? 'Un momento…' : modo === 'login' ? 'Entrar' : 'Crear cuenta'}

@@ -42,8 +42,7 @@ export default function EquipoPanel({ equipo, limites, esTurnoActual, esQuienRob
         <span className="equipo-panel-v2-label">CONTADORES</span>
         <div className="equipo-panel-v2-contadores">
           <span>
-            <span className="equipo-panel-v2-categoria">Vocales:</span> {equipo.intentos.vocales}/
-            {limites.vocales}
+            <span className="equipo-panel-v2-categoria">Vocales:</span> {equipo.intentos.vocales}/{limites.vocales}
           </span>
           <span>
             <span className="equipo-panel-v2-categoria">Consonantes:</span> {equipo.intentos.consonantes}/

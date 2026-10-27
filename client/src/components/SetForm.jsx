@@ -80,7 +80,11 @@ export default function SetForm({ valorInicial, onGuardar, onCancelar, guardando
         ))}
       </div>
 
-      {error && <p className="set-form-error" role="alert">{error}</p>}
+      {error && (
+        <p className="set-form-error" role="alert">
+          {error}
+        </p>
+      )}
 
       <div className="set-form-acciones">
         <button type="button" className="btn-secundario" onClick={onCancelar}>

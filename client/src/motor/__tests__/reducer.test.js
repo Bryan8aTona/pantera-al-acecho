@@ -169,24 +169,18 @@ describe('COMPRAR_ACIERTO_SEGURO', () => {
   it('se rechaza si no quedan letras de esa categoría por descubrir', () => {
     let estado = motorReducer(estadoConCasa(), { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' });
     // CASA solo tiene una vocal distinta (A), ya revelada.
-    expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })).toThrow(
-      MotorError,
-    );
+    expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })).toThrow(MotorError);
   });
 
   it('se rechaza si el saldo es insuficiente', () => {
     let estado = estadoConCasa();
     estado = { ...estado, equipos: { ...estado.equipos, rojo: { ...estado.equipos.rojo, saldo: 10 } } };
-    expect(() =>
-      motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' }),
-    ).toThrow(MotorError);
+    expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' })).toThrow(MotorError);
   });
 
   it('no está disponible en Ronda 2', () => {
     const estado = estadoBase({ ronda: 2, cartaActualId: 'c1' });
-    expect(() =>
-      motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' }),
-    ).toThrow(MotorError);
+    expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })).toThrow(MotorError);
   });
 });
 
@@ -241,9 +235,7 @@ describe('Robo de frase', () => {
   it('durante el robo no se pueden pedir letras ni comprar Acierto Seguro', () => {
     const estado = estadoEnRobo();
     expect(() => motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'A' })).toThrow(MotorError);
-    expect(() =>
-      motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' }),
-    ).toThrow(MotorError);
+    expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })).toThrow(MotorError);
   });
 
   it('caso límite: si el último equipo del sorteo pierde, el robo cae en el primero (circular)', () => {
@@ -375,9 +367,7 @@ describe('Ronda 2 (Repechaje)', () => {
 
   it('no permite Acierto Seguro', () => {
     let estado = motorReducer(estadoRepechaje(), { type: 'ELEGIR_CARTA', cartaId: 'c5' });
-    expect(() =>
-      motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' }),
-    ).toThrow(MotorError);
+    expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })).toThrow(MotorError);
   });
 
   it('un fallo es derrota directa, sin activar Robo', () => {

@@ -37,6 +37,7 @@ navegador.
   colección `sets`. La autorización vive en `firestore.rules`.
 - **Hosting:** Firebase Hosting (sitio estático).
 - **Pruebas:** Vitest + Testing Library (jsdom) en el cliente — 124 pruebas.
+- **Calidad de código:** ESLint (reglas de React y de hooks) y Prettier, revisados en CI.
 
 ## Estructura del repositorio
 
@@ -100,6 +101,8 @@ cuenta** de la propia aplicación (nombre, email, contraseña de 8+ caracteres).
 | --- | --- | --- |
 | `client/` | `npm run dev` | Servidor de desarrollo Vite. |
 | `client/` | `npm test` | Ejecuta las 124 pruebas (Vitest). |
+| `client/` | `npm run lint` | Revisa el código con ESLint. |
+| `client/` | `npm run format` | Formatea el código con Prettier (`format:check` solo revisa). |
 | `client/` | `npm run build` | Build de producción en `client/dist/`. |
 | `client/` | `npm run preview` | Sirve el build de producción localmente. |
 | raíz | `firebase deploy` | Publica Hosting + reglas de Firestore. |

@@ -22,7 +22,12 @@ describe('normalizarFrases', () => {
 
 describe('frasesConId', () => {
   it('sintetiza un id estable derivado del orden (lo usa el mazo del motor)', () => {
-    expect(frasesConId([{ orden: 3, texto: 'c' }, { orden: 1, texto: 'a' }])).toEqual([
+    expect(
+      frasesConId([
+        { orden: 3, texto: 'c' },
+        { orden: 1, texto: 'a' },
+      ]),
+    ).toEqual([
       { orden: 1, texto: 'a', id: 'f1' },
       { orden: 3, texto: 'c', id: 'f3' },
     ]);

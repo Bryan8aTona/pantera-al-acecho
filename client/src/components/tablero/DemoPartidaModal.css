@@ -24,7 +24,9 @@
   background: linear-gradient(170deg, #1d4a34 0%, #0e2a1f 60%, #0a211a 100%);
   border: 2px solid var(--verde-canopy);
   border-radius: 16px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 18px 50px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 18px 50px rgba(0, 0, 0, 0.6);
   padding: 18px 24px 20px;
   animation: demo-entrar 0.25s ease-out;
 }
@@ -71,9 +73,9 @@
 /* --- Escenario: una versión en miniatura del Tablero --- */
 
 .demo-escenario {
-  --selva: #1F5138;
-  --canopy: #2E6B47;
-  --dorado: #ECC15A;
+  --selva: #1f5138;
+  --canopy: #2e6b47;
+  --dorado: #ecc15a;
 
   position: relative;
   overflow: hidden;
@@ -111,7 +113,9 @@
   border-radius: var(--radius-sm);
   background: rgba(0, 0, 0, 0.25);
   box-shadow: 0 0 14px 2px var(--color-equipo);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .demo-equipo-hueco {
@@ -119,7 +123,9 @@
 }
 
 .demo-equipo-robo {
-  box-shadow: 0 0 0 2px var(--dorado), 0 0 16px 3px var(--dorado);
+  box-shadow:
+    0 0 0 2px var(--dorado),
+    0 0 16px 3px var(--dorado);
   animation: demo-entrar-lado 0.4s ease-out;
 }
 
@@ -159,13 +165,13 @@
 }
 
 .demo-etiqueta-turno {
-  background: #39FF6A;
-  color: #0E2A1F;
+  background: #39ff6a;
+  color: #0e2a1f;
 }
 
 .demo-etiqueta-robo {
   background: var(--dorado);
-  color: #0E2A1F;
+  color: #0e2a1f;
 }
 
 /* Pantera: los mismos videos del Tablero, en una cajita. */
@@ -284,7 +290,7 @@
 
 .demo-celda.nueva {
   animation: demo-revelar 0.5s ease-out;
-  color: #8CF0A8;
+  color: #8cf0a8;
 }
 
 .demo-celda.tecleada {
@@ -321,7 +327,7 @@
 
 .demo-burbuja-compra {
   background: var(--dorado);
-  color: #0E2A1F;
+  color: #0e2a1f;
 }
 
 .demo-burbuja-adivinar {
@@ -353,7 +359,7 @@
 
 .demo-tecla.acierto {
   background: var(--color-success);
-  border-color: #46A86C;
+  border-color: #46a86c;
 }
 
 .demo-tecla.fallo {
@@ -471,7 +477,9 @@
   height: 10px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.25);
-  transition: background 0.3s, transform 0.3s;
+  transition:
+    background 0.3s,
+    transform 0.3s;
 }
 
 .demo-progreso button:hover::before {
@@ -486,7 +494,6 @@
   background: var(--color-accent);
   transform: scale(1.4);
 }
-
 
 .demo-acciones {
   display: flex;
@@ -505,70 +512,142 @@
    cascada y si no lo pintaría de verde). Amarillo oscuro, no claro, para
    que el cambio se note. */
 .demo-acciones .btn-primario:hover:not(:disabled) {
-  background: #C9971F;
+  background: #c9971f;
 }
 
 /* --- Animaciones --- */
 
 @keyframes demo-aparecer {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes demo-entrar {
-  from { opacity: 0; transform: translateY(12px) scale(0.98); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes demo-entrar-lado {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes demo-sacudir {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
 }
 
 @keyframes demo-latido {
-  0% { transform: scale(0.6); opacity: 0; }
-  60% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes demo-pulsar {
-  0% { transform: scale(1); }
-  40% { transform: scale(1.4); box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.6); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.4);
+    box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.6);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes demo-revelar {
-  from { transform: rotateY(90deg); }
-  to { transform: rotateY(0); }
+  from {
+    transform: rotateY(90deg);
+  }
+  to {
+    transform: rotateY(0);
+  }
 }
 
 @keyframes demo-teclear {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes demo-elegir {
-  0%, 25% { transform: none; }
-  55%, 100% { transform: translateY(-14px) scale(1.12); box-shadow: 0 0 16px 4px rgba(236, 193, 90, 0.8); border-radius: 6px; }
+  0%,
+  25% {
+    transform: none;
+  }
+  55%,
+  100% {
+    transform: translateY(-14px) scale(1.12);
+    box-shadow: 0 0 16px 4px rgba(236, 193, 90, 0.8);
+    border-radius: 6px;
+  }
 }
 
 @keyframes demo-destello {
-  0% { opacity: 0; }
-  15% { opacity: 1; }
-  100% { opacity: 0.9; }
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.9;
+  }
 }
 
 @keyframes demo-garra {
-  from { opacity: 0; transform: translate(-30px, -30px) scale(1.4) rotate(-8deg); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translate(-30px, -30px) scale(1.4) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Pantallas bajas (laptop 1366×768, 1920×1080 al 150%): misma

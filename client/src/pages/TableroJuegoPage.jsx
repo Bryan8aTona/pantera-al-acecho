@@ -46,14 +46,8 @@ export default function TableroJuegoPage() {
   const { set, salirPartida } = usePartida();
   const { estado, dispatch, limpiarError } = usePartidaEngine(set);
   const { estadoAnunciando, completarAnuncio } = useVidaPerdida(estado);
-  const {
-    mostrarVictoria,
-    cartaGanadora,
-    completarVictoria,
-    mostrarRevelacion,
-    cartaRevelada,
-    completarRevelacion,
-  } = useSecuenciasDramaticas(estado);
+  const { mostrarVictoria, cartaGanadora, completarVictoria, mostrarRevelacion, cartaRevelada, completarRevelacion } =
+    useSecuenciasDramaticas(estado);
   const { mostrarAnuncioRepechaje, completarAnuncioRepechaje } = useAnuncioRepechaje(estado);
   const { reproducir, silenciado, alternarSilencio } = useSonido();
   const [mostrarZarpazo, setMostrarZarpazo] = useState(false);

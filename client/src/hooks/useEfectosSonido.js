@@ -11,10 +11,7 @@ function contarAciertos(letrasUsadas) {
 // "antes vs. ahora" vive en una ref mutada DENTRO de un useEffect, que
 // es el patrón seguro bajo React.StrictMode (si se hiciera durante el
 // render, la doble invocación dispararía cada sonido dos veces).
-export function useEfectosSonido(
-  estado,
-  { estadoAnunciando, mostrarZarpazo, mostrarVictoria, repechajeVisible },
-) {
+export function useEfectosSonido(estado, { estadoAnunciando, mostrarZarpazo, mostrarVictoria, repechajeVisible }) {
   // Fallo de letra al aire: la pantera avanzó de estado. Suena igual en
   // todos los avances, incluido el 5 (la derrota) — ese fallo también es
   // un fallo de letra. El golpe de "derrota" se reserva para el zarpazo
