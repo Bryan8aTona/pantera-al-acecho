@@ -66,13 +66,13 @@ Los equipos no gastan su saldo: lo que cuesta cada ayuda sale de la bolsa de la 
 | Saldo inicial | 0 monedas |
 | Bolsa de la tarjeta | 50 + 5 por cada letra distinta de la frase |
 | Cada letra pedida al aire (acierte o falle) | −5 a la bolsa |
-| Acierto Seguro (vocal o consonante) | −15 a la bolsa |
+| Acierto Seguro (vocal o consonante) | −10 a la bolsa |
 
 > **Piso en 0:** La bolsa nunca baja de 0. Con la bolsa vacía el equipo puede seguir jugando, pero adivinar ya no le suma monedas.
 
 > **En pantalla:** Al elegir la tarjeta, la bolsa cae junto a ella y cuenta sus monedas. Cada letra pedida le saca monedas con una animación y un sonido; cuando le quedan 30 o menos se pone en rojo y tiembla, y vacía se ve gris con una polilla.
 
-> **Acierto Seguro:** Al usarlo, el sistema elige automáticamente una letra correcta de la categoría elegida que aún no haya sido descubierta, la revela en todos sus espacios, descuenta el intento correspondiente y le quita 15 monedas a la bolsa. No depende del saldo del equipo. Si no quedan letras disponibles de esa categoría en la frase, el botón se inhabilita. Esta mecánica no está disponible en Ronda 2.
+> **Acierto Seguro:** Al usarlo, el sistema elige automáticamente una letra correcta de la categoría elegida que aún no haya sido descubierta, la revela en todos sus espacios, descuenta el intento correspondiente y le quita 10 monedas a la bolsa. No depende del saldo del equipo. Si no quedan letras disponibles de esa categoría en la frase, el botón se inhabilita. Esta mecánica no está disponible en Ronda 2.
 
 ### 3.4 La Pantera al Acecho (Vidas/Errores)
 

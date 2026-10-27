@@ -158,7 +158,7 @@ const MANUAL = [
       'En su turno, el equipo elige una carta boca abajo y tú registras en el tablero lo que declaran en voz alta:',
     puntos: [
       'Pedir una letra: púlsala en el teclado virtual. Cada letra le quita 5 monedas a la bolsa; si no está en la frase, además la pantera avanza y el equipo pierde una vida.',
-      'Acierto Seguro: los botones de vocal / consonante revelan una letra sin arriesgar a la pantera, pero le quitan 15 monedas a la bolsa.',
+      'Acierto Seguro: los botones de vocal / consonante revelan una letra sin arriesgar a la pantera, pero le quitan 10 monedas a la bolsa.',
       'Adivinar Frase: escribe la frase completa que el equipo declara y el sistema la valida. Si acierta, se lleva lo que quede en la bolsa; la escena de victoria espera tu clic para continuar.',
       'A los 5 fallos la pantera ataca: el equipo pierde el turno y el equipo siguiente puede robar la frase con un único intento.',
     ],

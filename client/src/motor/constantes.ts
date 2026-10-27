@@ -22,7 +22,7 @@ export const SALDO_INICIAL = 0;
 export const BOLSA_BASE = 50;
 export const BOLSA_POR_LETRA = 5;
 export const COSTO_LETRA = 5;
-export const COSTO_ACIERTO_SEGURO: Record<Categoria, number> = { vocal: 15, consonante: 15 };
+export const COSTO_ACIERTO_SEGURO: Record<Categoria, number> = { vocal: 10, consonante: 10 };
 
 // Sección 3.2
 export const LIMITES_INTENTOS: Record<Ronda, Intentos> = {

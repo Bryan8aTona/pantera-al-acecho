@@ -120,7 +120,7 @@
     0 0 12px rgba(255, 210, 90, 0.45);
 }
 
-/* "−5" / "−15" que flota desde la placa */
+/* "−5" / "−10" que flota desde la placa */
 .bolsa-resta {
   position: absolute;
   right: -10px;
