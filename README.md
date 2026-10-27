@@ -63,7 +63,8 @@ pantera-al-acecho/
 - **Node.js 20 LTS** o superior.
 - Una cuenta de **Firebase** con un proyecto (plan Spark, gratuito) que tenga
   habilitados **Authentication → Email/Password** y **Cloud Firestore**.
-- `firebase-tools` para desplegar: `npm install -g firebase-tools`.
+- `firebase-tools` para desplegar y para los emuladores: `npm install -g firebase-tools`.
+- **Java 21** o superior, solo para correr los emuladores de Firebase (`npm run test:firebase`, `npm run dev:emulador`).
 
 ## Puesta en marcha (desarrollo)
 
@@ -101,6 +102,9 @@ cuenta** de la propia aplicación (nombre, email, contraseña de 8+ caracteres).
 | --- | --- | --- |
 | `client/` | `npm run dev` | Servidor de desarrollo Vite. |
 | `client/` | `npm test` | Ejecuta las 134 pruebas (Vitest). |
+| `client/` | `npm run emuladores` | Levanta los emuladores de Auth y Firestore (proyecto ficticio `demo-pantera`). |
+| `client/` | `npm run test:firebase` | Prueba `sets.js` y `firestore.rules` contra los emuladores ya levantados. |
+| `client/` | `npm run dev:emulador` | Servidor de desarrollo contra los emuladores ya levantados. |
 | `client/` | `npm run lint` | Revisa el código con ESLint. |
 | `client/` | `npm run format` | Formatea el código con Prettier (`format:check` solo revisa). |
 | `client/` | `npm run build` | Build de producción en `client/dist/`. |
@@ -172,5 +176,15 @@ Actualizaciones posteriores: `cd client && npm run build && cd .. && firebase de
 
 `cd client && npm test` — el motor de reglas (`src/motor/__tests__/`) y la
 integración de las secuencias dramáticas de React bajo `StrictMode`
-(`src/**/__tests__/`). La capa de Firebase se verifica manualmente. Ver
-`docs/arquitectura.md` §7.1.
+(`src/**/__tests__/`).
+
+La capa de datos (`lib/sets.js`) y las reglas de `firestore.rules` se prueban
+contra los emuladores de Auth y Firestore, con un proyecto ficticio
+(`demo-pantera`) que nunca toca el real. Necesita Java. En dos terminales:
+
+```bash
+cd client && npm run emuladores      # terminal 1 (Ctrl+C para cerrarlos)
+cd client && npm run test:firebase   # terminal 2
+```
+
+Ver `docs/arquitectura.md` §7.1.

@@ -8,11 +8,11 @@
 // Los valores se toman de client/.env (ver client/.env.example).
 
 import { initializeApp, getApps } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
 // Build "lite": CRUD por petición, sin listeners en tiempo real. El
 // docente solo edita sus propios sets; no hace falta sincronización viva
 // y así el bundle pesa bastante menos.
-import { getFirestore } from 'firebase/firestore/lite';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore/lite';
 
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -28,3 +28,12 @@ const app = getApps().length ? getApps()[0] : initializeApp(config);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Modo emulador (client/.env.emulador): Auth y Firestore locales de
+// `firebase emulators:start`, con el proyecto ficticio demo-pantera.
+// Lo usan las pruebas de la capa de datos y `npm run dev:emulador`.
+// El emulador ya conectado no se vuelve a conectar (HMR de Vite).
+if (import.meta.env.VITE_USE_EMULATORS === 'true' && !auth.emulatorConfig) {
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+  connectFirestoreEmulator(db, '127.0.0.1', 8080);
+}

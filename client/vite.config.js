@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { configDefaults } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
@@ -24,5 +25,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.js'],
+    // Las de la capa de datos necesitan los emuladores de Firebase:
+    // van aparte, con `npm run test:firebase` (vitest.firebase.config.js).
+    exclude: [...configDefaults.exclude, '**/*.firebase.test.js'],
   },
 });
