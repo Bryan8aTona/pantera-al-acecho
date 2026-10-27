@@ -43,7 +43,7 @@ const NOMBRE_FASE = {
 const ETIQUETA_CATEGORIA = { vocal: 'Vocal', consonante: 'Consonante' };
 
 export default function TableroJuegoPage() {
-  const { set, salirPartida } = usePartida();
+  const { set, esInvitado, salirPartida } = usePartida();
   const { estado, dispatch, limpiarError } = usePartidaEngine(set);
   const { estadoAnunciando, completarAnuncio } = useVidaPerdida(estado);
   const { mostrarVictoria, cartaGanadora, completarVictoria, mostrarRevelacion, cartaRevelada, completarRevelacion } =
@@ -76,7 +76,8 @@ export default function TableroJuegoPage() {
 
   function manejarSalida() {
     salirPartida();
-    navigate('/configuracion-partida');
+    // El invitado no tiene sesión: Configuración lo mandaría al login.
+    navigate(esInvitado ? '/' : '/configuracion-partida');
   }
 
   // Fin del video del anuncio de la pantera. En los estados 1-4 termina

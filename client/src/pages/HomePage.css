@@ -47,10 +47,17 @@
   color: var(--color-text-secondary);
 }
 
+.home-hero-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 30px;
+}
+
 /* Dos clases para ganarle a .btn-primario, que global.css carga después. */
 .home-hero .home-hero-cta {
   display: inline-block;
-  margin-top: 30px;
   text-decoration: none;
   padding: 15px 40px;
   font-size: 16px;
@@ -67,6 +74,22 @@
   background: var(--color-primary-dark);
   transform: translateY(-1px);
   box-shadow: 0 8px 22px rgba(240, 130, 0, 0.36);
+}
+
+/* "Probar sin cuenta": mismo tamaño que el principal, pero con contorno. */
+.home-hero .home-hero-cta-secundario {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  padding: 13px 38px;
+  box-shadow: none;
+}
+
+.home-hero .home-hero-cta-secundario:hover:not(:disabled) {
+  background: var(--color-surface);
+  color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  box-shadow: 0 6px 18px rgba(240, 130, 0, 0.2);
 }
 
 /* Contenido */

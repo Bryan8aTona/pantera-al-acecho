@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import BotonProbarSinCuenta from '../components/BotonProbarSinCuenta.jsx';
 import '../styles/campo.css';
 import './LoginPage.css';
 
@@ -107,6 +108,12 @@ export default function LoginPage() {
             {enviando ? 'Un momento…' : modo === 'login' ? 'Entrar' : 'Crear cuenta'}
           </button>
         </form>
+
+        <p className="login-separador" aria-hidden="true">
+          o
+        </p>
+        <BotonProbarSinCuenta className="login-invitado" />
+        <p className="login-invitado-nota">Juega una partida con un set de ejemplo, sin registrarte.</p>
       </div>
     </div>
   );

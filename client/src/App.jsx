@@ -59,14 +59,16 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Sin ProtectedRoute: el modo invitado juega sin cuenta. Basta
+                  con que haya una partida en memoria, y solo se arranca desde
+                  Configuración (con sesión) o "Probar sin cuenta". El Tablero
+                  no lee ni escribe en Firestore. */}
               <Route
                 path="/partida"
                 element={
-                  <ProtectedRoute>
-                    <RutaConPartida>
-                      <TableroJuegoPage />
-                    </RutaConPartida>
-                  </ProtectedRoute>
+                  <RutaConPartida>
+                    <TableroJuegoPage />
+                  </RutaConPartida>
                 }
               />
               <Route path="*" element={<Navigate to="/" replace />} />

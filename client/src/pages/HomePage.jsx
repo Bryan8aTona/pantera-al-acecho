@@ -1,6 +1,7 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Footer from '../components/Footer.jsx';
+import BotonProbarSinCuenta from '../components/BotonProbarSinCuenta.jsx';
 import './HomePage.css';
 
 // Íconos de trazo para "¿Cómo se juega?". Heredan el color del círculo
@@ -192,9 +193,12 @@ export default function HomePage() {
         <img src="/assets/logo-uam.png" alt="Universidad Autónoma Metropolitana" className="home-hero-logo" />
         <h1 className="home-hero-titulo">Pantera al Acecho</h1>
         <p className="home-hero-tagline">Un videojuego para el repaso en clase</p>
-        <Link to="/login" className="btn-primario home-hero-cta">
-          Iniciar sesión
-        </Link>
+        <div className="home-hero-acciones">
+          <Link to="/login" className="btn-primario home-hero-cta">
+            Iniciar sesión
+          </Link>
+          <BotonProbarSinCuenta className="btn-secundario home-hero-cta home-hero-cta-secundario" />
+        </div>
       </header>
 
       <main className="home-contenido">
