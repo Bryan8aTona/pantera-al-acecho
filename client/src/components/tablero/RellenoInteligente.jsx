@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { esLetra, normalizarLetra } from '../../motor/index.ts';
+import { indicesPorPalabra } from './palabras.js';
 
 // Copia SOLO el caso (mayúscula/minúscula) del carácter correspondiente
 // de la frase objetivo: si en la frase esa posición va en minúscula, lo
@@ -92,47 +93,51 @@ export default function RellenoInteligente({ texto, letrasUsadas = {}, onEnviar,
     onEnviar(valores.join(''));
   }
 
+  function renderCelda(i) {
+    const celda = celdas[i];
+    if (celda.tipo === 'fijo') {
+      // Igual que ProgresoFrase: los signos de puntuación se muestran tal
+      // cual, sin ser editables.
+      return (
+        <span key={i} className="progreso-celda revelada">
+          {celda.valor}
+        </span>
+      );
+    }
+    if (celda.tipo === 'bloqueada') {
+      return (
+        <span key={i} className="progreso-celda revelada celda-bloqueada">
+          {celda.valor}
+        </span>
+      );
+    }
+    return (
+      <input
+        key={i}
+        ref={(el) => {
+          refs.current[i] = el;
+        }}
+        type="text"
+        inputMode="text"
+        maxLength={1}
+        value={valores[i]}
+        onChange={(e) => manejarCambio(i, e.target.value)}
+        onKeyDown={(e) => manejarTeclaAbajo(i, e)}
+        onFocus={(e) => e.target.select()}
+        className="progreso-celda celda-editable"
+        aria-label={`Letra ${i + 1} por completar`}
+      />
+    );
+  }
+
   return (
     <div className="relleno-inteligente">
       <div className="relleno-celdas">
-        {celdas.map((celda, i) => {
-          if (celda.tipo === 'fijo') {
-            // Igual que ProgresoFrase: el espacio separa palabras y los
-            // signos de puntuación se muestran tal cual, sin ser editables.
-            if (celda.valor === ' ') {
-              return <span key={i} className="progreso-espacio" aria-hidden="true" />;
-            }
-            return (
-              <span key={i} className="progreso-celda revelada">
-                {celda.valor}
-              </span>
-            );
-          }
-          if (celda.tipo === 'bloqueada') {
-            return (
-              <span key={i} className="progreso-celda revelada celda-bloqueada">
-                {celda.valor}
-              </span>
-            );
-          }
-          return (
-            <input
-              key={i}
-              ref={(el) => {
-                refs.current[i] = el;
-              }}
-              type="text"
-              inputMode="text"
-              maxLength={1}
-              value={valores[i]}
-              onChange={(e) => manejarCambio(i, e.target.value)}
-              onKeyDown={(e) => manejarTeclaAbajo(i, e)}
-              onFocus={(e) => e.target.select()}
-              className="progreso-celda celda-editable"
-              aria-label={`Letra ${i + 1} por completar`}
-            />
-          );
-        })}
+        {indicesPorPalabra(texto).map((indices) => (
+          <span key={indices[0]} className="progreso-palabra">
+            {indices.map(renderCelda)}
+          </span>
+        ))}
       </div>
 
       <button type="button" className="btn-primario" disabled={faltanCeldas} onClick={intentarEnviar}>
