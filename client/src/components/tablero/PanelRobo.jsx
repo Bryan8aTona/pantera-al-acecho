@@ -5,8 +5,8 @@ export default function PanelRobo({ equipoQueRoba, equipoOriginal, carta, letras
     <div className="panel-robo">
       <p className="panel-robo-aviso">
         {equipoOriginal?.nombre ?? 'El equipo'} no logró adivinar. <br />
-        <strong>{equipoQueRoba.nombre}</strong> tiene una única oportunidad de robar la frase, sin pedir
-        letras ni usar monedas.
+        <strong>{equipoQueRoba.nombre}</strong> tiene una única oportunidad de robar la frase, sin pedir letras ni usar
+        monedas.
       </p>
 
       <RellenoInteligente

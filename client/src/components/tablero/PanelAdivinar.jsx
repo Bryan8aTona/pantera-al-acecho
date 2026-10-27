@@ -4,9 +4,7 @@ export default function PanelAdivinar({ texto, letrasUsadas, obligatorio, onEnvi
   return (
     <div className="panel-adivinar">
       {obligatorio && (
-        <p className="panel-adivinar-aviso">
-          El equipo agotó sus intentos de letras y debe declarar la frase.
-        </p>
+        <p className="panel-adivinar-aviso">El equipo agotó sus intentos de letras y debe declarar la frase.</p>
       )}
 
       <RellenoInteligente texto={texto} letrasUsadas={letrasUsadas} onEnviar={onEnviar} textoBoton="Adivinar" />

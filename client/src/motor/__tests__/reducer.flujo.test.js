@@ -90,12 +90,9 @@ describe('Ronda 2: derrota por pantera (sin Robo)', () => {
   });
 
   it('CONFIRMAR_DERROTA cierra la carta sin ganador y pasa al siguiente equipo del repechaje', () => {
-    const estado = aplicar(
-      estadoRepechaje(['amarillo', 'rojo']),
-      elegir('c5'),
-      ...cincoFallos,
-      { type: 'CONFIRMAR_DERROTA' },
-    );
+    const estado = aplicar(estadoRepechaje(['amarillo', 'rojo']), elegir('c5'), ...cincoFallos, {
+      type: 'CONFIRMAR_DERROTA',
+    });
 
     expect(estado.mazo.c5).toMatchObject({ jugada: true, ganadorId: null });
     expect(estado.equipos.amarillo.gano).toBe(false);
@@ -153,10 +150,14 @@ describe('Robo: el equipo que roba conserva su propio turno', () => {
   it('si roba el primer equipo (que ya jugó) tras fallar el último, la ronda termina igual', () => {
     let estado = aplicar(
       estadoBase(),
-      elegir('c1'), responder('sol'), // rojo gana
-      elegir('c2'), responder('mar'), // azul gana
-      elegir('c3'), responder('pan'), // amarillo gana
-      elegir('c4'), responder('incorrecto'), // verde falla -> roba rojo
+      elegir('c1'),
+      responder('sol'), // rojo gana
+      elegir('c2'),
+      responder('mar'), // azul gana
+      elegir('c3'),
+      responder('pan'), // amarillo gana
+      elegir('c4'),
+      responder('incorrecto'), // verde falla -> roba rojo
     );
     expect(estado.modoRobo).toEqual({ equipoId: 'rojo', cartaId: 'c4' });
 

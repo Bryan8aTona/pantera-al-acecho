@@ -3,10 +3,10 @@
      global.css), pero las pantallas de la partida en sí conservan el
      verde selva original — se redefinen las variables aquí, scoped a
      .tablero, sin tocar el resto del proyecto. */
-  --color-primary: #1F5138; /* verde selva medio: paneles y realces */
-  --color-primary-dark: #0E2A1F; /* verde casi negro: fondo lejano */
-  --verde-canopy: #2E6B47; /* verde claro para bordes/acentos */
-  --color-accent: #ECC15A; /* dorado algo más brillante para proyector */
+  --color-primary: #1f5138; /* verde selva medio: paneles y realces */
+  --color-primary-dark: #0e2a1f; /* verde casi negro: fondo lejano */
+  --verde-canopy: #2e6b47; /* verde claro para bordes/acentos */
+  --color-accent: #ecc15a; /* dorado algo más brillante para proyector */
 
   position: relative;
   isolation: isolate;
@@ -26,7 +26,7 @@
     radial-gradient(ellipse 70% 45% at 50% -8%, rgba(150, 220, 150, 0.16), transparent 70%),
     radial-gradient(circle at 50% 118%, rgba(0, 0, 0, 0.5), transparent 60%),
     radial-gradient(circle at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.35) 100%),
-    linear-gradient(180deg, #17402E 0%, #0E2A1F 55%, #0A211A 100%);
+    linear-gradient(180deg, #17402e 0%, #0e2a1f 55%, #0a211a 100%);
 }
 
 /* Follaje decorativo (HojasDecorativas.jsx): pegado a los bordes, muy
@@ -383,7 +383,10 @@
 .etiqueta-en-turno {
   color: #39ff14;
   background: rgba(57, 255, 20, 0.12);
-  text-shadow: 0 0 4px #39ff14, 0 0 10px rgba(57, 255, 20, 0.8), 0 0 18px rgba(57, 255, 20, 0.5);
+  text-shadow:
+    0 0 4px #39ff14,
+    0 0 10px rgba(57, 255, 20, 0.8),
+    0 0 18px rgba(57, 255, 20, 0.5);
 }
 
 .etiqueta-robo {
@@ -428,7 +431,11 @@
   justify-content: center;
   animation: cartaEntrada 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   animation-delay: calc(var(--i) * 0.08s);
-  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.25s ease, filter 0.25s ease;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.25s ease,
+    filter 0.25s ease;
 }
 
 @keyframes cartaEntrada {
@@ -480,7 +487,9 @@
   transform: scale(1.22) translateY(-6px);
   z-index: 4;
   opacity: 1 !important;
-  box-shadow: 0 14px 22px rgba(0, 0, 0, 0.5), 0 0 0 3px var(--color-accent);
+  box-shadow:
+    0 14px 22px rgba(0, 0, 0, 0.5),
+    0 0 0 3px var(--color-accent);
 }
 
 .carta-atenuada {
@@ -585,7 +594,9 @@
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
-  transition: background 0.12s ease, transform 0.12s ease;
+  transition:
+    background 0.12s ease,
+    transform 0.12s ease;
 }
 
 .tecla:not(:disabled):hover {

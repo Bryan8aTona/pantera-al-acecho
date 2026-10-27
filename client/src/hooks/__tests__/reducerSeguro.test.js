@@ -43,7 +43,12 @@ describe('reducerSeguro', () => {
     expect(() => reducerSeguro(estadoBase(), { type: 'ELEGIR_CARTA' /* sin cartaId */ })).not.toThrow();
     // ELEGIR_CARTA sin cartaId cae en "carta inexistente" -> sí es MotorError, se atrapa.
     // Forzamos un caso realmente inesperado con una acción rota a propósito:
-    const accionRota = { type: 'ELEGIR_CARTA', get cartaId() { throw new TypeError('boom'); } };
+    const accionRota = {
+      type: 'ELEGIR_CARTA',
+      get cartaId() {
+        throw new TypeError('boom');
+      },
+    };
     expect(() => reducerSeguro(estadoBase(), accionRota)).toThrow(TypeError);
   });
 });

@@ -80,9 +80,7 @@ describe('impedimentoAciertoSeguro', () => {
   });
 
   it('sin letras de esa categoría por descubrir', () => {
-    expect(impedimentoAciertoSeguro(equipo, 'vocal', 'SOL', { O: 'acierto' }).codigo).toBe(
-      'SIN_LETRAS_DISPONIBLES',
-    );
+    expect(impedimentoAciertoSeguro(equipo, 'vocal', 'SOL', { O: 'acierto' }).codigo).toBe('SIN_LETRAS_DISPONIBLES');
   });
 });
 
@@ -132,8 +130,6 @@ describe('hayDerrotaPendiente', () => {
   it('no en Ronda 1, ni sin carta, ni con la pantera por debajo de 5', () => {
     expect(hayDerrotaPendiente({ ...enRonda2, ronda: 1 })).toBe(false);
     expect(hayDerrotaPendiente({ ...enRonda2, cartaActualId: null })).toBe(false);
-    expect(
-      hayDerrotaPendiente({ ...enRonda2, equipos: { azul: { id: 'azul', panteraEstado: 4 } } }),
-    ).toBe(false);
+    expect(hayDerrotaPendiente({ ...enRonda2, equipos: { azul: { id: 'azul', panteraEstado: 4 } } })).toBe(false);
   });
 });

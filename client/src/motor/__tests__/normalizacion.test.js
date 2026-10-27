@@ -8,9 +8,7 @@ describe('normalizarTexto', () => {
   });
 
   it('ignora mayúsculas/minúsculas', () => {
-    expect(normalizarTexto('HTTP es un protocolo sin estado')).toBe(
-      'HTTP ES UN PROTOCOLO SIN ESTADO',
-    );
+    expect(normalizarTexto('HTTP es un protocolo sin estado')).toBe('HTTP ES UN PROTOCOLO SIN ESTADO');
   });
 
   it('NUNCA convierte la Ñ en N (no es una tilde, es otra letra)', () => {

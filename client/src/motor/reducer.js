@@ -218,9 +218,7 @@ function manejarComprarAciertoSeguro(estado, { categoria }) {
   const impedimento = impedimentoAciertoSeguro(equipo, categoria, carta.texto, estado.letrasUsadas);
   if (impedimento) throw impedimento;
 
-  const disponibles = letrasUnicasPorCategoria(carta.texto, categoria).filter(
-    (letra) => !estado.letrasUsadas[letra],
-  );
+  const disponibles = letrasUnicasPorCategoria(carta.texto, categoria).filter((letra) => !estado.letrasUsadas[letra]);
 
   // Determinístico (primera letra sin descubrir, en orden de aparición)
   // en vez de aleatorio: mantiene el motor predecible y fácil de testear,

@@ -53,8 +53,7 @@ export function useSecuenciasDramaticas(estado) {
   const tieneGanador = Boolean(cartaResuelta?.ganadorId);
 
   // La victoria (si hay ganador) va ANTES de la revelación.
-  const necesitaVictoriaPrimero =
-    Boolean(cartaResueltaId) && tieneGanador && victoriaCompletadaId !== cartaResueltaId;
+  const necesitaVictoriaPrimero = Boolean(cartaResueltaId) && tieneGanador && victoriaCompletadaId !== cartaResueltaId;
   const mostrarVictoria = necesitaVictoriaPrimero;
 
   // La revelación es obligatoria para TODA carta resuelta, tenga o no

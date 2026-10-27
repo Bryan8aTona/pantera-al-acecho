@@ -35,12 +35,7 @@ describe('posicionesDeLetra', () => {
 
 describe('letrasUnicasPorCategoria', () => {
   it('devuelve solo vocales únicas en orden de aparición', () => {
-    expect(letrasUnicasPorCategoria('El modelo OSI tiene siete capas', 'vocal')).toEqual([
-      'E',
-      'O',
-      'I',
-      'A',
-    ]);
+    expect(letrasUnicasPorCategoria('El modelo OSI tiene siete capas', 'vocal')).toEqual(['E', 'O', 'I', 'A']);
   });
 
   it('no repite letras ya vistas', () => {

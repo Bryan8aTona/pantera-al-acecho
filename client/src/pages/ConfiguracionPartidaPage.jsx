@@ -49,7 +49,11 @@ export default function ConfiguracionPartidaPage() {
         </Link>
       </header>
 
-      {error && <p className="config-partida-error" role="alert">{error}</p>}
+      {error && (
+        <p className="config-partida-error" role="alert">
+          {error}
+        </p>
+      )}
 
       {sets === null && <p className="config-partida-estado">Cargando tus sets…</p>}
 
@@ -85,12 +89,7 @@ export default function ConfiguracionPartidaPage() {
           </ul>
 
           <div className="config-partida-acciones">
-            <button
-              type="button"
-              className="btn-primario"
-              disabled={!seleccionId || iniciando}
-              onClick={manejarInicio}
-            >
+            <button type="button" className="btn-primario" disabled={!seleccionId || iniciando} onClick={manejarInicio}>
               {iniciando ? 'Cargando partida…' : 'Iniciar partida'}
             </button>
           </div>

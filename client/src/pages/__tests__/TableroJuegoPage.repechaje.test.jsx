@@ -20,7 +20,12 @@ vi.mock('../../motor/estadoInicial.js', () => ({
       ...extra,
     });
     const carta = (n, texto, jugada) => ({
-      id: `f${n}`, texto, orden: n, valor: 80, jugada, ganadorId: null,
+      id: `f${n}`,
+      texto,
+      orden: n,
+      valor: 80,
+      jugada,
+      ganadorId: null,
     });
     return {
       fase: 'REPECHAJE',
@@ -112,9 +117,7 @@ describe('Repechaje: derrota por pantera (Tablero de juego)', () => {
 
     // 5º fallo: video del estado 5 en la cajita, aún sin revelación.
     fireEvent.click(screen.getByRole('button', { name: 'G' }));
-    expect(document.querySelector('video').getAttribute('src')).toBe(
-      '/assets/pantera/pantera-estado-5-zarpazo.mp4',
-    );
+    expect(document.querySelector('video').getAttribute('src')).toBe('/assets/pantera/pantera-estado-5-zarpazo.mp4');
     expect(screen.queryByText('La frase era')).not.toBeInTheDocument();
 
     terminarVideo();

@@ -19,12 +19,7 @@ export default function ZarpazoOverlay({ onCompleta }) {
   return (
     <div className="zarpazo-overlay" aria-hidden="true">
       {!imagenRota && (
-        <img
-          src="/assets/zarpazo-garra.png"
-          alt=""
-          className="zarpazo-imagen"
-          onError={() => setImagenRota(true)}
-        />
+        <img src="/assets/zarpazo-garra.png" alt="" className="zarpazo-imagen" onError={() => setImagenRota(true)} />
       )}
     </div>
   );

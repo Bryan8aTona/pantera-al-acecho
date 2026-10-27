@@ -30,9 +30,7 @@ const MENSAJES_ERROR = {
 };
 
 function traducirError(error) {
-  return new Error(
-    MENSAJES_ERROR[error?.code] || 'No se pudo completar la operación. Inténtalo de nuevo.',
-  );
+  return new Error(MENSAJES_ERROR[error?.code] || 'No se pudo completar la operación. Inténtalo de nuevo.');
 }
 
 export function AuthProvider({ children }) {
