@@ -34,8 +34,12 @@ service cloud.firestore {
     }
 
     match /sets/{setId} {
+      // `resource == null`: leer un set que ya no existe (p. ej. borrado en
+      // otra pestaña) devuelve "no existe" en vez de un permiso negado, y
+      // el cliente muestra "No se encontró el set.". No expone datos: solo
+      // dice que ese id no existe, y los ids son aleatorios.
       allow read: if request.auth != null
-                  && resource.data.ownerUid == request.auth.uid;
+                  && (resource == null || resource.data.ownerUid == request.auth.uid);
 
       allow create: if request.auth != null
                     && request.resource.data.ownerUid == request.auth.uid
