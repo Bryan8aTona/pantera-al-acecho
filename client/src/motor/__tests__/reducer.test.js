@@ -191,10 +191,10 @@ describe('COMPRAR_ACIERTO_SEGURO', () => {
     return motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
   }
 
-  it('le quita 15 a la bolsa (no al saldo), gasta el intento y revela una letra sin afectar la pantera', () => {
+  it('le quita 10 a la bolsa (no al saldo), gasta el intento y revela una letra sin afectar la pantera', () => {
     const estado = motorReducer(estadoConCasa(), { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' });
 
-    expect(estado.mazo.c1.bolsa).toBe(85); // 100 - 15
+    expect(estado.mazo.c1.bolsa).toBe(90); // 100 - 10
     expect(estado.equipos.rojo.saldo).toBe(200);
     expect(estado.equipos.rojo.intentos.vocales).toBe(2);
     expect(estado.equipos.rojo.panteraEstado).toBe(0);
@@ -207,9 +207,9 @@ describe('COMPRAR_ACIERTO_SEGURO', () => {
     expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })).toThrow(MotorError);
   });
 
-  it('la consonante también cuesta 15 a la bolsa', () => {
+  it('la consonante también cuesta 10 a la bolsa', () => {
     const estado = motorReducer(estadoConCasa(), { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' });
-    expect(estado.mazo.c1.bolsa).toBe(85);
+    expect(estado.mazo.c1.bolsa).toBe(90);
   });
 
   it('se puede comprar aunque el equipo no tenga saldo', () => {
@@ -218,12 +218,12 @@ describe('COMPRAR_ACIERTO_SEGURO', () => {
     estado = motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' });
 
     expect(estado.equipos.rojo.saldo).toBe(0);
-    expect(estado.mazo.c1.bolsa).toBe(85);
+    expect(estado.mazo.c1.bolsa).toBe(90);
   });
 
   it('la bolsa no baja de 0', () => {
     let estado = estadoConCasa();
-    estado = { ...estado, mazo: { ...estado.mazo, c1: { ...estado.mazo.c1, bolsa: 10 } } };
+    estado = { ...estado, mazo: { ...estado.mazo, c1: { ...estado.mazo.c1, bolsa: 5 } } };
     estado = motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' });
     expect(estado.mazo.c1.bolsa).toBe(0);
   });

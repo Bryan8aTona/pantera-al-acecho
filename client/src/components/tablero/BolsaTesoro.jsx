@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { COSTO_LETRA } from '../../motor/constantes.ts';
 import { reproducirSonido } from '../../sonido/gestorSonido.js';
 import { useContadorAnimado, prefiereMenosMovimiento } from './useContadorAnimado.js';
 import { SacoMonedas, Polilla } from './SacoMonedas.jsx';
@@ -9,7 +10,7 @@ const BOLSA_BAJA = 30;
 
 // La bolsa de monedas de la carta en juego (requerimientos.md 3.3).
 // Cae al voltear la carta y su contador sube de 0; cada letra pedida hace
-// saltar monedas (una por −5, tres por el −15 del Acierto Seguro) y la
+// saltar monedas (una por −5, tres por el −10 del Acierto Seguro) y la
 // bolsa se desinfla. Vacía, sale una polilla.
 //
 // entrada: 'caer' al voltear la carta, 'voltear' cuando la bolsa pasa
@@ -39,8 +40,8 @@ export default function BolsaTesoro({ bolsa, bolsaInicial, entrada = 'caer', col
 
     const resta = anterior - bolsa;
     const id = siguienteIdRef.current++;
-    setSaltos((actuales) => [...actuales, { id, resta, monedas: resta >= 15 ? 3 : 1 }]);
-    reproducirSonido(resta >= 15 ? 'monedas' : 'moneda');
+    setSaltos((actuales) => [...actuales, { id, resta, monedas: resta > COSTO_LETRA ? 3 : 1 }]);
+    reproducirSonido(resta > COSTO_LETRA ? 'monedas' : 'moneda');
 
     const timers = [setTimeout(() => setSaltos((actuales) => actuales.filter((s) => s.id !== id)), 1300)];
     if (bolsa === 0) timers.push(setTimeout(() => reproducirSonido('bolsaVacia'), 450));
@@ -76,7 +77,11 @@ export default function BolsaTesoro({ bolsa, bolsaInicial, entrada = 'caer', col
           <span aria-hidden="true">🪙</span> {mostrado}
         </span>
         {saltos.map((salto) => (
-          <span key={salto.id} className={salto.resta >= 15 ? 'bolsa-resta grande' : 'bolsa-resta'} aria-hidden="true">
+          <span
+            key={salto.id}
+            className={salto.resta > COSTO_LETRA ? 'bolsa-resta grande' : 'bolsa-resta'}
+            aria-hidden="true"
+          >
             −{salto.resta}
           </span>
         ))}
