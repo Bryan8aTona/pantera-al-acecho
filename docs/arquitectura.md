@@ -225,7 +225,15 @@ El motor de reglas (lógica pura, sin React) se prueba con Vitest directamente: 
 
 Los componentes de React que orquestan las secuencias dramáticas (derrota, victoria, revelación, repechaje) se prueban con Vitest + Testing Library + jsdom, montando el `TableroJuegoPage` completo dentro de `React.StrictMode` (para que las pruebas atrapen el mismo tipo de problema descrito en 3.5.1) y simulando eventos reales (clics, el evento `ended` de un `<video>`, avance de temporizadores).
 
-La capa de datos (Firebase Auth y Firestore) no tiene pruebas automatizadas: es una integración fina con un servicio externo que se verifica manualmente. Ningún archivo de prueba importa `client/src/lib/firebase.js`; las transformaciones puras de las frases (`client/src/lib/frases.js`) viven aparte justamente para poder probarlas. Las reglas de `firestore.rules` se pueden verificar contra el emulador (`firebase emulators:exec --only firestore …`).
+La capa de datos (Firebase Auth y Firestore) se prueba aparte, contra los **emuladores de Firebase** (requiere Java): `npm run emuladores` en una terminal y `npm run test:firebase` en otra. En CI, `npm run test:firebase:ci` los levanta y los apaga con `firebase emulators:exec`; en local se evita porque en Windows deja vivo el proceso Java del emulador de Firestore al terminar, y la siguiente corrida falla con "port taken" (se libera con `taskkill /PID <pid> /F`). Usa el proyecto ficticio `demo-pantera` (`client/.env.emulador`: el prefijo `demo-` garantiza que nunca se toca un proyecto real) y `lib/firebase.js` se conecta a los emuladores cuando `VITE_USE_EMULATORS=true`.
+
+**Cuidado:** Vitest ignora `mode` dentro de su archivo de configuración, así que `.env.emulador` solo se carga con `--mode emulador` en la línea de comandos (ya está en el script). Sin él, `firebase.js` usaría el `.env` de producción. Por eso `lib/__tests__/emulador.js` aborta antes de la primera petición si no está conectado a los emuladores con `demo-pantera`.
+
+Hay dos suites, ambas con usuarios reales del emulador de Auth:
+- `sets.firebase.test.js`: el CRUD de `lib/sets.js` (crear, listar en orden, obtener normalizado, editar, borrar) y que cada docente solo ve sus sets.
+- `reglas.firebase.test.js`: `firestore.rules` probadas con el SDK directamente, sin pasar por `sets.js`, para comprobar que la protección la dan las reglas: el dueño puede todo, otro usuario y un visitante sin sesión no, nadie crea a nombre de otro ni cambia `ownerUid`, y se rechazan los sets mal formados (nombre o frases fuera de límites, 7 o 9 frases, frases fuera de orden). También deja documentado que leer un set **que no existe** se niega (`resource.data` es `null`), por lo que abrir un set ya borrado muestra "No tienes permiso…" en vez de "No se encontró el set.".
+
+`npm test` las excluye (`*.firebase.test.js`), porque necesitan los emuladores; en CI corren en un job propio. Las transformaciones puras de las frases (`client/src/lib/frases.js`) siguen aparte para poder probarlas sin el SDK.
 
 **Limitaciones del entorno de pruebas:**
 - `jsdom` no implementa `<canvas>`, que `lottie-web` (usado por `lottie-react`) necesita al cargar. Se resuelve simulando (`vi.mock`) `lottie-react` globalmente en `client/src/test-setup.js`, en vez de instalar el paquete nativo `canvas` (frágil de compilar, sobre todo en Windows).
