@@ -5,8 +5,9 @@ import { useContadorAnimado, prefiereMenosMovimiento } from './useContadorAnimad
 import { SacoMonedas, Polilla } from './SacoMonedas.jsx';
 import './BolsaTesoro.css';
 
-// Por debajo de esto la bolsa tiembla y su placa se pone roja.
-const BOLSA_BAJA = 30;
+// Con esta fracción de la bolsa inicial o menos, tiembla y su placa se
+// pone roja. Es relativa porque las bolsas van de ~80 a ~220 monedas.
+const FRACCION_BOLSA_BAJA = 0.25;
 
 // La bolsa de monedas de la carta en juego (requerimientos.md 3.3).
 // Cae al voltear la carta y su contador sube de 0; cada letra pedida hace
@@ -50,7 +51,7 @@ export default function BolsaTesoro({ bolsa, bolsaInicial, entrada = 'caer', col
 
   const proporcion = bolsaInicial > 0 ? bolsa / bolsaInicial : 0;
   const vacia = bolsa === 0;
-  const baja = !vacia && bolsa <= BOLSA_BAJA;
+  const baja = !vacia && bolsa <= bolsaInicial * FRACCION_BOLSA_BAJA;
 
   let clase = `bolsa bolsa-entrada-${entrada}`;
   if (baja) clase += ' bolsa-baja';

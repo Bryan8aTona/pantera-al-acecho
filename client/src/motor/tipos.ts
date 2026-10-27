@@ -34,7 +34,7 @@ export interface Carta {
   id: string;
   texto: string;
   orden: number; // número 1–8 que se ve boca abajo (posición en el mazo barajado)
-  bolsaInicial: number; // 50 + 5 × letras distintas de la frase
+  bolsaInicial: number; // 50 + 10 × letras distintas de la frase
   bolsa: number; // lo que queda: baja con cada letra pedida, nunca de 0
   jugada: boolean;
   ganadorId: EquipoId | null;
