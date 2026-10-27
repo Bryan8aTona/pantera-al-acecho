@@ -228,7 +228,8 @@ La capa de datos (Firebase Auth y Firestore) no tiene pruebas automatizadas: es 
 **Limitaciones del entorno de pruebas:**
 - `jsdom` no implementa `<canvas>`, que `lottie-web` (usado por `lottie-react`) necesita al cargar. Se resuelve simulando (`vi.mock`) `lottie-react` globalmente en `client/src/test-setup.js`, en vez de instalar el paquete nativo `canvas` (frágil de compilar, sobre todo en Windows).
 - `jsdom` no implementa `HTMLMediaElement.prototype.play/pause/load`; se sustituyen por stubs en `test-setup.js`.
-- El JSON de Lottie se importa de forma estática (no con `import()` dinámico), por lo que queda incluido en el chunk principal.
+- El JSON de Lottie se importa de forma estática (no con `import()` dinámico): un `import()` del JSON corría contra los temporizadores simulados de Vitest. Queda dentro del chunk del Tablero, que `App.jsx` carga con `React.lazy` junto con las demás páginas protegidas (las pruebas importan `TableroJuegoPage` directamente, sin pasar por `App.jsx`). `lottie-react` va en su propio chunk (`manualChunks` en `vite.config.js`), que solo se descarga con el Tablero.
+- El CSS de las páginas diferidas se importa en `main.jsx`, antes de `global.css`, para que siga en la hoja principal y en el mismo orden de cascada; si viajara con su chunk diferido quedaría detrás de `global.css` y le ganaría los empates de especificidad.
 
 ---
 
