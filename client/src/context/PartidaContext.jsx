@@ -7,13 +7,18 @@ const PartidaContext = createContext(null);
 
 export function PartidaProvider({ children }) {
   const [set, setSet] = useState(null);
+  // Partida del modo invitado (sin cuenta): al salir vuelve a la
+  // portada en vez de a Configuración de partida, que pide sesión.
+  const [esInvitado, setEsInvitado] = useState(false);
 
-  const iniciarPartida = useCallback((setCompleto) => {
+  const iniciarPartida = useCallback((setCompleto, { invitado = false } = {}) => {
     setSet(setCompleto);
+    setEsInvitado(invitado);
   }, []);
 
   const salirPartida = useCallback(() => {
     setSet(null);
+    setEsInvitado(false);
   }, []);
 
   const hayPartidaActiva = set !== null;
@@ -34,7 +39,7 @@ export function PartidaProvider({ children }) {
   }, [hayPartidaActiva]);
 
   return (
-    <PartidaContext.Provider value={{ set, hayPartidaActiva, iniciarPartida, salirPartida }}>
+    <PartidaContext.Provider value={{ set, esInvitado, hayPartidaActiva, iniciarPartida, salirPartida }}>
       {children}
     </PartidaContext.Provider>
   );

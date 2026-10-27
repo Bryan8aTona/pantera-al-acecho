@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/Bryan8aTona/pantera-al-acecho/actions/workflows/ci.yml/badge.svg)
 
-**[▶ Jugar en línea](https://pantera-al-acecho.web.app)** · Para entrar como docente, crea una cuenta en *Iniciar sesión → Crear cuenta*.
+**[▶ Jugar en línea](https://pantera-al-acecho.web.app)** · Presiona **Probar sin cuenta** para jugar al instante con un set de ejemplo. Para crear tus propios sets, crea una cuenta en *Iniciar sesión → Crear cuenta*.
 
 ![Partida de ejemplo: el equipo elige una carta, pide letras, la pantera acecha tras un fallo y el equipo resuelve la frase](docs/img/partida.gif)
 
@@ -36,7 +36,7 @@ navegador.
 - **Persistencia:** Cloud Firestore (`firebase/firestore/lite`), una sola
   colección `sets`. La autorización vive en `firestore.rules`.
 - **Hosting:** Firebase Hosting (sitio estático).
-- **Pruebas:** Vitest + Testing Library (jsdom) en el cliente — 124 pruebas.
+- **Pruebas:** Vitest + Testing Library (jsdom) en el cliente — 134 pruebas.
 - **Calidad de código:** ESLint (reglas de React y de hooks) y Prettier, revisados en CI.
 
 ## Estructura del repositorio
@@ -100,7 +100,7 @@ cuenta** de la propia aplicación (nombre, email, contraseña de 8+ caracteres).
 | Ubicación | Comando | Efecto |
 | --- | --- | --- |
 | `client/` | `npm run dev` | Servidor de desarrollo Vite. |
-| `client/` | `npm test` | Ejecuta las 124 pruebas (Vitest). |
+| `client/` | `npm test` | Ejecuta las 134 pruebas (Vitest). |
 | `client/` | `npm run lint` | Revisa el código con ESLint. |
 | `client/` | `npm run format` | Formatea el código con Prettier (`format:check` solo revisa). |
 | `client/` | `npm run build` | Build de producción en `client/dist/`. |
@@ -136,9 +136,13 @@ frases. Detalle completo en [`docs/modelo-datos.md`](docs/modelo-datos.md).
 | `/panel` | Privada | Back-office: gestión de sets de frases. |
 | `/sets/nuevo`, `/sets/:id/editar` | Privada | Formulario de set (página completa). |
 | `/configuracion-partida` | Privada | Selección de set e inicio de partida. |
-| `/partida` | Privada | Tablero de juego (proyección en aula). |
+| `/partida` | Con partida en memoria | Tablero de juego (proyección en aula). |
 
-Cualquier ruta desconocida redirige a `/`. Un docente ya autenticado que entra
+`/partida` no pide sesión, para el modo invitado (**Probar sin cuenta**, en
+`/` y `/login`), pero sí una partida en memoria: solo se arranca desde
+`/configuracion-partida` o con el set de ejemplo. Sin partida, redirige a la
+configuración (y de ahí al login si no hay sesión). El Tablero no lee ni
+escribe en Firestore. Cualquier ruta desconocida redirige a `/`. Un docente ya autenticado que entra
 a `/` es redirigido a `/panel`.
 
 ## Despliegue

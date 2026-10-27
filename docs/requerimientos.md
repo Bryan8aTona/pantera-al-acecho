@@ -156,6 +156,8 @@ Al finalizar todos los turnos de la Ronda 2, o de forma inmediata si ningún equ
 
 **Autenticación:** El acceso al sistema requiere inicio de sesión. Los docentes pueden crear sus propias cuentas mediante un formulario de registro sencillo; sin embargo, la versión actual no cuenta con recuperación automatizada de credenciales. En caso de olvido de contraseña, el usuario deberá solicitar el restablecimiento directamente al administrador.
 
+**Modo invitado:** Desde la portada o el inicio de sesión, el botón "Probar sin cuenta" abre directamente el Tablero con un set de ejemplo de 8 frases incluido en la aplicación, sin registrarse. El invitado juega una partida completa, pero no puede crear, editar ni guardar sets; al salir de la partida vuelve a la portada.
+
 **Persistencia de Sets:** Los sets de frases creados por el docente se almacenan en la nube y quedan vinculados a su cuenta, accesibles desde cualquier equipo de cómputo.
 
 **Limitación:** El estado de una partida en curso no se guarda. Si el navegador se recarga durante el juego, la sesión se pierde.
