@@ -136,10 +136,10 @@ El motor se construyó como módulos puros, sin dependencia de React, en `client
 
 | Archivo | Responsabilidad |
 | --- | --- |
-| `constantes.ts` | Todos los valores numéricos de `requerimientos.md` (saldos, costos, límites de intentos, premios) en un solo lugar |
+| `constantes.ts` | Todos los valores numéricos de `requerimientos.md` (saldo inicial, bolsa base y por letra, costos a la bolsa, límites de intentos) en un solo lugar |
 | `normalizacion.ts` | Normalización de texto/letras (con el manejo especial de la Ñ descrito arriba) |
 | `letras.ts` | Clasificación vocal/consonante, búsqueda de posiciones y letras únicas de una frase |
-| `mazo.ts` | Construcción del mazo: baraja las frases (el número de carta es la posición en el mazo, no en el set) y asigna premios aleatorios (función aleatoria inyectable, para pruebas determinísticas) |
+| `mazo.ts` | Construcción del mazo: baraja las frases (el número de carta es la posición en el mazo, no en el set) y calcula la bolsa inicial de cada carta (`bolsaInicialDe`: 50 + 5 por letra distinta). La función aleatoria es inyectable, para pruebas determinísticas |
 | `sorteo.ts` | Barajado Fisher-Yates, usado para el orden de equipos y para el mazo (misma inyección de aleatoriedad) |
 | `estadoInicial.ts` | Construye el estado completo de una partida nueva a partir de un set de 8 frases |
 | `reducer.ts` | La máquina de estados en sí: un reducer puro `(estado, accion) => nuevoEstado`, que lanza `MotorError` ante acciones inválidas |
@@ -167,15 +167,18 @@ Dos hooks adicionales orquestan las pausas visuales que no son parte de la lógi
 
 ### 3.6 Componentes del Tablero (`client/src/components/tablero/`)
 
-- `MazoCartas` — el mazo de 8 cartas.
+- `MazoCartas` — el mazo de 8 cartas. Una vez elegida la carta, solo queda esa, del alto de la pantera, y deja a su lado el lugar de la bolsa.
 - `PanteraDisplay` — el recuadro de la pantera; reproduce video con o sin sonido según si se está anunciando un nuevo estado o mostrando el estado en reposo.
 - `ZarpazoOverlay` — la imagen de garra superpuesta a pantalla completa al llegar al estado 5.
 - `EfectoImpacto` — la vibración de pantalla y el destello rojo al perder una vida.
 - `Teclado`, `ProgresoFrase`, `RellenoInteligente` — el teclado virtual y las dos formas de mostrar/completar la frase (solo lectura y editable).
 - `PanelRobo`, `PanelRevelacion`, `AnimacionVictoria`, `PanelCierre`, `PanelAdivinar`, `PanelRepechaje` — los distintos paneles que reemplazan el área de juego según el momento de la partida. `PanelAdivinar` y `PanelRobo` tienen un botón "Rendirse" que despacha `RENDIRSE`: el reducer lo resuelve igual que una respuesta incorrecta.
-- `EquipoPanel` — el panel de cada equipo.
+- `BolsaTesoro` — la bolsa de la carta en juego (costal SVG de `SacoMonedas` + placa con el contador). Cae al elegir la carta (o se voltea al empezar el Robo), cuenta sus monedas con `useContadorAnimado` y en cada baja suelta monedas con sonido. Detecta las bajas comparando contra una `ref` dentro de un efecto (3.5.1).
+- `AnimacionVictoria` — la escena de victoria: la bolsa revienta en una fuente de monedas con el nombre del equipo y el premio. No se cierra sola: espera el clic (o Enter/Espacio) del docente.
+- `MedidorVidas` — los 5 corazones sobre la pantera (vidas del equipo en turno). La tensión del Tablero (clases `tension-alerta` / `tension-peligro` y `latiendo` en `.tablero`, en `MedidorVidas.css`) late junto con el sonido del latido (`useLatidoDeTension` en `TableroJuegoPage`): el CSS usa el mismo periodo y el mismo retraso inicial, y `latiendo` se quita mientras corre el video de la pantera para que al volver arranquen juntos.
+- `EquipoPanel` — el panel de cada equipo. Cuando gana una carta, unas monedas vuelan desde la jugada hasta su saldo (portal a `document.body`), el panel brilla y el saldo cuenta hacia arriba; `retenerSaldo` lo aplaza mientras la escena de victoria sigue en pantalla.
 - `HojasDecorativas` — el follaje de fondo del tablero (SVG inline).
-- `DemoPartidaModal` — la demostración de cómo se juega que tapa el tablero al arrancar (`TableroJuegoPage` la monta con `mostrarDemo` y deja el resto del tablero `inert` mientras está abierta). Es un guion fijo de pasos (`PASOS`), no usa el motor real; reutiliza los videos de la pantera (`RUTA_VIDEOS` de `PanteraDisplay`) y la animación Lottie de victoria.
+- `DemoPartidaModal` — la demostración de cómo se juega que tapa el tablero al arrancar (`TableroJuegoPage` la monta con `mostrarDemo` y deja el resto del tablero `inert` mientras está abierta). Es un guion fijo de pasos (`PASOS`), no usa el motor real; reutiliza los videos de la pantera (`RUTA_VIDEOS` de `PanteraDisplay`) y el costal de la bolsa (`SacoMonedas`).
 
 ---
 
@@ -225,7 +228,7 @@ La autorización vive por completo en `firestore.rules`: cada set solo es legibl
 | Frontend | React + Vite, react-router-dom |
 | Autenticación | Firebase Authentication (email/contraseña) |
 | Persistencia | Cloud Firestore (`firebase/firestore/lite`) |
-| Animaciones | lottie-react |
+| Animaciones | CSS y SVG propios (sin bibliotecas) |
 | Pruebas (cliente) | Vitest, Testing Library, jsdom |
 | Hosting | Firebase Hosting (caché en `firebase.json`: los JS/CSS con hash de Vite, un año e `immutable`; imágenes, videos y sonidos, una semana; el HTML, `no-cache` para que cada deploy se vea de inmediato) |
 
@@ -246,9 +249,8 @@ Hay dos suites, ambas con usuarios reales del emulador de Auth:
 `npm test` las excluye (`*.firebase.test.js`), porque necesitan los emuladores; en CI corren en un job propio. Las transformaciones puras de las frases (`client/src/lib/frases.js`) siguen aparte para poder probarlas sin el SDK.
 
 **Limitaciones del entorno de pruebas:**
-- `jsdom` no implementa `<canvas>`, que `lottie-web` (usado por `lottie-react`) necesita al cargar. Se resuelve simulando (`vi.mock`) `lottie-react` globalmente en `client/src/test-setup.js`, en vez de instalar el paquete nativo `canvas` (frágil de compilar, sobre todo en Windows).
 - `jsdom` no implementa `HTMLMediaElement.prototype.play/pause/load`; se sustituyen por stubs en `test-setup.js`.
-- El JSON de Lottie se importa de forma estática (no con `import()` dinámico): un `import()` del JSON corría contra los temporizadores simulados de Vitest. Queda dentro del chunk del Tablero, que `App.jsx` carga con `React.lazy` junto con las demás páginas protegidas (las pruebas importan `TableroJuegoPage` directamente, sin pasar por `App.jsx`). `lottie-react` va en su propio chunk (`manualChunks` en `vite.config.js`), que solo se descarga con el Tablero.
+- `App.jsx` carga las páginas protegidas con `React.lazy`; las pruebas importan `TableroJuegoPage` directamente, sin pasar por `App.jsx`.
 - El CSS de las páginas diferidas se importa en `main.jsx`, antes de `global.css`, para que siga en la hoja principal y en el mismo orden de cascada; si viajara con su chunk diferido quedaría detrás de `global.css` y le ganaría los empates de especificidad.
 
 ---

@@ -12,6 +12,7 @@
   isolation: isolate;
   height: 100%;
   max-height: 100vh;
+  overflow-x: hidden;
   overflow-y: auto;
   color: white;
   padding: 16px 24px 20px;
@@ -186,6 +187,9 @@
 }
 
 .tablero-jugada {
+  /* Contenedor de la fila pantera-carta-bolsa: su alto también se limita
+     por el ancho de la jugada (cqi), no solo por el de la pantalla. */
+  container-type: inline-size;
   grid-column: 1;
   grid-row: 1;
   min-height: 0;
@@ -201,11 +205,26 @@
 }
 
 .jugada-superior {
+  --alto-pantera: clamp(110px, min(14.5vw, 22vh, 25.5cqi), 250px);
   display: flex;
   gap: 14px;
   align-items: center;
   justify-content: center;
   width: 100%;
+}
+
+/* Con carta en juego: pantera (con sus vidas encima), la carta elegida y
+   la bolsa, en una sola fila. La bolsa se apila (costal sobre la placa)
+   para caber en el alto de la pantera. */
+.jugada-superior.con-carta {
+  gap: clamp(10px, 1.3vw, 28px);
+  align-items: flex-end;
+}
+
+.jugada-superior .bolsa {
+  --tam-bolsa: calc(var(--alto-pantera) * 0.62);
+  flex-direction: column;
+  gap: 6px;
 }
 
 .jugada-frase {
@@ -315,6 +334,7 @@
 }
 
 .equipo-panel-v2-saldo {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -323,6 +343,136 @@
   font-size: 19px;
   font-weight: 700;
   color: var(--color-accent);
+}
+
+/* El equipo gana una bolsa (EquipoPanel.jsx): las monedas vuelan de la
+   jugada al saldo, el número cuenta agrandado, sube un "+N" y el panel
+   brilla en dorado. */
+.saldo-vuelo-moneda {
+  position: fixed;
+  z-index: 50;
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: saldo-vuela 0.8s cubic-bezier(0.5, 0, 0.75, 0.4) both;
+}
+
+@keyframes saldo-vuela {
+  0% {
+    transform: translate(0, 0) scale(0.5) rotateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--dx) * 0.5), calc(var(--dy) * 0.5 + var(--arco))) scale(1.2) rotateY(360deg);
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.7) rotateY(720deg);
+    opacity: 0;
+  }
+}
+
+.equipo-panel-v2.ganando {
+  animation: panel-gana 2.8s ease-out both;
+}
+
+@keyframes panel-gana {
+  0%,
+  20% {
+    scale: 1;
+  }
+  30% {
+    scale: 1.06;
+    box-shadow:
+      0 0 0 4px #ffe07a,
+      0 0 40px 12px rgba(255, 214, 102, 0.7);
+  }
+  75% {
+    scale: 1.04;
+    box-shadow:
+      0 0 0 4px #ffe07a,
+      0 0 30px 8px rgba(255, 214, 102, 0.5);
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+.equipo-panel-v2-saldo.contando {
+  animation: saldo-contando 2.6s ease-out both;
+}
+
+@keyframes saldo-contando {
+  0%,
+  20% {
+    scale: 1;
+  }
+  32% {
+    scale: 2;
+    color: #fff3b0;
+    text-shadow: 0 0 18px rgba(255, 214, 102, 0.9);
+  }
+  80% {
+    scale: 1.7;
+    color: #ffe07a;
+    text-shadow: 0 0 14px rgba(255, 214, 102, 0.7);
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+.saldo-premio {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  translate: -50% 0;
+  font-size: 1.4em;
+  font-weight: 800;
+  color: #ffe07a;
+  white-space: nowrap;
+  text-shadow:
+    0 2px 0 #8a5a0f,
+    0 0 12px rgba(255, 214, 102, 0.8);
+  pointer-events: none;
+  animation: saldo-premio-sube 2.4s ease-out 0.6s both;
+}
+
+@keyframes saldo-premio-sube {
+  0% {
+    transform: translateY(10px) scale(0.4);
+    opacity: 0;
+  }
+  15% {
+    transform: translateY(0) scale(1.2);
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-34px) scale(1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saldo-vuelo,
+  .saldo-premio {
+    display: none;
+  }
+
+  .equipo-panel-v2.ganando,
+  .equipo-panel-v2-saldo.contando {
+    animation: none;
+  }
 }
 
 .equipo-panel-v2-moneda {
@@ -481,20 +631,41 @@
   }
 }
 
-/* Una vez elegida: esa carta queda al frente, las demás se atenúan.
-   Ninguna vuelve a ser interactiva (disabled desde React). */
+/* Una vez elegida, el mazo se va y solo queda esa carta, del alto de la
+   pantera: entra girando y se asienta con un brillo dorado. */
+.mazo-cartas-elegida .mazo-cartas-grid {
+  grid-template-columns: 1fr;
+}
+
 .carta-en-frente {
-  transform: scale(1.22) translateY(-6px);
-  z-index: 4;
+  height: var(--alto-pantera);
   opacity: 1 !important;
   box-shadow:
     0 14px 22px rgba(0, 0, 0, 0.5),
-    0 0 0 3px var(--color-accent);
+    0 0 0 3px var(--color-accent),
+    0 0 26px rgba(236, 193, 90, 0.45);
+  animation: cartaProtagonista 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.carta-atenuada {
-  opacity: 0.3 !important;
-  filter: grayscale(0.4);
+.carta-en-frente .carta-boca-abajo-num {
+  width: 28px;
+  height: 28px;
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+@keyframes cartaProtagonista {
+  0% {
+    transform: scale(0.6) rotateY(90deg);
+    filter: brightness(1.6);
+  }
+  60% {
+    transform: scale(1.08) rotateY(-8deg);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
 }
 
 .carta-imagen {
@@ -813,7 +984,7 @@
 
 .pantera-display {
   position: relative;
-  height: clamp(110px, min(14.5vw, 22vh), 190px);
+  height: var(--alto-pantera, clamp(110px, min(14.5vw, 22vh), 250px));
   aspect-ratio: 340 / 190;
   flex-shrink: 0;
   border-radius: var(--radius);
@@ -949,43 +1120,6 @@
     opacity: 1;
     transform: scale(1) rotate(0deg);
   }
-}
-
-/* Victoria — animación Lottie */
-
-.animacion-victoria {
-  position: relative;
-  width: clamp(300px, 36vw, 440px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: none;
-  background: transparent;
-  color: inherit;
-}
-
-.animacion-victoria-hint {
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 6px 0 0;
-}
-
-.animacion-victoria-lottie {
-  width: clamp(260px, 32vw, 380px);
-  height: clamp(260px, 32vw, 380px);
-}
-
-.animacion-victoria-texto {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-accent);
-  z-index: 1;
-  margin-top: -20px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -11,6 +11,9 @@ import './components/SetForm.css';
 import './pages/SetFormPage.css';
 import './pages/ConfiguracionPartidaPage.css';
 import './components/tablero/DemoPartidaModal.css';
+import './components/tablero/BolsaTesoro.css';
+import './components/tablero/AnimacionVictoria.css';
+import './components/tablero/MedidorVidas.css';
 import './pages/TableroJuegoPage.css';
 import './styles/global.css';
 

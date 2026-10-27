@@ -1,6 +1,13 @@
-import { PREMIOS_DISPONIBLES, FRASES_POR_SET } from './constantes.ts';
+import { BOLSA_BASE, BOLSA_POR_LETRA, FRASES_POR_SET } from './constantes.ts';
+import { letrasUnicasDeTexto } from './letras.ts';
 import { sortearOrden } from './sorteo.ts';
 import type { Frase, Mazo } from './tipos.ts';
+
+// Bolsa con la que arranca una frase (requerimientos.md 3.3): más letras
+// distintas, más difícil de adivinar y más monedas en juego.
+export function bolsaInicialDe(texto: string): number {
+  return BOLSA_BASE + BOLSA_POR_LETRA * letrasUnicasDeTexto(texto).length;
+}
 
 // frases: [{ id, texto, orden }] — exactamente 8, tal como las entrega
 // lib/sets.js (que sintetiza el `id`; ver modelo-datos.md). `aleatorio`
@@ -18,12 +25,13 @@ export function crearMazo(frases: Frase[], aleatorio: () => number = Math.random
   const barajadas = sortearOrden(frases, aleatorio);
   const mazo: Mazo = {};
   barajadas.forEach((frase, i) => {
-    const valor = PREMIOS_DISPONIBLES[Math.floor(aleatorio() * PREMIOS_DISPONIBLES.length)];
+    const bolsa = bolsaInicialDe(frase.texto);
     mazo[frase.id] = {
       id: frase.id,
       texto: frase.texto,
       orden: i + 1,
-      valor,
+      bolsaInicial: bolsa,
+      bolsa,
       jugada: false,
       ganadorId: null,
     };

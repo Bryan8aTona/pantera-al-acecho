@@ -6,7 +6,7 @@ export default function PanelRevelacion({ carta, equipoGanador, onContinuar }) {
 
       {equipoGanador ? (
         <p className="panel-revelacion-resultado ganador">
-          {equipoGanador.nombre} ganó {carta.valor} 🪙
+          {equipoGanador.nombre} ganó {carta.bolsa} 🪙
         </p>
       ) : (
         <p className="panel-revelacion-resultado">Nadie ganó esta frase</p>

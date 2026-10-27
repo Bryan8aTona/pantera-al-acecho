@@ -23,7 +23,7 @@ function estadoBase(overrides = {}) {
   const mazo = {};
   textos.forEach((texto, i) => {
     const id = `c${i + 1}`;
-    mazo[id] = { id, texto, orden: i + 1, valor: 100, jugada: false, ganadorId: null };
+    mazo[id] = { id, texto, orden: i + 1, bolsaInicial: 100, bolsa: 100, jugada: false, ganadorId: null };
   });
 
   return {

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Lottie from 'lottie-react';
-import victoriaAnimacion from '../../assets/lottie/victoria.json';
+import { SacoMonedas } from './SacoMonedas.jsx';
 import { COLORES_EQUIPO } from './coloresEquipo.js';
 import { RUTA_VIDEOS } from './PanteraDisplay.jsx';
 import './DemoPartidaModal.css';
@@ -8,7 +7,7 @@ import './DemoPartidaModal.css';
 // Demostración de cómo se juega, encima del Tablero al arrancar la
 // partida (TableroJuegoPage). No usa el motor real: es un guion fijo de
 // "fotos" del tablero, una por paso, con un turno ganado (letras, fallo,
-// Acierto Seguro, Modo Adivinar) y uno perdido (pantera hasta el zarpazo
+// Acierto Seguro, Adivinar Frase) y uno perdido (pantera hasta el zarpazo
 // y Robo). No avanza sola: el docente pasa de un paso a otro (bolitas,
 // flechas del teclado o botones) al ritmo de su explicación.
 
@@ -21,34 +20,41 @@ export const PASOS = [
   {
     equipo: 'rojo',
     frase: 'LA SELVA',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 75,
     eligiendo: true,
-    leyenda: 'Cuando es tu turno, eliges una carta del mazo. Detrás hay una frase escondida y un premio en monedas.',
+    leyenda:
+      'Cuando es tu turno, eliges una carta del mazo. Detrás hay una frase escondida y una bolsa de monedas: entre más letras distintas tenga la frase, más trae.',
   },
   {
     equipo: 'rojo',
     frase: 'LA SELVA',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 70,
     aciertos: 'A',
     pedida: 'A',
     tipo: 'acierto',
-    leyenda: 'Si pides la A y está en la frase, aparece en todos los lugares donde va.',
+    leyenda:
+      'Si pides la A y está en la frase, aparece en todos los lugares donde va. Cada letra que pides le quita 5 monedas a la bolsa.',
   },
   {
     equipo: 'rojo',
     frase: 'LA SELVA',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 65,
     aciertos: 'A',
     fallos: 'T',
     pantera: 1,
     pedida: 'T',
     tipo: 'fallo',
-    leyenda: 'Si pides la T y no está, la pantera se acerca un poco más.',
+    leyenda:
+      'Si pides la T y no está, la pantera se acerca y pierdes una vida. Ojo: la letra también le costó 5 monedas a la bolsa.',
   },
   {
     equipo: 'rojo',
     frase: 'LA SELVA',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 60,
     aciertos: 'AS',
     fallos: 'T',
     pantera: 1,
@@ -59,41 +65,46 @@ export const PASOS = [
   {
     equipo: 'rojo',
     frase: 'LA SELVA',
-    saldo: 180,
+    saldo: 0,
+    bolsa: 45,
     aciertos: 'ASL',
     fallos: 'T',
     pantera: 1,
     pedida: 'L',
     tipo: 'compra',
     leyenda:
-      '¿No se te ocurre ninguna? Con Acierto Seguro pagas 20 monedas y el juego te da una consonante que sí está.',
+      '¿No se te ocurre ninguna? Con Acierto Seguro el juego te da una consonante que sí está, pero la bolsa pierde 15 monedas.',
   },
   {
     equipo: 'rojo',
     frase: 'LA SELVA',
-    saldo: 180,
+    saldo: 0,
+    bolsa: 45,
     aciertos: 'ASL',
     fallos: 'T',
     pantera: 1,
     intento: 'LA SELVA',
-    leyenda: '¿Ya sabes cuál es la frase? Pide adivinarla y dila completa.',
+    leyenda:
+      '¿Ya sabes cuál es la frase? Pide adivinarla y dila completa. Entre menos letras pidas, más monedas quedan.',
   },
   {
     equipo: 'rojo',
     frase: 'LA SELVA',
-    saldo: 270,
+    saldo: 45,
+    bolsa: 45,
     aciertos: 'ASLEV',
     fallos: 'T',
     pantera: 1,
     efecto: 'victoria',
-    leyenda: '¡Le atinaste! Te llevas el premio de la carta: 90 monedas más.',
+    leyenda: '¡Le atinaste! Te llevas lo que quedaba en la bolsa: 45 monedas.',
   },
 
   // Turno perdido
   {
     equipo: 'azul',
     frase: 'TUCAN',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 70,
     fallos: 'O',
     pantera: 1,
     pedida: 'O',
@@ -103,7 +114,8 @@ export const PASOS = [
   {
     equipo: 'azul',
     frase: 'TUCAN',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 65,
     fallos: 'OI',
     pantera: 2,
     pedida: 'I',
@@ -113,7 +125,8 @@ export const PASOS = [
   {
     equipo: 'azul',
     frase: 'TUCAN',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 60,
     fallos: 'OIR',
     pantera: 3,
     pedida: 'R',
@@ -123,17 +136,19 @@ export const PASOS = [
   {
     equipo: 'azul',
     frase: 'TUCAN',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 55,
     fallos: 'OIRS',
     pantera: 4,
     pedida: 'S',
     tipo: 'fallo',
-    leyenda: '¡Cuidado! Está lista para saltar. Un fallo más y te ataca.',
+    leyenda: '¡Última vida! Está lista para saltar. Un fallo más y te ataca.',
   },
   {
     equipo: 'azul',
     frase: 'TUCAN',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 50,
     fallos: 'OIRSL',
     pantera: 5,
     pedida: 'L',
@@ -144,12 +159,13 @@ export const PASOS = [
   {
     equipo: 'azul',
     frase: 'TUCAN',
-    saldo: 200,
+    saldo: 0,
+    bolsa: 50,
     fallos: 'OIRSL',
     pantera: 5,
     efecto: 'robo',
     leyenda:
-      'Cuando un equipo pierde, el siguiente puede robar la frase: tiene una sola oportunidad de decirla completa y quedarse con el premio.',
+      'Cuando un equipo pierde, el siguiente puede robar la frase: tiene una sola oportunidad de decirla completa y quedarse con lo que quedó en la bolsa.',
   },
 ];
 
@@ -238,6 +254,8 @@ export default function DemoPartidaModal({ onCerrar }) {
   const pantera = paso.pantera ?? 0;
   const resuelta = paso.efecto === 'victoria';
   const saldoCambia = indice > 0 && PASOS[indice - 1].saldo !== paso.saldo;
+  // Lo que la bolsa perdió en este paso (para el "−5" que salta de ella).
+  const bajaBolsa = indice > 0 && PASOS[indice - 1].equipo === paso.equipo ? PASOS[indice - 1].bolsa - paso.bolsa : 0;
 
   function estadoTecla(letra) {
     if (aciertos.includes(letra)) return 'acierto';
@@ -286,9 +304,11 @@ export default function DemoPartidaModal({ onCerrar }) {
                   if (paso.efecto === 'zarpazo') setGarraEn(indice);
                 }}
               />
-              <div className="demo-puntos">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <span key={n} className={n <= pantera ? 'demo-punto lleno' : 'demo-punto'} />
+              <div className="demo-vidas">
+                {[5, 4, 3, 2, 1].map((n) => (
+                  <span key={n} className={n <= pantera ? 'demo-vida perdida' : 'demo-vida'}>
+                    ♥
+                  </span>
                 ))}
               </div>
             </div>
@@ -296,11 +316,21 @@ export default function DemoPartidaModal({ onCerrar }) {
             {paso.efecto === 'robo' ? (
               <div className="demo-equipo demo-equipo-robo" style={{ '--color-equipo': COLORES_EQUIPO.amarillo }}>
                 <span className="demo-equipo-tab">Equipo Amarillo</span>
-                <span className="demo-equipo-saldo">🪙 200</span>
-                <span className="demo-etiqueta demo-etiqueta-robo">¡Puede robar!</span>
+                <span className="demo-equipo-saldo">🪙 0</span>
+                <span className="demo-etiqueta demo-etiqueta-robo">¡Va por {paso.bolsa} 🪙!</span>
               </div>
-            ) : (
+            ) : paso.eligiendo ? (
               <div className="demo-equipo demo-equipo-hueco" />
+            ) : (
+              <div className="demo-bolsa" key={`bolsa-${paso.equipo}`}>
+                <SacoMonedas proporcion={paso.bolsa / PASOS[0].bolsa} className="demo-bolsa-saco" />
+                <span className="demo-bolsa-placa">🪙 {paso.bolsa}</span>
+                {bajaBolsa > 0 && (
+                  <span key={`baja-${indice}`} className="demo-bolsa-baja">
+                    −{bajaBolsa}
+                  </span>
+                )}
+              </div>
             )}
           </div>
 
@@ -350,7 +380,7 @@ export default function DemoPartidaModal({ onCerrar }) {
                 {paso.tipo === 'compra' ? `Acierto Seguro: ${paso.pedida}` : `¿${paso.pedida}?`}
               </span>
             )}
-            {paso.intento && <span className="demo-burbuja demo-burbuja-adivinar">Modo Adivinar</span>}
+            {paso.intento && <span className="demo-burbuja demo-burbuja-adivinar">Adivinar Frase</span>}
           </div>
 
           <div className="demo-teclado">
@@ -368,8 +398,8 @@ export default function DemoPartidaModal({ onCerrar }) {
 
           {resuelta && (
             <div className="demo-victoria">
-              <Lottie animationData={victoriaAnimacion} loop={false} className="demo-victoria-lottie" />
-              <strong>¡+90 monedas!</strong>
+              <SacoMonedas proporcion={1} className="demo-victoria-saco" />
+              <strong>¡+{paso.bolsa} monedas!</strong>
             </div>
           )}
           {garraEn === indice && (

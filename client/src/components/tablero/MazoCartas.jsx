@@ -3,16 +3,15 @@ import { reproducirSonido } from '../../sonido/gestorSonido.js';
 
 const DURACION_CLICK_MS = 450;
 
-// A diferencia de antes, este componente se queda montado durante todo
-// el turno del equipo (no solo mientras elige). Antes de elegir es
-// interactivo; una vez elegida una carta, todas quedan deshabilitadas
-// y la elegida se ve "al frente" (más grande, con brillo), el resto
-// atenuadas — visibles pero claramente fuera de juego.
+// Este componente se queda montado durante todo el turno del equipo (no
+// solo mientras elige). Antes de elegir es interactivo; una vez elegida,
+// solo queda esa carta, grande junto a la pantera, y deja a su lado el
+// lugar de la bolsa.
 export default function MazoCartas({ mazo, interactivo, cartaElegidaId, onElegir }) {
   const [seleccionandoId, setSeleccionandoId] = useState(null);
 
   const cartasDisponibles = Object.values(mazo)
-    .filter((carta) => !carta.jugada)
+    .filter((carta) => !carta.jugada && (!cartaElegidaId || carta.id === cartaElegidaId))
     .sort((a, b) => a.orden - b.orden);
 
   // Sonido de "se reparten las cartas" al empezar cada turno (cuando el
@@ -62,15 +61,13 @@ export default function MazoCartas({ mazo, interactivo, cartaElegidaId, onElegir
   }
 
   return (
-    <div className="mazo-cartas">
+    <div className={cartaElegidaId ? 'mazo-cartas mazo-cartas-elegida' : 'mazo-cartas'}>
       {interactivo && <p className="mazo-cartas-instruccion">Elige una carta boca abajo:</p>}
       <div className="mazo-cartas-grid">
         {cartasDisponibles.map((carta, i) => {
           let clase = 'carta-boca-abajo';
           if (seleccionandoId === carta.id) clase += ' carta-seleccionada';
-          if (cartaElegidaId) {
-            clase += carta.id === cartaElegidaId ? ' carta-en-frente' : ' carta-atenuada';
-          }
+          if (cartaElegidaId) clase += ' carta-en-frente';
 
           return (
             <button

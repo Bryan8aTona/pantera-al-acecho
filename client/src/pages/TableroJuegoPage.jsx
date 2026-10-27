@@ -29,6 +29,9 @@ import PanteraDisplay, { precargarPantera } from '../components/tablero/PanteraD
 import EfectoImpacto from '../components/tablero/EfectoImpacto.jsx';
 import ZarpazoOverlay from '../components/tablero/ZarpazoOverlay.jsx';
 import AnimacionVictoria from '../components/tablero/AnimacionVictoria.jsx';
+import BolsaTesoro from '../components/tablero/BolsaTesoro.jsx';
+import MedidorVidas from '../components/tablero/MedidorVidas.jsx';
+import { COLORES_EQUIPO } from '../components/tablero/coloresEquipo.js';
 import PanelRepechaje from '../components/tablero/PanelRepechaje.jsx';
 import HojasDecorativas from '../components/tablero/HojasDecorativas.jsx';
 import DemoPartidaModal from '../components/tablero/DemoPartidaModal.jsx';
@@ -41,6 +44,50 @@ const NOMBRE_FASE = {
 };
 
 const ETIQUETA_CATEGORIA = { vocal: 'Vocal', consonante: 'Consonante' };
+
+// Tensión del Tablero según las vidas que le quedan al equipo en turno:
+// 0 = tranquilo, 1 = alerta (2 vidas), 2 = peligro (1 vida o el zarpazo).
+const CLASE_TENSION = ['', ' tension-alerta', ' tension-peligro'];
+
+function nivelDeTension(vidas) {
+  if (vidas <= 1) return 2;
+  if (vidas === 2) return 1;
+  return 0;
+}
+
+// Mientras haya tensión, late un corazón (~67 por minuto, igual con 2
+// vidas que con la última). Calla durante el video de la pantera.
+// El borde rojo y los corazones laten con él: MedidorVidas.css usa el
+// mismo periodo y el mismo retraso inicial, y arranca con la clase
+// .latiendo, que se pone en el mismo render. El primer golpe se difiere
+// también porque en el render en que sube la pantera el anuncio aún no
+// arranca (lo levanta useVidaPerdida un render después) y ese cambio
+// cancela el temporizador.
+const PERIODO_LATIDO_MS = 900;
+const RETRASO_LATIDO_MS = 700;
+
+function useLatidoDeTension(nivel, pausado, reproducir) {
+  useEffect(() => {
+    if (!nivel || pausado) return undefined;
+    // Cada golpe se programa contra el reloj desde el arranque (no con
+    // setInterval, que se va retrasando) para no desfasarse del CSS.
+    const arranque = performance.now() + RETRASO_LATIDO_MS;
+    let golpe = 0;
+    let temporizador;
+    const programar = () => {
+      temporizador = setTimeout(
+        () => {
+          reproducir('latido', { volumen: 0.55 });
+          golpe += 1;
+          programar();
+        },
+        Math.max(0, arranque + golpe * PERIODO_LATIDO_MS - performance.now()),
+      );
+    };
+    programar();
+    return () => clearTimeout(temporizador);
+  }, [nivel, pausado, reproducir]);
+}
 
 export default function TableroJuegoPage() {
   const { set, esInvitado, salirPartida } = usePartida();
@@ -74,6 +121,16 @@ export default function TableroJuegoPage() {
 
   useEfectosSonido(estado, { estadoAnunciando, mostrarZarpazo, mostrarVictoria, repechajeVisible });
 
+  const equipoDelTurno = equipoDelTurnoNormal(estado);
+  const hayCartaEnJuego = Boolean(cartaEnJuego(estado));
+  useLatidoDeTension(
+    hayCartaEnJuego && equipoDelTurno && (!estado.modoRobo || estadoAnunciando)
+      ? nivelDeTension(PANTERA_ESTADO_DERROTA - equipoDelTurno.panteraEstado)
+      : 0,
+    Boolean(estadoAnunciando) || mostrarZarpazo,
+    reproducir,
+  );
+
   function manejarSalida() {
     salirPartida();
     // El invitado no tiene sesión: Configuración lo mandaría al login.
@@ -95,12 +152,16 @@ export default function TableroJuegoPage() {
     }
   }, [estadoAnunciando, completarAnuncio]);
 
+  // Carta cuyo zarpazo ya se mostró completo (ver derrotaSinAnunciar).
+  const [zarpazoCumplidoEn, setZarpazoCumplidoEn] = useState(null);
   const derrotaPendiente = hayDerrotaPendiente(estado);
+  const idCartaEnJuego = cartaEnJuego(estado)?.id ?? null;
   const manejarFinZarpazo = useCallback(() => {
     setMostrarZarpazo(false);
+    setZarpazoCumplidoEn(idCartaEnJuego);
     completarAnuncio();
     if (derrotaPendiente) dispatch({ type: 'CONFIRMAR_DERROTA' });
-  }, [derrotaPendiente, completarAnuncio, dispatch]);
+  }, [derrotaPendiente, idCartaEnJuego, completarAnuncio, dispatch]);
 
   const haySecuenciaPendiente =
     Boolean(estadoAnunciando) || mostrarZarpazo || mostrarVictoria || mostrarRevelacion || mostrarAnuncioRepechaje;
@@ -153,13 +214,32 @@ export default function TableroJuegoPage() {
   // terminar ese, se pasa al Robo (ahí sí desaparece el teclado).
   const esDerrota = estadoAnunciando === PANTERA_ESTADO_DERROTA;
   const anunciando = Boolean(estadoAnunciando);
+  // Con la 5ª letra fallada, el reducer activa el Robo en ese mismo commit,
+  // pero el anuncio de la pantera arranca un render después (el desfase de
+  // CLAUDE.md). Sin esto, ese render montaba un instante la pantalla de
+  // Robo y, al volver a la jugada, la carta y la bolsa se montaban de
+  // nuevo (animación y sonido otra vez). Hasta que termina el zarpazo se
+  // trata como si ya estuviera anunciándose.
+  const derrotaSinAnunciar =
+    estado.modoRobo && equipoOriginal.panteraEstado >= PANTERA_ESTADO_DERROTA && zarpazoCumplidoEn !== cartaActual?.id;
+  const enJugada = anunciando || derrotaSinAnunciar;
+
+  // Vidas del equipo dueño del turno (en el zarpazo de Ronda 1 el robo ya
+  // empezó, pero el medidor sigue mostrando a quien acaba de perder).
+  const mostrarVidas = Boolean(cartaActual) && (!estado.modoRobo || enJugada);
+  const tension =
+    mostrarVidas && !mostrarVictoria && !mostrarRevelacion
+      ? nivelDeTension(PANTERA_ESTADO_DERROTA - equipoOriginal.panteraEstado)
+      : 0;
+  // Late (sonido, borde y corazones) salvo mientras se ve la pantera.
+  const latiendo = tension > 0 && !anunciando && !mostrarZarpazo;
 
   const mostrandoControlesNormales =
     !mostrarVictoria &&
     !mostrarRevelacion &&
     !mostrarAnuncioRepechaje &&
     Boolean(cartaActual) &&
-    (anunciando || (!estado.modoRobo && !mostrandoAdivinar));
+    (enJugada || (!estado.modoRobo && !mostrandoAdivinar));
 
   // Mientras la demostración está abierta, el tablero de fondo queda
   // inerte (ni clic ni Tab llegan a él). React 18 no conoce `inert`,
@@ -167,7 +247,7 @@ export default function TableroJuegoPage() {
   const fondoInerte = mostrarDemo ? { inert: '' } : {};
 
   return (
-    <div className="tablero">
+    <div className={`tablero${CLASE_TENSION[tension]}${latiendo ? ' latiendo' : ''}`}>
       <HojasDecorativas />
       {mostrarDemo && <DemoPartidaModal onCerrar={cerrarDemo} />}
       <header className="tablero-header" {...fondoInerte}>
@@ -210,7 +290,11 @@ export default function TableroJuegoPage() {
       >
         <div className="tablero-jugada">
           {mostrarVictoria ? (
-            <AnimacionVictoria carta={cartaGanadora} onCompleta={completarVictoria} />
+            <AnimacionVictoria
+              carta={cartaGanadora}
+              equipo={estado.equipos[cartaGanadora.ganadorId]}
+              onCompleta={completarVictoria}
+            />
           ) : mostrarRevelacion ? (
             <PanelRevelacion
               carta={cartaRevelada}
@@ -222,36 +306,55 @@ export default function TableroJuegoPage() {
               equipos={estado.ordenTurnoActual.map((id) => estado.equipos[id])}
               onComenzar={completarAnuncioRepechaje}
             />
-          ) : estado.modoRobo && !anunciando ? (
-            <PanelRobo
-              equipoQueRoba={equipoActual}
-              equipoOriginal={equipoOriginal}
-              carta={cartaActual}
-              letrasUsadas={estado.letrasUsadas}
-              onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
-              onRendirse={() => dispatch({ type: 'RENDIRSE' })}
-            />
+          ) : estado.modoRobo && !enJugada ? (
+            <>
+              <BolsaTesoro
+                key={`robo-${cartaActual.id}`}
+                bolsa={cartaActual.bolsa}
+                bolsaInicial={cartaActual.bolsaInicial}
+                entrada="voltear"
+                colorEquipo={COLORES_EQUIPO[equipoActual.id]}
+                etiqueta={`¡${equipoActual.nombre} va por la bolsa!`}
+              />
+              <PanelRobo
+                equipoQueRoba={equipoActual}
+                equipoOriginal={equipoOriginal}
+                carta={cartaActual}
+                letrasUsadas={estado.letrasUsadas}
+                onEnviar={(intento) => dispatch({ type: 'ENVIAR_RESPUESTA', intento })}
+                onRendirse={() => dispatch({ type: 'RENDIRSE' })}
+              />
+            </>
           ) : (
             <>
-              <div className="jugada-superior">
-                <PanteraDisplay
-                  estado={panteraEstadoAmostrar}
-                  reproducir={Boolean(estadoAnunciando)}
-                  mostrarPrimerFrame={panteraPrimerFrame}
-                  onSecuenciaCompleta={estadoAnunciando ? manejarFinAnuncioVideo : undefined}
-                />
+              <div className={cartaActual ? 'jugada-superior con-carta' : 'jugada-superior'}>
+                <div className="pantera-zona">
+                  {mostrarVidas && <MedidorVidas errores={equipoOriginal.panteraEstado} />}
+                  <PanteraDisplay
+                    estado={panteraEstadoAmostrar}
+                    reproducir={Boolean(estadoAnunciando)}
+                    mostrarPrimerFrame={panteraPrimerFrame}
+                    onSecuenciaCompleta={estadoAnunciando ? manejarFinAnuncioVideo : undefined}
+                  />
+                </div>
                 <MazoCartas
                   mazo={estado.mazo}
                   interactivo={!estado.cartaActualId}
                   cartaElegidaId={estado.cartaActualId}
                   onElegir={(cartaId) => dispatch({ type: 'ELEGIR_CARTA', cartaId })}
                 />
+                {cartaActual && (
+                  <BolsaTesoro key={cartaActual.id} bolsa={cartaActual.bolsa} bolsaInicial={cartaActual.bolsaInicial} />
+                )}
               </div>
 
               <div className="jugada-frase">
                 {!cartaActual ? (
                   <p className="jugada-frase-vacia">Elige una carta para comenzar</p>
-                ) : mostrandoAdivinar ? (
+                ) : mostrandoAdivinar && !enJugada ? (
+                  // Si la última letra fue un fallo, el panel espera a que
+                  // termine el video: mientras tanto el teclado sigue en
+                  // pantalla y los dos juntos no caben (el Tablero desbordaba).
                   <PanelAdivinar
                     texto={cartaActual.texto}
                     letrasUsadas={estado.letrasUsadas}
@@ -278,6 +381,7 @@ export default function TableroJuegoPage() {
                 limites={limites}
                 esTurnoActual={equipo.id === equipoOriginal?.id}
                 esQuienRoba={estado.modoRobo?.equipoId === equipo.id}
+                retenerSaldo={mostrarVictoria}
               />
             ))}
         </div>
@@ -288,17 +392,17 @@ export default function TableroJuegoPage() {
               <button
                 type="button"
                 className="btn-primario tablero-btn-adivinar"
-                disabled={anunciando}
+                disabled={enJugada}
                 onClick={() => dispatch({ type: 'ACTIVAR_MODO_ADIVINAR' })}
               >
-                Modo Adivinar
+                Adivinar Frase
               </button>
 
               <Teclado
                 letrasUsadas={estado.letrasUsadas}
-                equipo={esDerrota ? equipoOriginal : equipoActual}
+                equipo={derrotaSinAnunciar ? equipoOriginal : equipoActual}
                 onPedirLetra={(letra) => dispatch({ type: 'PEDIR_LETRA_LIBRE', letra })}
-                deshabilitado={anunciando}
+                deshabilitado={enJugada}
               />
 
               {estado.ronda === 1 && (
@@ -309,14 +413,15 @@ export default function TableroJuegoPage() {
                       type="button"
                       className="btn-secundario"
                       disabled={
-                        anunciando ||
+                        enJugada ||
                         Boolean(
                           impedimentoAciertoSeguro(equipoActual, categoria, cartaActual.texto, estado.letrasUsadas),
                         )
                       }
                       onClick={() => comprarAciertoSeguro(categoria)}
                     >
-                      Acierto Seguro · {ETIQUETA_CATEGORIA[categoria]} ({COSTO_ACIERTO_SEGURO[categoria]} 🪙)
+                      Acierto Seguro · {ETIQUETA_CATEGORIA[categoria]} (−{COSTO_ACIERTO_SEGURO[categoria]} 🪙 a la
+                      bolsa)
                     </button>
                   ))}
                 </div>

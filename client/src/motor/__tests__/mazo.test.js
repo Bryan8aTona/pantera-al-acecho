@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { crearMazo } from '../mazo.ts';
-import { PREMIOS_DISPONIBLES } from '../constantes.ts';
+import { bolsaInicialDe, crearMazo } from '../mazo.ts';
 
 const FRASES_EJEMPLO = Array.from({ length: 8 }, (_, i) => ({
   id: `frase-${i + 1}`,
@@ -22,14 +21,11 @@ describe('crearMazo', () => {
     }
   });
 
-  it('asigna siempre uno de los 5 valores de premio permitidos', () => {
-    const secuencia = [0, 0.25, 0.5, 0.75, 0.99, 0.1, 0.6, 0.9];
-    let i = 0;
-    const aleatorio = () => secuencia[i++ % secuencia.length];
-    const mazo = crearMazo(FRASES_EJEMPLO, aleatorio);
-
+  it('cada carta arranca con la bolsa llena según su frase', () => {
+    const mazo = crearMazo(FRASES_EJEMPLO, () => 0.5);
     for (const carta of Object.values(mazo)) {
-      expect(PREMIOS_DISPONIBLES).toContain(carta.valor);
+      expect(carta.bolsaInicial).toBe(bolsaInicialDe(carta.texto));
+      expect(carta.bolsa).toBe(carta.bolsaInicial);
     }
   });
 
@@ -65,5 +61,21 @@ describe('crearMazo', () => {
     const mazoA = crearMazo(FRASES_EJEMPLO, () => 0.42);
     const mazoB = crearMazo(FRASES_EJEMPLO, () => 0.42);
     expect(mazoA).toEqual(mazoB);
+  });
+});
+
+describe('bolsaInicialDe', () => {
+  it('50 + 5 por cada letra distinta de la frase', () => {
+    expect(bolsaInicialDe('SOL')).toBe(65); // S, O, L
+    expect(bolsaInicialDe('LA SELVA TROPICAL')).toBe(105); // L A S E V T R O P I C
+  });
+
+  it('ignora espacios, mayúsculas y tildes', () => {
+    expect(bolsaInicialDe('la célula')).toBe(bolsaInicialDe('LA CELULA'));
+    expect(bolsaInicialDe('LA CELULA')).toBe(75); // L A C E U
+  });
+
+  it('la Ñ cuenta como letra distinta de la N', () => {
+    expect(bolsaInicialDe('NAÑA')).toBe(65); // N, A, Ñ
   });
 });
