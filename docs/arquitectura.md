@@ -180,6 +180,8 @@ Registro e inicio de sesión de los docentes con proveedor **email/contraseña**
 
 No se almacena ninguna contraseña ni hash: eso lo gestiona Firebase.
 
+**Modo invitado.** "Probar sin cuenta" (portada y login, `components/BotonProbarSinCuenta.jsx`) arranca una partida con `SET_EJEMPLO` (`lib/setEjemplo.js`, 8 frases fijas en el cliente) y marca la partida como de invitado en `PartidaContext` (`esInvitado`). Por eso la ruta `/partida` no lleva `ProtectedRoute`, solo `RutaConPartida`: el Tablero no toca Firestore y la partida solo puede arrancarse desde Configuración (con sesión) o desde ese botón. Al salir, el invitado vuelve a `/` en lugar de a Configuración. El resto de rutas privadas y `firestore.rules` no cambian.
+
 ---
 
 ## 5. Persistencia (Cloud Firestore)
