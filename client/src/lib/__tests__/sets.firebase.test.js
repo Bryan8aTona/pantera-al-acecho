@@ -57,6 +57,17 @@ describe('sets.js — CRUD del docente', () => {
 
     expect(await listarSets()).toEqual([]);
   });
+
+  // Por ejemplo, borrado en otra pestaña mientras este seguía abierto.
+  it('un set que ya no existe da "No se encontró el set." al abrirlo, editarlo o borrarlo', async () => {
+    await entrarComo('ana');
+    const id = await crearSet({ nombre: 'Borrado', frases: frasesValidas() });
+    await eliminarSet(id);
+
+    await expect(obtenerSet(id)).rejects.toThrow('No se encontró el set.');
+    await expect(actualizarSet(id, { nombre: 'X', frases: frasesValidas() })).rejects.toThrow('No se encontró el set.');
+    await expect(eliminarSet(id)).rejects.toThrow('No se encontró el set.');
+  });
 });
 
 describe('sets.js — cada docente ve solo sus sets', () => {

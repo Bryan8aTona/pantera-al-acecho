@@ -39,11 +39,14 @@ describe('firestore.rules — propiedad del set', () => {
     expect(propios.empty).toBe(true);
   });
 
-  // La regla de lectura usa resource.data, que es null si el documento no
-  // existe: Firestore lo niega en vez de devolver "no existe". Por eso
-  // sets.js muestra "No tienes permiso…" al abrir un set ya borrado.
-  it('leer un set que no existe se niega, aun con sesión', async () => {
+  // Un set que no existe se puede "leer" con sesión: Firestore responde
+  // que no existe (y sets.js dice "No se encontró el set.") en vez de
+  // negar el permiso. Sin sesión se sigue negando.
+  it('leer un set que no existe responde "no existe" con sesión, y se niega sin ella', async () => {
     await entrarComo('ana');
+    expect((await getDoc(doc(db, 'sets', 'no-existe'))).exists()).toBe(false);
+
+    await salir();
     await expect(getDoc(doc(db, 'sets', 'no-existe'))).rejects.toMatchObject(DENEGADO);
   });
 
