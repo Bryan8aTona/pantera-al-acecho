@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { listarSets, eliminarSet } from '../lib/sets.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -22,17 +22,20 @@ export default function BackOfficePage() {
     }
   }
 
-  const cargarSets = useCallback(async () => {
+  useEffect(() => {
+    listarSets()
+      .then((lista) => setSets(lista))
+      .catch((err) => setError(err.message || 'No se pudieron cargar los sets'));
+  }, []);
+
+  // Recarga tras eliminar un set.
+  async function cargarSets() {
     try {
       setSets(await listarSets());
     } catch (err) {
       setError(err.message || 'No se pudieron cargar los sets');
     }
-  }, []);
-
-  useEffect(() => {
-    cargarSets();
-  }, [cargarSets]);
+  }
 
   async function confirmarEliminar(id) {
     setEliminandoId(id);

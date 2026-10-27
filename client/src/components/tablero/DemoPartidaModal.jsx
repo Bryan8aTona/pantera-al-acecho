@@ -208,13 +208,16 @@ export default function DemoPartidaModal({ onCerrar }) {
   const paso = PASOS[indice];
 
   // Circular: después del último paso vuelve al primero, y viceversa.
-  const irA = useCallback((i) => {
-    setIndice((i + PASOS.length) % PASOS.length);
-  }, []);
-
-  useEffect(() => {
-    setGarraEn(null);
-  }, [indice]);
+  // Al cambiar de paso se quita la garra, para que al volver a un
+  // zarpazo aparezca de nuevo recién al terminar su video.
+  const irA = useCallback(
+    (i) => {
+      const destino = (i + PASOS.length) % PASOS.length;
+      if (destino !== indice) setGarraEn(null);
+      setIndice(destino);
+    },
+    [indice],
+  );
 
   useEffect(() => {
     botonRef.current?.focus();
