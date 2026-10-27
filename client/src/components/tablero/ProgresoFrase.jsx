@@ -1,20 +1,20 @@
 import { progresoDeFrase } from '../../motor/index.ts';
+import { indicesPorPalabra } from './palabras.js';
 
 export default function ProgresoFrase({ texto, letrasUsadas }) {
   const progreso = progresoDeFrase(texto, letrasUsadas);
 
   return (
     <div className="progreso-frase" aria-label="Frase a adivinar">
-      {progreso.map((item, i) => {
-        if (item.caracter === ' ') {
-          return <span key={i} className="progreso-espacio" aria-hidden="true" />;
-        }
-        return (
-          <span key={i} className={item.revelada ? 'progreso-celda revelada' : 'progreso-celda'}>
-            {item.revelada ? item.caracter : ''}
-          </span>
-        );
-      })}
+      {indicesPorPalabra(texto).map((indices) => (
+        <span key={indices[0]} className="progreso-palabra">
+          {indices.map((i) => (
+            <span key={i} className={progreso[i].revelada ? 'progreso-celda revelada' : 'progreso-celda'}>
+              {progreso[i].revelada ? progreso[i].caracter : ''}
+            </span>
+          ))}
+        </span>
+      ))}
     </div>
   );
 }

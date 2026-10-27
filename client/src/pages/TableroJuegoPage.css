@@ -699,7 +699,18 @@
   }
 }
 
+/* Las celdas van agrupadas por palabra (.progreso-palabra) para que el
+   renglón solo se corte entre palabras. El hueco entre palabras es el que
+   antes dejaba el espaciador: 5px + 14px + 5px. */
 .progreso-frase {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 24px;
+  justify-content: center;
+}
+
+/* Una palabra no se parte, salvo que sola no quepa en el renglón. */
+.progreso-palabra {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
@@ -736,10 +747,6 @@
   100% {
     transform: scale(1);
   }
-}
-
-.progreso-espacio {
-  width: 14px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1141,7 +1148,7 @@
 .relleno-celdas {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 5px 24px;
   justify-content: center;
 }
 
