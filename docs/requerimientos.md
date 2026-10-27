@@ -34,7 +34,7 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Carga de Frases:** El docente selecciona un set de frases previamente guardado o crea uno nuevo desde el módulo de configuración antes de iniciar la partida.
 
-**Bolsa de la tarjeta:** Cada tarjeta tiene una bolsa de monedas que se calcula a partir de su frase: 50 monedas más 5 por cada letra distinta (sin contar espacios, mayúsculas ni tildes; la Ñ cuenta como letra propia). Las frases más largas y variadas valen más. Todas las tarjetas son visualmente idénticas boca abajo; la bolsa se descubre al elegir la tarjeta y baja en vivo mientras se juega (ver 3.3).
+**Bolsa de la tarjeta:** Cada tarjeta tiene una bolsa de monedas que se calcula a partir de su frase: 50 monedas más 10 por cada letra distinta (sin contar espacios, mayúsculas ni tildes; la Ñ cuenta como letra propia). Las frases más largas y variadas valen más. Todas las tarjetas son visualmente idénticas boca abajo; la bolsa se descubre al elegir la tarjeta y baja en vivo mientras se juega (ver 3.3).
 
 **Sorteo Inicial:** El sistema realiza un barajado aleatorio de los 4 equipos. Aparecen en posiciones aleatorias en pantalla y el orden de turno es de izquierda a derecha según el resultado.
 
@@ -64,13 +64,13 @@ Los equipos no gastan su saldo: lo que cuesta cada ayuda sale de la bolsa de la 
 | **Concepto** | **Valor** |
 | --- | --- |
 | Saldo inicial | 0 monedas |
-| Bolsa de la tarjeta | 50 + 5 por cada letra distinta de la frase |
+| Bolsa de la tarjeta | 50 + 10 por cada letra distinta de la frase |
 | Cada letra pedida al aire (acierte o falle) | −5 a la bolsa |
 | Acierto Seguro (vocal o consonante) | −10 a la bolsa |
 
 > **Piso en 0:** La bolsa nunca baja de 0. Con la bolsa vacía el equipo puede seguir jugando, pero adivinar ya no le suma monedas.
 
-> **En pantalla:** Al elegir la tarjeta, la bolsa cae junto a ella y cuenta sus monedas. Cada letra pedida le saca monedas con una animación y un sonido; cuando le quedan 30 o menos se pone en rojo y tiembla, y vacía se ve gris con una polilla.
+> **En pantalla:** Al elegir la tarjeta, la bolsa cae junto a ella y cuenta sus monedas. Cada letra pedida le saca monedas con una animación y un sonido; cuando le queda la cuarta parte o menos de lo que traía se pone en rojo y tiembla, y vacía se ve gris con una polilla.
 
 > **Acierto Seguro:** Al usarlo, el sistema elige automáticamente una letra correcta de la categoría elegida que aún no haya sido descubierta, la revela en todos sus espacios, descuenta el intento correspondiente y le quita 10 monedas a la bolsa. No depende del saldo del equipo. Si no quedan letras disponibles de esa categoría en la frase, el botón se inhabilita. Esta mecánica no está disponible en Ronda 2.
 
