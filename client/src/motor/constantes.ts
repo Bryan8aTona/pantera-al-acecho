@@ -19,8 +19,8 @@ export const FRASES_POR_SET = 8;
 // pedida le resta lo suyo (nunca baja de 0). Quien adivina se lleva lo
 // que queda.
 export const SALDO_INICIAL = 0;
-export const BOLSA_BASE = 50;
-export const BOLSA_POR_LETRA = 10;
+export const BOLSA_BASE = 40;
+export const BOLSA_POR_LETRA = 5;
 export const COSTO_LETRA = 5;
 export const COSTO_ACIERTO_SEGURO: Record<Categoria, number> = { vocal: 10, consonante: 10 };
 

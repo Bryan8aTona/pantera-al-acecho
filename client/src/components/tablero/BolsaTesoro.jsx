@@ -6,7 +6,7 @@ import { SacoMonedas, Polilla } from './SacoMonedas.jsx';
 import './BolsaTesoro.css';
 
 // Con esta fracción de la bolsa inicial o menos, tiembla y su placa se
-// pone roja. Es relativa porque las bolsas van de ~80 a ~220 monedas.
+// pone roja. Es relativa porque las bolsas van de ~55 a ~150 monedas.
 const FRACCION_BOLSA_BAJA = 0.25;
 
 // La bolsa de monedas de la carta en juego (requerimientos.md 3.3).
