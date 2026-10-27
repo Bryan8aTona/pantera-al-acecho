@@ -109,13 +109,15 @@
 }
 
 /* Modo Adivinar: en verde selva se perdía contra el fondo; en dorado y
-   del ancho del teclado se distingue desde el fondo del salón. */
+   del alto del teclado, a su izquierda, se distingue desde el fondo del
+   salón. */
 .tablero .tablero-btn-adivinar {
-  /* Mismo ancho que .teclado-virtual: 9 teclas y 8 huecos. */
-  width: calc(9 * clamp(34px, min(4.2vw, 6.4vh), 54px) + 8 * clamp(5px, 0.7vw, 8px));
-  max-width: 100%;
-  padding: 8px 18px;
-  font-size: 16px;
+  grid-area: adivinar;
+  justify-self: end;
+  width: var(--ancho-lateral-controles);
+  padding: 8px 14px;
+  font-size: 18px;
+  line-height: 1.25;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -544,15 +546,21 @@
   color: var(--color-primary-dark);
 }
 
-/* Controles (teclado + acierto seguro + modo adivinar) */
+/* Controles: Adivinar Frase | teclado | Acierto Seguro, en una sola
+   fila. Apilados en vertical sumaban ~100px de alto y, con frases largas,
+   el Tablero hacía scroll en laptops. Los dos lados miden lo mismo para
+   que el teclado quede centrado; en Ronda 2 (sin Acierto Seguro) el lado
+   derecho queda vacío. */
 
 .tablero-controles {
+  --ancho-lateral-controles: clamp(150px, 14vw, 210px);
   grid-column: 1 / -1;
   grid-row: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: 'adivinar teclado acierto';
+  align-items: stretch;
+  column-gap: clamp(12px, 1.4vw, 22px);
   min-height: 0;
 }
 
@@ -709,6 +717,21 @@
   justify-content: center;
 }
 
+/* Frases largas (esFraseLarga en palabras.js; en ProgresoFrase y en
+   RellenoInteligente): celdas un poco más chicas y renglones más juntos,
+   para que la frase no empuje el teclado fuera de pantalla. Dos clases
+   para ganarle a .relleno-celdas, que viene después. */
+.progreso-frase.progreso-frase-larga,
+.relleno-celdas.progreso-frase-larga {
+  gap: 3px 18px;
+}
+
+.progreso-frase-larga .progreso-celda {
+  width: clamp(20px, 1.9vw, 26px);
+  height: clamp(26px, min(2.6vw, 4.4vh), 32px);
+  font-size: clamp(15px, 1.6vw, 19px);
+}
+
 /* Una palabra no se parte, salvo que sola no quepa en el renglón. */
 .progreso-palabra {
   display: flex;
@@ -756,6 +779,7 @@
 }
 
 .teclado-virtual {
+  grid-area: teclado;
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: clamp(5px, 0.7vw, 8px);
@@ -800,22 +824,86 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Los dos Acierto Seguro, uno sobre otro, del alto del teclado. */
 .acierto-seguro {
+  grid-area: acierto;
+  justify-self: start;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: clamp(5px, 0.7vw, 8px);
+  width: var(--ancho-lateral-controles);
+}
+
+.tablero .acierto-seguro-btn {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 10px;
+  line-height: 1.15;
+}
+
+.acierto-seguro-titulo {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Categoría y costo: si no caben en un renglón, el costo baja entero. */
+.acierto-seguro-detalle {
+  display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  column-gap: 8px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.acierto-seguro-costo {
+  white-space: nowrap;
+  color: var(--color-accent);
+}
+
+/* Pantallas angostas: no caben los tres lado a lado, se vuelven a apilar.
+   La columna mide lo que el teclado, así que Adivinar toma su ancho. Va
+   después de .acierto-seguro para ganarle con la misma especificidad. */
+@media (max-width: 760px) {
+  .tablero-controles {
+    grid-template-columns: auto;
+    grid-template-areas:
+      'adivinar'
+      'teclado'
+      'acierto';
+    justify-content: center;
+    row-gap: 10px;
+  }
+
+  .tablero .tablero-btn-adivinar {
+    justify-self: stretch;
+    width: auto;
+  }
+
+  .acierto-seguro {
+    justify-self: center;
+    grid-template-rows: none;
+    grid-auto-flow: column;
+    width: auto;
+  }
 }
 
 /* Robo */
 
+/* Todo el ancho de la jugada, como .panel-adivinar: con 480px las frases
+   largas no cabían sin scroll. */
 .panel-robo {
   background: rgba(179, 67, 43, 0.15);
   border: 2px solid var(--color-danger);
   border-radius: var(--radius);
   padding: 24px;
   text-align: center;
-  max-width: 480px;
+  width: 100%;
 }
 
 .panel-robo-aviso {
@@ -889,11 +977,12 @@
 
 /* Modo adivinar */
 
+/* Todo el ancho de la jugada: con 480px, una frase larga ocupaba once
+   renglones y el Tablero hacía scroll. */
 .panel-adivinar {
   background: rgba(255, 255, 255, 0.06);
   border-radius: var(--radius);
   padding: 20px;
-  max-width: 480px;
   width: 100%;
   text-align: center;
 }
@@ -1278,12 +1367,7 @@
   }
 
   .tablero-controles {
-    gap: 6px;
-  }
-
-  .tablero .tablero-btn-adivinar {
-    padding: 6px 18px;
-    font-size: 14px;
+    row-gap: 6px;
   }
 }
 

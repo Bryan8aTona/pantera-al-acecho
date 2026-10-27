@@ -1,11 +1,12 @@
 import { progresoDeFrase } from '../../motor/index.ts';
-import { indicesPorPalabra } from './palabras.js';
+import { esFraseLarga, indicesPorPalabra } from './palabras.js';
 
 export default function ProgresoFrase({ texto, letrasUsadas }) {
   const progreso = progresoDeFrase(texto, letrasUsadas);
+  const clase = esFraseLarga(texto) ? 'progreso-frase progreso-frase-larga' : 'progreso-frase';
 
   return (
-    <div className="progreso-frase" aria-label="Frase a adivinar">
+    <div className={clase} aria-label="Frase a adivinar">
       {indicesPorPalabra(texto).map((indices) => (
         <span key={indices[0]} className="progreso-palabra">
           {indices.map((i) => (

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { esLetra, normalizarLetra } from '../../motor/index.ts';
-import { indicesPorPalabra } from './palabras.js';
+import { esFraseLarga, indicesPorPalabra } from './palabras.js';
 
 // Copia SOLO el caso (mayúscula/minúscula) del carácter correspondiente
 // de la frase objetivo: si en la frase esa posición va en minúscula, lo
@@ -132,7 +132,7 @@ export default function RellenoInteligente({ texto, letrasUsadas = {}, onEnviar,
 
   return (
     <div className="relleno-inteligente">
-      <div className="relleno-celdas">
+      <div className={esFraseLarga(texto) ? 'relleno-celdas progreso-frase-larga' : 'relleno-celdas'}>
         {indicesPorPalabra(texto).map((indices) => (
           <span key={indices[0]} className="progreso-palabra">
             {indices.map(renderCelda)}
