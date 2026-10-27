@@ -12,12 +12,10 @@ export default defineConfig({
       output: {
         // Separa dependencias grandes y estables en su propio chunk:
         // se descargan en paralelo con el código de la app y quedan en
-        // caché del navegador entre despliegues. lottie solo lo pide el
-        // chunk diferido del Tablero, así que se descarga junto con él.
+        // caché del navegador entre despliegues.
         manualChunks: {
           firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore/lite'],
           react: ['react', 'react-dom', 'react-router-dom'],
-          lottie: ['lottie-react'],
         },
       },
     },

@@ -10,7 +10,7 @@ export default function PanelRepechaje({ equipos, onComenzar }) {
       <p className="panel-repechaje-kicker">Terminó la Ronda 1</p>
       <h2>Comienza la Ronda de Repechaje</h2>
       <p className="panel-repechaje-texto">
-        Vuelven a jugar solo los equipos que no adivinaron su frase. Sin monedas y sin robo:{' '}
+        Vuelven a jugar solo los equipos que no adivinaron su frase. Sin Acierto Seguro y sin robo:{' '}
         {LIMITES_INTENTOS[2].vocales} intentos de vocales y {LIMITES_INTENTOS[2].consonantes} de consonantes.
       </p>
 

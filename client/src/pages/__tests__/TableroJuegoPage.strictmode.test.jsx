@@ -103,7 +103,7 @@ describe('Secuencias dramáticas bajo StrictMode (regresión)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'O' }));
     fireEvent.click(screen.getByRole('button', { name: 'L' }));
 
-    expect(screen.getByText(/monedas!/i)).toBeInTheDocument();
+    expect(screen.getByText(/se lleva la bolsa/i)).toBeInTheDocument();
   });
 
   it('cuando el robo falla (nadie gana), la revelación igual aparece bajo StrictMode', () => {
@@ -139,8 +139,8 @@ describe('Secuencias dramáticas bajo StrictMode (regresión)', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Declarar frase' }));
 
-    // Sin ganador -> no hay animación de monedas, va directo a la revelación.
-    expect(screen.queryByText(/monedas!/i)).not.toBeInTheDocument();
+    // Sin ganador -> no revienta la bolsa, va directo a la revelación.
+    expect(screen.queryByText(/se lleva la bolsa/i)).not.toBeInTheDocument();
     expect(screen.getByText('GATO')).toBeInTheDocument();
     expect(screen.getByText(/nadie ganó/i)).toBeInTheDocument();
 

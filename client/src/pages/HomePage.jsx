@@ -100,31 +100,31 @@ const PASOS = [
     icono: <IconoCartaLetra />,
     titulo: 'Cada equipo elige una carta y pide letras',
     detalle:
-      'En su turno, el equipo toma una tarjeta del mazo y pide letras al aire (gratis) o compra un “Acierto Seguro” con monedas. Cada letra consume un intento, y los intentos por categoría son limitados.',
+      'En su turno, el equipo toma una tarjeta del mazo, que trae una bolsa de monedas, y pide letras al aire o usa un “Acierto Seguro”. Cada letra le quita monedas a la bolsa y consume un intento, y los intentos por categoría son limitados.',
   },
   {
     icono: <IconoPantera />,
     titulo: 'La pantera acecha con cada error',
     detalle:
-      'Cada fallo en la opción gratuita acerca a la pantera un estado. Al quinto error la pantera ataca: el equipo pierde el turno y la frase queda en juego para que la robe el equipo siguiente.',
+      'Cada letra al aire que no está en la frase acerca a la pantera y le quita una de sus 5 vidas al equipo. Al quinto error la pantera ataca: el equipo pierde el turno y la frase queda en juego para que la robe el equipo siguiente.',
   },
   {
     icono: <IconoAdivinar />,
-    titulo: 'Modo Adivinar para declarar la frase',
+    titulo: 'Adivinar Frase para declarar la frase completa',
     detalle:
-      'En cualquier momento el equipo puede intentar la frase completa. El docente escribe la respuesta que el equipo declara en voz alta y el sistema la valida.',
+      'En cualquier momento el equipo puede intentar la frase completa. El docente escribe la respuesta que el equipo declara en voz alta y el sistema la valida. Quien la adivina se lleva lo que quede en la bolsa.',
   },
   {
     icono: <IconoRepechaje />,
     titulo: 'Ronda de Repechaje',
     detalle:
-      'Los equipos que no adivinaron en la Ronda 1 juegan una segunda ronda con menos intentos, sin monedas y sin robo: un fallo es derrota directa.',
+      'Los equipos que no adivinaron en la Ronda 1 juegan una segunda ronda con menos intentos, sin Acierto Seguro y sin robo: un fallo es derrota directa.',
   },
   {
     icono: <IconoTrofeo />,
     titulo: 'Marcador final',
     detalle:
-      'Al cerrar la partida se revelan todas las tarjetas restantes con su valor y se muestra el marcador con los saldos de los cuatro equipos.',
+      'Al cerrar la partida se revelan las frases de las tarjetas restantes y se muestra el marcador con los saldos de los cuatro equipos.',
   },
 ];
 
@@ -148,18 +148,18 @@ const MANUAL = [
     alt: 'Pantalla “Configurar partida” con la lista de sets, uno seleccionado, y el botón “Iniciar partida”.',
     titulo: 'Inicia la partida',
     detalle:
-      'Entra a “Configuración de partida”, elige el set y comienza. Proyecta la pantalla al grupo y ponla en pantalla completa del navegador (tecla F11). El sorteo de los equipos y el reparto de premios de las cartas son automáticos.',
+      'Entra a “Configuración de partida”, elige el set y comienza. Proyecta la pantalla al grupo y ponla en pantalla completa del navegador (tecla F11). El sorteo de los equipos y la bolsa de monedas de cada carta son automáticos.',
   },
   {
     imagen: '/assets/home/manual-4-turno.webp',
-    alt: 'Tablero durante un turno: la carta elegida, la frase con las letras acertadas, el teclado virtual con las letras usadas y la pantera asomando tras dos fallos.',
+    alt: 'Tablero durante un turno: la pantera con las vidas del equipo, la carta elegida junto a su bolsa de monedas, la frase con las letras acertadas y el teclado virtual con las letras usadas.',
     titulo: 'Dirige cada turno',
     detalle:
       'En su turno, el equipo elige una carta boca abajo y tú registras en el tablero lo que declaran en voz alta:',
     puntos: [
-      'Pedir una letra: púlsala en el teclado virtual. Si la letra no está en la frase, la pantera avanza un estado.',
-      'Acierto Seguro: los botones de vocal / consonante gastan monedas del equipo y revelan una letra sin arriesgar a la pantera.',
-      'Modo Adivinar: escribe la frase completa que el equipo declara y el sistema la valida.',
+      'Pedir una letra: púlsala en el teclado virtual. Cada letra le quita 5 monedas a la bolsa; si no está en la frase, además la pantera avanza y el equipo pierde una vida.',
+      'Acierto Seguro: los botones de vocal / consonante revelan una letra sin arriesgar a la pantera, pero le quitan 15 monedas a la bolsa.',
+      'Adivinar Frase: escribe la frase completa que el equipo declara y el sistema la valida. Si acierta, se lleva lo que quede en la bolsa; la escena de victoria espera tu clic para continuar.',
       'A los 5 fallos la pantera ataca: el equipo pierde el turno y el equipo siguiente puede robar la frase con un único intento.',
     ],
   },
@@ -168,14 +168,14 @@ const MANUAL = [
     alt: 'Panel “Comienza la Ronda de Repechaje” con los equipos que vuelven a jugar y el botón “Comenzar repechaje”.',
     titulo: 'Ronda de Repechaje',
     detalle:
-      'Al terminar la Ronda 1, un panel anuncia el Repechaje: vuelven solo los equipos que no adivinaron su frase, con menos intentos, sin monedas y sin robo. Pulsa “Comenzar repechaje” cuando el grupo esté listo.',
+      'Al terminar la Ronda 1, un panel anuncia el Repechaje: vuelven solo los equipos que no adivinaron su frase, con menos intentos, sin Acierto Seguro y sin robo. Pulsa “Comenzar repechaje” cuando el grupo esté listo.',
   },
   {
     imagen: '/assets/home/manual-6-marcador.webp',
-    alt: 'Marcador final con los saldos de los cuatro equipos y las frases que no se jugaron con su valor.',
+    alt: 'Marcador final con los saldos de los cuatro equipos y las frases que no se jugaron.',
     titulo: 'Cierre y marcador',
     detalle:
-      'Al final se revelan las frases no jugadas con su valor y se muestra el marcador con los saldos. Usa “Salir de la partida” para volver a la configuración e iniciar otra.',
+      'Al final se revelan las frases no jugadas y se muestra el marcador con los saldos. Usa “Salir de la partida” para volver a la configuración e iniciar otra.',
   },
 ];
 

@@ -1,4 +1,4 @@
-import { COSTO_ACIERTO_SEGURO, PANTERA_ESTADO_DERROTA } from './constantes.ts';
+import { PANTERA_ESTADO_DERROTA } from './constantes.ts';
 import { MotorError } from './errores.ts';
 import { normalizarLetra } from './normalizacion.ts';
 import { claveIntento, esLetra, letrasUnicasPorCategoria } from './letras.ts';
@@ -48,9 +48,6 @@ export function impedimentoAciertoSeguro(
   const clave = claveIntento(categoria);
   if (equipo.intentos[clave] <= 0) {
     return new MotorError('SIN_INTENTOS', `El equipo no tiene intentos de ${categoria} disponibles`);
-  }
-  if (equipo.saldo < COSTO_ACIERTO_SEGURO[categoria]) {
-    return new MotorError('SALDO_INSUFICIENTE', 'El equipo no tiene saldo suficiente');
   }
   if (!hayLetrasDisponiblesAciertoSeguro(fraseTexto, categoria, letrasUsadas)) {
     return new MotorError(

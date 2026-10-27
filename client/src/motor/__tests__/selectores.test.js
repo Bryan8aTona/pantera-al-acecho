@@ -73,10 +73,10 @@ describe('impedimentoAciertoSeguro', () => {
     expect(impedimentoAciertoSeguro(sinVocales, 'vocal', 'SOL', {}).codigo).toBe('SIN_INTENTOS');
   });
 
-  it('saldo insuficiente (35 para vocal, 20 para consonante)', () => {
-    const pobre = { ...equipo, saldo: 34 };
-    expect(impedimentoAciertoSeguro(pobre, 'vocal', 'SOL', {}).codigo).toBe('SALDO_INSUFICIENTE');
-    expect(impedimentoAciertoSeguro(pobre, 'consonante', 'SOL', {})).toBeNull();
+  it('el saldo no lo impide: el costo sale de la bolsa de la carta', () => {
+    const sinSaldo = { ...equipo, saldo: 0 };
+    expect(impedimentoAciertoSeguro(sinSaldo, 'vocal', 'SOL', {})).toBeNull();
+    expect(impedimentoAciertoSeguro(sinSaldo, 'consonante', 'SOL', {})).toBeNull();
   });
 
   it('sin letras de esa categoría por descubrir', () => {

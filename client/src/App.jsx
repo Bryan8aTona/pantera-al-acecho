@@ -8,9 +8,8 @@ import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 
 // Inicio y login van en el bundle principal (son la entrada). El resto
-// se descarga al entrar a su ruta; el Tablero, con el JSON de Lottie
-// (que dentro de su chunk sigue siendo un import estático), es el más
-// pesado. Su CSS se importa en main.jsx para no alterar la cascada.
+// se descarga al entrar a su ruta. Su CSS se importa en main.jsx para no
+// alterar la cascada.
 const BackOfficePage = lazy(() => import('./pages/BackOfficePage.jsx'));
 const SetFormPage = lazy(() => import('./pages/SetFormPage.jsx'));
 const ConfiguracionPartidaPage = lazy(() => import('./pages/ConfiguracionPartidaPage.jsx'));

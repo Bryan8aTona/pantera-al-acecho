@@ -14,7 +14,6 @@ vi.mock('../../motor/sorteo.ts', () => ({ sortearOrden: (items) => [...items] })
 const DURACION_CLICK_CARTA_MS = 450;
 const DURACION_IMPACTO_MS = 600;
 const DURACION_ENCOGER_MS = 400;
-const DURACION_LOTTIE_MOCK_MS = 100; // ver src/test-setup.js
 
 const SET_PRUEBA = {
   id: 'set-1',
@@ -85,6 +84,17 @@ function escribirEnCeldas(letras) {
   });
 }
 
+// Monedas que tiene ahora la bolsa de la carta en juego (su placa).
+function monedasEnLaBolsa() {
+  const placa = document.querySelector('.bolsa-placa');
+  return Number(placa.getAttribute('aria-label').match(/(\d+) monedas/)[1]);
+}
+
+// La bolsa revienta y se queda celebrando hasta que el docente da clic.
+function cerrarVictoria() {
+  fireEvent.click(screen.getByRole('button', { name: /Ganó la carta/i }));
+}
+
 describe('Revelación de la frase (pausa docente)', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -118,23 +128,19 @@ describe('Revelación de la frase (pausa docente)', () => {
 
     expect(screen.getByText(/única oportunidad de robar/i)).toBeInTheDocument();
 
+    // Quien roba gana lo que dejó el equipo anterior en la bolsa.
+    const bolsaAlRobar = monedasEnLaBolsa();
     escribirEnCeldas('GATO');
     fireEvent.click(screen.getByRole('button', { name: 'Declarar frase' }));
 
-    // Hubo ganador -> primero la animación de monedas (Lottie simulado,
-    // ver test-setup.js). El valor del premio es aleatorio
-    // (100/90/80/70/60), así que lo capturamos en vez de asumirlo.
-    const textoVictoria = screen.getByText(/monedas!/i).textContent;
-    const valorGanado = textoVictoria.match(/\d+/)[0];
+    // Hubo ganador -> primero la bolsa que revienta.
+    expect(screen.getByText(/se lleva la bolsa/i)).toBeInTheDocument();
     expect(screen.queryByText('GATO')).not.toBeInTheDocument(); // todavía no la revelación
-
-    act(() => {
-      vi.advanceTimersByTime(DURACION_LOTTIE_MOCK_MS);
-    });
+    cerrarVictoria();
 
     // Ahora sí: la frase completa, visible, con pausa para el docente.
     expect(screen.getByText('GATO')).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`ganó ${valorGanado}`, 'i'))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`ganó ${bolsaAlRobar}`, 'i'))).toBeInTheDocument();
 
     // No debe avanzar solo: el mazo del siguiente equipo aún no aparece.
     expect(screen.queryByText(/Elige una carta boca abajo/i)).not.toBeInTheDocument();
@@ -152,16 +158,14 @@ describe('Revelación de la frase (pausa docente)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'S' }));
     fireEvent.click(screen.getByRole('button', { name: 'O' }));
+    const bolsaAntes = monedasEnLaBolsa();
     fireEvent.click(screen.getByRole('button', { name: 'L' })); // completa la frase sola
 
-    const textoVictoria = screen.getByText(/monedas!/i).textContent;
-    const valorGanado = textoVictoria.match(/\d+/)[0];
+    expect(screen.getByText(/se lleva la bolsa/i)).toBeInTheDocument();
+    cerrarVictoria();
 
-    act(() => {
-      vi.advanceTimersByTime(DURACION_LOTTIE_MOCK_MS);
-    });
-
+    // La última letra también le quita sus 5 monedas a la bolsa.
     expect(screen.getByText('SOL')).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`ganó ${valorGanado}`, 'i'))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`ganó ${bolsaAntes - 5}`, 'i'))).toBeInTheDocument();
   });
 });

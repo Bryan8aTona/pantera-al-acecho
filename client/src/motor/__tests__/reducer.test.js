@@ -21,14 +21,14 @@ function estadoBase(overrides = {}) {
   }, {});
 
   const mazoBase = {
-    c1: { id: 'c1', texto: 'SOL', orden: 1, valor: 100, jugada: false, ganadorId: null },
-    c2: { id: 'c2', texto: 'MAR', orden: 2, valor: 90, jugada: false, ganadorId: null },
-    c3: { id: 'c3', texto: 'PAN', orden: 3, valor: 80, jugada: false, ganadorId: null },
-    c4: { id: 'c4', texto: 'LUZ', orden: 4, valor: 70, jugada: false, ganadorId: null },
-    c5: { id: 'c5', texto: 'RIO', orden: 5, valor: 60, jugada: false, ganadorId: null },
-    c6: { id: 'c6', texto: 'TREN', orden: 6, valor: 100, jugada: false, ganadorId: null },
-    c7: { id: 'c7', texto: 'FLOR', orden: 7, valor: 90, jugada: false, ganadorId: null },
-    c8: { id: 'c8', texto: 'NUBE', orden: 8, valor: 80, jugada: false, ganadorId: null },
+    c1: { id: 'c1', texto: 'SOL', orden: 1, bolsaInicial: 100, bolsa: 100, jugada: false, ganadorId: null },
+    c2: { id: 'c2', texto: 'MAR', orden: 2, bolsaInicial: 90, bolsa: 90, jugada: false, ganadorId: null },
+    c3: { id: 'c3', texto: 'PAN', orden: 3, bolsaInicial: 80, bolsa: 80, jugada: false, ganadorId: null },
+    c4: { id: 'c4', texto: 'LUZ', orden: 4, bolsaInicial: 70, bolsa: 70, jugada: false, ganadorId: null },
+    c5: { id: 'c5', texto: 'RIO', orden: 5, bolsaInicial: 60, bolsa: 60, jugada: false, ganadorId: null },
+    c6: { id: 'c6', texto: 'TREN', orden: 6, bolsaInicial: 100, bolsa: 100, jugada: false, ganadorId: null },
+    c7: { id: 'c7', texto: 'FLOR', orden: 7, bolsaInicial: 90, bolsa: 90, jugada: false, ganadorId: null },
+    c8: { id: 'c8', texto: 'NUBE', orden: 8, bolsaInicial: 80, bolsa: 80, jugada: false, ganadorId: null },
   };
 
   return {
@@ -104,7 +104,7 @@ describe('PEDIR_LETRA_LIBRE', () => {
     let estado = estadoBase({
       mazo: {
         ...estadoBase().mazo,
-        c1: { id: 'c1', texto: 'BCDFGHJKX', orden: 1, valor: 100, jugada: false, ganadorId: null },
+        c1: { id: 'c1', texto: 'BCDFGHJKX', orden: 1, bolsaInicial: 100, bolsa: 100, jugada: false, ganadorId: null },
       },
     });
     estado = motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
@@ -126,7 +126,7 @@ describe('Pantera al Acecho — derrota automática', () => {
     let estado = estadoBase({
       mazo: {
         ...estadoBase().mazo,
-        c1: { id: 'c1', texto: 'AEIOU', orden: 1, valor: 100, jugada: false, ganadorId: null },
+        c1: { id: 'c1', texto: 'AEIOU', orden: 1, bolsaInicial: 100, bolsa: 100, jugada: false, ganadorId: null },
       },
     });
     estado = motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
@@ -146,21 +146,56 @@ describe('Pantera al Acecho — derrota automática', () => {
   });
 });
 
+describe('Bolsa de la carta', () => {
+  it('cada letra pedida le quita 5, acierte o falle', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' }); // SOL, bolsa 100
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'S' });
+    expect(estado.mazo.c1.bolsa).toBe(95);
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'X' });
+    expect(estado.mazo.c1.bolsa).toBe(90);
+  });
+
+  it('no baja de 0', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = { ...estado, mazo: { ...estado.mazo, c1: { ...estado.mazo.c1, bolsa: 5 } } };
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'S' });
+    expect(estado.mazo.c1.bolsa).toBe(0);
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'X' });
+    expect(estado.mazo.c1.bolsa).toBe(0);
+  });
+
+  it('con la bolsa vacía, ganar no suma nada', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = { ...estado, mazo: { ...estado.mazo, c1: { ...estado.mazo.c1, bolsa: 0 } } };
+    estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'sol' });
+
+    expect(estado.equipos.rojo.gano).toBe(true);
+    expect(estado.equipos.rojo.saldo).toBe(200);
+  });
+
+  it('no toca la bolsa de las demás cartas', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'S' });
+    expect(estado.mazo.c2.bolsa).toBe(90);
+  });
+});
+
 describe('COMPRAR_ACIERTO_SEGURO', () => {
   function estadoConCasa() {
     let estado = estadoBase({
       mazo: {
         ...estadoBase().mazo,
-        c1: { id: 'c1', texto: 'CASA', orden: 1, valor: 100, jugada: false, ganadorId: null },
+        c1: { id: 'c1', texto: 'CASA', orden: 1, bolsaInicial: 100, bolsa: 100, jugada: false, ganadorId: null },
       },
     });
     return motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
   }
 
-  it('descuenta saldo e intento, y revela una letra sin afectar la pantera', () => {
+  it('le quita 15 a la bolsa (no al saldo), gasta el intento y revela una letra sin afectar la pantera', () => {
     const estado = motorReducer(estadoConCasa(), { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' });
 
-    expect(estado.equipos.rojo.saldo).toBe(165); // 200 - 35
+    expect(estado.mazo.c1.bolsa).toBe(85); // 100 - 15
+    expect(estado.equipos.rojo.saldo).toBe(200);
     expect(estado.equipos.rojo.intentos.vocales).toBe(2);
     expect(estado.equipos.rojo.panteraEstado).toBe(0);
     expect(estado.letrasUsadas.A).toBe('acierto');
@@ -172,10 +207,25 @@ describe('COMPRAR_ACIERTO_SEGURO', () => {
     expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' })).toThrow(MotorError);
   });
 
-  it('se rechaza si el saldo es insuficiente', () => {
+  it('la consonante también cuesta 15 a la bolsa', () => {
+    const estado = motorReducer(estadoConCasa(), { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' });
+    expect(estado.mazo.c1.bolsa).toBe(85);
+  });
+
+  it('se puede comprar aunque el equipo no tenga saldo', () => {
     let estado = estadoConCasa();
-    estado = { ...estado, equipos: { ...estado.equipos, rojo: { ...estado.equipos.rojo, saldo: 10 } } };
-    expect(() => motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' })).toThrow(MotorError);
+    estado = { ...estado, equipos: { ...estado.equipos, rojo: { ...estado.equipos.rojo, saldo: 0 } } };
+    estado = motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'consonante' });
+
+    expect(estado.equipos.rojo.saldo).toBe(0);
+    expect(estado.mazo.c1.bolsa).toBe(85);
+  });
+
+  it('la bolsa no baja de 0', () => {
+    let estado = estadoConCasa();
+    estado = { ...estado, mazo: { ...estado.mazo, c1: { ...estado.mazo.c1, bolsa: 10 } } };
+    estado = motorReducer(estado, { type: 'COMPRAR_ACIERTO_SEGURO', categoria: 'vocal' });
+    expect(estado.mazo.c1.bolsa).toBe(0);
   });
 
   it('no está disponible en Ronda 2', () => {
@@ -185,8 +235,8 @@ describe('COMPRAR_ACIERTO_SEGURO', () => {
 });
 
 describe('ENVIAR_RESPUESTA — turno normal', () => {
-  it('acierto: suma el premio, marca la carta y avanza el turno', () => {
-    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' }); // SOL, valor 100
+  it('acierto: se lleva la bolsa, marca la carta y avanza el turno', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' }); // SOL, bolsa 100
     estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'sol' });
 
     expect(estado.equipos.rojo.saldo).toBe(300);
@@ -213,7 +263,7 @@ describe('Robo de frase', () => {
     return motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'fallo' }); // activa robo -> azul
   }
 
-  it('robo exitoso: el equipo que roba se lleva el premio', () => {
+  it('robo exitoso: el equipo que roba se lleva la bolsa', () => {
     let estado = motorReducer(estadoEnRobo(), { type: 'ENVIAR_RESPUESTA', intento: 'sol' });
 
     expect(estado.equipos.azul.saldo).toBe(300); // 200 + 100
@@ -223,7 +273,17 @@ describe('Robo de frase', () => {
     expect(estado.turnoActualIndex).toBe(1); // avanza a azul, que ahora juega su propio turno
   });
 
-  it('robo fallido: nadie recibe el premio', () => {
+  it('el que roba se lleva lo que quedó en la bolsa tras las letras del equipo original', () => {
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' }); // SOL, bolsa 100
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'S' }); // 95
+    estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'X' }); // 90 (un fallo también cuesta)
+    estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'fallo' }); // robo -> azul
+    estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'sol' });
+
+    expect(estado.equipos.azul.saldo).toBe(290); // 200 + 90
+  });
+
+  it('robo fallido: nadie se lleva la bolsa', () => {
     let estado = motorReducer(estadoEnRobo(), { type: 'ENVIAR_RESPUESTA', intento: 'incorrecto' });
 
     expect(estado.equipos.azul.saldo).toBe(200);
@@ -266,7 +326,7 @@ describe('Robo de frase', () => {
 
 describe('Victoria automática al revelar todas las letras (sin Modo Adivinar)', () => {
   it('si el equipo adivina todas las letras sueltas, gana de inmediato sin ENVIAR_RESPUESTA', () => {
-    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' }); // SOL, valor 100
+    let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' }); // SOL, bolsa 100
 
     estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'S' });
     expect(estado.equipos.rojo.gano).toBeNull(); // todavía falta O y L
@@ -278,7 +338,8 @@ describe('Victoria automática al revelar todas las letras (sin Modo Adivinar)',
     estado = motorReducer(estado, { type: 'PEDIR_LETRA_LIBRE', letra: 'L' });
 
     expect(estado.equipos.rojo.gano).toBe(true);
-    expect(estado.equipos.rojo.saldo).toBe(300); // 200 + 100
+    // Cada letra pedida le quitó 5 a la bolsa, también la última: 100 - 15.
+    expect(estado.equipos.rojo.saldo).toBe(285);
     expect(estado.mazo.c1.jugada).toBe(true);
     expect(estado.mazo.c1.ganadorId).toBe('rojo');
     expect(estado.cartaActualId).toBeNull(); // el turno ya avanzó
@@ -289,7 +350,7 @@ describe('Victoria automática al revelar todas las letras (sin Modo Adivinar)',
     let estado = estadoBase({
       mazo: {
         ...estadoBase().mazo,
-        c1: { id: 'c1', texto: 'MAR', orden: 1, valor: 90, jugada: false, ganadorId: null },
+        c1: { id: 'c1', texto: 'MAR', orden: 1, bolsaInicial: 90, bolsa: 90, jugada: false, ganadorId: null },
       },
     });
     estado = motorReducer(estado, { type: 'ELEGIR_CARTA', cartaId: 'c1' });
@@ -380,8 +441,8 @@ describe('Ronda 2 (Repechaje)', () => {
     expect(estado.fase).toBe('CIERRE'); // único equipo en repechaje -> termina la ronda
   });
 
-  it('un acierto suma el premio igual que en Ronda 1', () => {
-    let estado = motorReducer(estadoRepechaje(), { type: 'ELEGIR_CARTA', cartaId: 'c5' }); // RIO, valor 60
+  it('un acierto se lleva la bolsa igual que en Ronda 1', () => {
+    let estado = motorReducer(estadoRepechaje(), { type: 'ELEGIR_CARTA', cartaId: 'c5' }); // RIO, bolsa 60
     estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'rio' });
 
     expect(estado.equipos.azul.saldo).toBe(260);
@@ -406,7 +467,7 @@ describe('Cierre', () => {
     estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'luz' });
 
     expect(estado.fase).toBe('CIERRE');
-    // verde juega y gana c4 (LUZ, valor 70) en esta misma prueba, así
+    // verde juega y gana c4 (LUZ, bolsa 70) en esta misma prueba, así
     // que su saldo pasa de 90 a 160 — por eso queda antes que rojo (150).
     expect(estado.cierre.marcador.map((e) => e.id)).toEqual(['azul', 'amarillo', 'verde', 'rojo']);
     expect(estado.cierre.cartasReveladas.every((c) => c.jugada)).toBe(true);
@@ -442,7 +503,7 @@ describe('RENDIRSE', () => {
     expect(estado.modoRobo).toBeNull();
   });
 
-  it('el equipo que roba puede rendirse: nadie se lleva el premio', () => {
+  it('el equipo que roba puede rendirse: nadie se lleva la bolsa', () => {
     let estado = motorReducer(estadoBase(), { type: 'ELEGIR_CARTA', cartaId: 'c1' });
     estado = motorReducer(estado, { type: 'ENVIAR_RESPUESTA', intento: 'fallo' });
     estado = motorReducer(estado, { type: 'RENDIRSE' });

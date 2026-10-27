@@ -1,5 +1,5 @@
 import { MotorError } from './errores.ts';
-import { LIMITES_INTENTOS, COSTO_ACIERTO_SEGURO, PANTERA_ESTADO_DERROTA, FASES } from './constantes.ts';
+import { LIMITES_INTENTOS, COSTO_ACIERTO_SEGURO, COSTO_LETRA, PANTERA_ESTADO_DERROTA, FASES } from './constantes.ts';
 import { normalizarTexto, normalizarLetra } from './normalizacion.ts';
 import {
   esLetra,
@@ -68,6 +68,13 @@ function actualizarCarta(estado: EstadoPartida, cartaId: string, cambios: Partia
       [cartaId]: { ...estado.mazo[cartaId], ...cambios },
     },
   };
+}
+
+// Cada letra pedida le quita monedas a la bolsa de la carta, que nunca
+// baja de 0 (requerimientos.md 3.3).
+function restarABolsa(estado: EstadoPartida, cartaId: string, costo: number): EstadoPartida {
+  const carta = estado.mazo[cartaId];
+  return actualizarCarta(estado, cartaId, { bolsa: Math.max(0, carta.bolsa - costo) });
 }
 
 // El equipo puede ganar sin pasar nunca por Modo Adivinar, simplemente
@@ -182,6 +189,7 @@ function manejarPedirLetraLibre(estado: EstadoPartida, { letra }: DatosAccion<'P
   let siguiente = actualizarEquipo(estado, equipoId, {
     intentos: { ...equipo.intentos, [clave]: equipo.intentos[clave] - 1 },
   });
+  siguiente = restarABolsa(siguiente, carta.id, COSTO_LETRA);
 
   siguiente = {
     ...siguiente,
@@ -251,9 +259,9 @@ function manejarComprarAciertoSeguro(
   const letraElegida = disponibles[0];
 
   let siguiente = actualizarEquipo(estado, equipoId, {
-    saldo: equipo.saldo - COSTO_ACIERTO_SEGURO[categoria],
     intentos: { ...equipo.intentos, [clave]: equipo.intentos[clave] - 1 },
   });
+  siguiente = restarABolsa(siguiente, carta.id, COSTO_ACIERTO_SEGURO[categoria]);
 
   siguiente = {
     ...siguiente,
@@ -351,7 +359,7 @@ function resolverAciertoDeTurno(estado: EstadoPartida, equipoId: EquipoId): Esta
   const carta = cartaActual(estado);
 
   let siguiente = actualizarEquipo(estado, equipoId, {
-    saldo: equipo.saldo + carta.valor,
+    saldo: equipo.saldo + carta.bolsa,
     gano: true,
   });
   siguiente = actualizarCarta(siguiente, carta.id, { jugada: true, ganadorId: equipoId });
@@ -398,7 +406,7 @@ function resolverIntentoRobo(
 
   if (esCorrecta(carta)) {
     const equipo = estado.equipos[equipoId];
-    siguiente = actualizarEquipo(siguiente, equipoId, { saldo: equipo.saldo + carta.valor });
+    siguiente = actualizarEquipo(siguiente, equipoId, { saldo: equipo.saldo + carta.bolsa });
     siguiente = actualizarCarta(siguiente, cartaId, { jugada: true, ganadorId: equipoId });
   } else {
     siguiente = actualizarCarta(siguiente, cartaId, { jugada: true, ganadorId: null });

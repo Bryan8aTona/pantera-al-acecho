@@ -18,7 +18,7 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Módulo de Configuración (Back-office):** Módulo privado donde el docente prepara la sesión. Permite crear, nombrar, editar y eliminar sets de frases, los cuales quedan vinculados a su cuenta y disponibles para clases futuras.
 
-**Motor de Reglas (Automatización):** Controla el límite de intentos, el estado de la pantera (vidas), la validación algorítmica de respuestas y la distribución aleatoria de premios. Ejerce el control final sobre saldos y cumplimiento de límites.
+**Motor de Reglas (Automatización):** Controla el límite de intentos, el estado de la pantera (vidas), la validación algorítmica de respuestas y la bolsa de monedas de cada tarjeta. Ejerce el control final sobre saldos y cumplimiento de límites.
 
 **Interfaz de Proyección:** Tablero visual de alta visibilidad optimizado para pantalla grande y proyector. El docente actúa como operador, ingresando las decisiones verbales de los equipos.
 
@@ -26,7 +26,7 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Operador (Docente):** Ingresa frases, coordina turnos y transcribe las respuestas verbales de los alumnos en el sistema.
 
-**Jugadores (Equipos):** 4 grupos (Rojo, Azul, Amarillo, Verde) que toman decisiones estratégicas basadas en su saldo y sus intentos restantes.
+**Jugadores (Equipos):** 4 grupos (Rojo, Azul, Amarillo, Verde) que toman decisiones estratégicas basadas en la bolsa de la tarjeta, sus intentos restantes y las vidas que les quedan.
 
 ## 3. Requerimientos Funcionales y Lógica de Negocio
 
@@ -34,13 +34,13 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Carga de Frases:** El docente selecciona un set de frases previamente guardado o crea uno nuevo desde el módulo de configuración antes de iniciar la partida.
 
-**Asignación de Premios:** El sistema asigna automáticamente un valor en monedas a cada frase. Los 5 niveles disponibles son: 100, 90, 80, 70 y 60 monedas de oro, distribuidos de forma aleatoria con repetición permitida entre las 8 frases. Todas las tarjetas son visualmente idénticas boca abajo; el valor permanece oculto hasta ser revelado al final del turno.
+**Bolsa de la tarjeta:** Cada tarjeta tiene una bolsa de monedas que se calcula a partir de su frase: 50 monedas más 5 por cada letra distinta (sin contar espacios, mayúsculas ni tildes; la Ñ cuenta como letra propia). Las frases más largas y variadas valen más. Todas las tarjetas son visualmente idénticas boca abajo; la bolsa se descubre al elegir la tarjeta y baja en vivo mientras se juega (ver 3.3).
 
 **Sorteo Inicial:** El sistema realiza un barajado aleatorio de los 4 equipos. Aparecen en posiciones aleatorias en pantalla y el orden de turno es de izquierda a derecha según el resultado.
 
 **Barajado de Frases:** Al iniciar cada partida el sistema baraja las 8 frases del set. El número que muestra cada tarjeta boca abajo es su posición en el mazo barajado, no la posición de la frase en el set, así que un mismo set no reparte siempre la misma frase detrás del mismo número.
 
-**Demostración previa:** Al abrir el Tablero, antes de que empiece el juego, se muestra encima de él una ventana emergente con una demostración animada de cómo se juega (un equipo que pide letras, falla, compra un Acierto Seguro y adivina la frase; y otro que llega al zarpazo y deja la frase en Robo), con los mismos videos de la pantera y la misma animación de victoria del juego. No avanza sola: el docente pasa de un paso a otro, o regresa a cualquiera, con las bolitas, las flechas del teclado o los botones, al ritmo de su explicación. La cierra con su botón, con Esc o con un clic fuera de ella; el tablero no se puede operar hasta entonces.
+**Demostración previa:** Al abrir el Tablero, antes de que empiece el juego, se muestra encima de él una ventana emergente con una demostración animada de cómo se juega (un equipo que pide letras, falla, usa un Acierto Seguro y adivina la frase; y otro que llega al zarpazo y deja la frase en Robo), con los mismos videos de la pantera y la misma bolsa de monedas del juego. No avanza sola: el docente pasa de un paso a otro, o regresa a cualquiera, con las bolitas, las flechas del teclado o los botones, al ritmo de su explicación. La cierra con su botón, con Esc o con un clic fuera de ella; el tablero no se puede operar hasta entonces.
 
 **Selección de Tarjetas:** En la Ronda 1, cada equipo elige una tarjeta del mazo boca abajo al inicio de su turno. En la Ronda 2, los equipos participantes reciben una tarjeta nueva del mazo sobrante (las 4 frases no jugadas en Ronda 1). Una vez elegida su tarjeta, el equipo no puede cambiarla ni elegir otra durante ese turno.
 
@@ -53,20 +53,26 @@ Cada equipo tiene un límite estricto de intentos por frase:
 | Ronda 1 | 3 | 8 |
 | Ronda 2 | 2 | 5 |
 
-> **Consumo:** Cada vez que un equipo pide una letra (gratuita o por compra), se descuenta un intento de su límite de intentos.
+> **Consumo:** Cada vez que un equipo pide una letra (al aire o con Acierto Seguro), se descuenta un intento de su límite de intentos.
 
-> **Restricción:** Si el límite de intentos de una categoría llega a 0, el equipo no puede pedir ni comprar más letras de ese tipo, aunque tenga saldo suficiente. El teclado virtual inhabilita visualmente las letras agotadas.
+> **Restricción:** Si el límite de intentos de una categoría llega a 0, el equipo no puede pedir más letras de ese tipo, ni al aire ni con Acierto Seguro. El teclado virtual inhabilita visualmente las letras agotadas.
 
-### 3.3 Economía de Juego (Solo Ronda 1)
+### 3.3 Economía de Juego: la Bolsa
+
+Los equipos no gastan su saldo: lo que cuesta cada ayuda sale de la bolsa de la tarjeta en juego, así que cada letra que piden hace que la tarjeta valga menos. El equipo que adivina la frase se lleva lo que quede en la bolsa.
 
 | **Concepto** | **Valor** |
 | --- | --- |
-| Saldo inicial | 200 monedas |
-| Costo vocal (Acierto Seguro) | 35 monedas |
-| Costo consonante (Acierto Seguro) | 20 monedas |
-| Premios (5 niveles aleatorios) | 100, 90, 80, 70 y 60 monedas |
+| Saldo inicial | 0 monedas |
+| Bolsa de la tarjeta | 50 + 5 por cada letra distinta de la frase |
+| Cada letra pedida al aire (acierte o falle) | −5 a la bolsa |
+| Acierto Seguro (vocal o consonante) | −15 a la bolsa |
 
-> **Acierto Seguro:** Al comprar, el sistema elige automáticamente una letra correcta de la categoría elegida que aún no haya sido descubierta, la revela en todos sus espacios y descuenta el intento correspondiente. Si no quedan letras disponibles de esa categoría en la frase, el botón de compra se inhabilita. Esta mecánica no está disponible en Ronda 2.
+> **Piso en 0:** La bolsa nunca baja de 0. Con la bolsa vacía el equipo puede seguir jugando, pero adivinar ya no le suma monedas.
+
+> **En pantalla:** Al elegir la tarjeta, la bolsa cae junto a ella y cuenta sus monedas. Cada letra pedida le saca monedas con una animación y un sonido; cuando le quedan 30 o menos se pone en rojo y tiembla, y vacía se ve gris con una polilla.
+
+> **Acierto Seguro:** Al usarlo, el sistema elige automáticamente una letra correcta de la categoría elegida que aún no haya sido descubierta, la revela en todos sus espacios, descuenta el intento correspondiente y le quita 15 monedas a la bolsa. No depende del saldo del equipo. Si no quedan letras disponibles de esa categoría en la frase, el botón se inhabilita. Esta mecánica no está disponible en Ronda 2.
 
 ### 3.4 La Pantera al Acecho (Vidas/Errores)
 
@@ -84,9 +90,11 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 
 > **Nota:** la pantera solo avanza por errores en la opción gratuita (letras al aire). El Acierto Seguro, al acertar siempre por diseño, nunca la hace avanzar.
 
+> **Vidas en pantalla:** Sobre el video de la pantera se muestran 5 corazones, las vidas que le quedan al equipo en turno; cada error apaga uno. Para que el equipo sienta la tensión de ir perdiendo: con 2 vidas aparece "¡Cuidado!" y empieza a sonar un latido, acompañado de un borde rojo tenue que late alrededor de la pantalla y de los corazones que laten al mismo ritmo; con la última vida aparece "¡Última vida!" y el borde rojo se intensifica. El latido calla mientras se reproduce el video de la pantera.
+
 ### 3.5 Modo Adivinar Frase e Interfaz de Validación
 
-**Activación:** El docente activa este modo mediante un botón dedicado, ubicado encima del teclado virtual y resaltado en dorado para que se distinga desde lejos. Puede activarse en tres situaciones: (a) el equipo elige intentarlo voluntariamente en cualquier momento de su turno, (b) el equipo ha agotado todos sus intentos de letras, o (c) el equipo revela todas las letras de la frase mediante la opción gratuita o el Acierto Seguro, en este último caso, el sistema otorga la victoria automáticamente en cuanto la última letra queda descubierta, sin requerir que el docente confirme manualmente a través del botón "Adivinar".
+**Activación:** El docente activa este modo mediante el botón "Adivinar Frase", ubicado encima del teclado virtual y resaltado en dorado para que se distinga desde lejos. Puede activarse en tres situaciones: (a) el equipo elige intentarlo voluntariamente en cualquier momento de su turno, (b) el equipo ha agotado todos sus intentos de letras, o (c) el equipo revela todas las letras de la frase mediante la opción gratuita o el Acierto Seguro, en este último caso, el sistema otorga la victoria automáticamente en cuanto la última letra queda descubierta, sin requerir que el docente confirme manualmente a través del botón "Adivinar".
 
 **Interfaz (Relleno Inteligente):** El modal replica el tablero. Las letras ya adivinadas aparecen bloqueadas y pre-rellenadas. El cursor se posiciona automáticamente en los espacios vacíos y salta sobre las letras ya reveladas tras cada pulsación. El docente puede hacer clic en cualquier celda específica para corregir o ingresar una letra manualmente.
 
@@ -98,7 +106,7 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 
 **Validación Algorítmica:** El sistema normaliza el texto (ignora mayúsculas, minúsculas y acentos) y compara el intento con la frase objetivo.
 
-- **Si es correcto:** Animación de victoria (tesoro descubierto). El sistema revela la frase y suma el valor del premio al saldo del equipo.
+- **Si es correcto:** Animación de victoria: la bolsa revienta y suelta sus monedas con el nombre del equipo y el premio. La escena se queda en pantalla hasta que el docente da clic (o Enter); entonces las monedas vuelan al panel del equipo y su saldo sube con una celebración. El sistema revela la frase y suma al saldo lo que quedaba en la bolsa.
 
 - **Si es incorrecto:** Se activa la mecánica de Robo (solo Ronda 1). La frase se revela al finalizar.
 
@@ -112,9 +120,9 @@ Reemplaza el ahorcado tradicional con una pantera acechando en la selva. Cada er
 
 - Se habilita únicamente el Modo Adivinar para el equipo siguiente en el orden del sorteo original, de forma circular: si el equipo que pierde es el último de ese orden, le toca robar al primero, incluso si ese equipo ya jugó su propio turno antes en la ronda.
 
-- El equipo que roba ve en pantalla las letras que ya estaban reveladas al momento del fallo — no parte de una frase en blanco. Tiene una única oportunidad: declarar verbalmente la frase completa. No puede pedir letras ni usar monedas.
+- El equipo que roba ve en pantalla las letras que ya estaban reveladas al momento del fallo — no parte de una frase en blanco. Tiene una única oportunidad: declarar verbalmente la frase completa. No puede pedir letras ni usar Acierto Seguro. La bolsa aparece en pantalla con lo que quedó tras el turno del equipo que falló.
 
-> - Si acierta: gana las monedas del premio de la tarjeta.
+> - Si acierta: se lleva lo que quedaba en la bolsa.
 
 > - Si falla: nadie suma monedas por esa tarjeta.
 
@@ -128,7 +136,7 @@ El proceso termina siempre con la revelación de la frase completa y una pausa p
 
 **Condiciones:**
 
-- Sin economía de monedas ni mecánica de Acierto Seguro: un equipo no puede comprar letras, pero un acierto sigue sumando el valor completo de la tarjeta a su saldo.
+- Sin Acierto Seguro. La bolsa funciona igual que en Ronda 1: cada letra pedida le quita 5 monedas y un acierto suma al saldo lo que quede en ella.
 
 - Intentos reducidos: 2 vocales y 5 consonantes.
 
@@ -136,7 +144,7 @@ El proceso termina siempre con la revelación de la frase completa y una pausa p
 
 ### 3.8 Cierre y Revelación Total
 
-Al finalizar todos los turnos de la Ronda 2, o de forma inmediata si ningún equipo requirió repechaje, el sistema revela automáticamente todas las tarjetas no jugadas, mostrando la frase y su valor. Se presenta el marcador final con los saldos de todos los equipos.
+Al finalizar todos los turnos de la Ronda 2, o de forma inmediata si ningún equipo requirió repechaje, el sistema revela automáticamente todas las tarjetas no jugadas, mostrando solo su frase. Se presenta el marcador final con los saldos de todos los equipos.
 
 ## 4. Requisitos No Funcionales
 
@@ -146,7 +154,7 @@ Al finalizar todos los turnos de la Ronda 2, o de forma inmediata si ningún equ
 
 **Visibilidad:** Fuentes de gran tamaño y alto contraste optimizadas para proyección en aula. Toda la interfaz de juego debe caber en una sola pantalla, sin necesidad de desplazamiento. Todos los elementos del panel de control deben ser operables desde la distancia del escritorio del profesor.
 
-**Animaciones:** Las animaciones de victoria (tesoro) y derrota (zarpazo) deben ser llamativas para captar la atención del grupo, pero breves para no interrumpir el ritmo de la clase.
+**Animaciones:** Las animaciones de victoria (la bolsa que revienta) y derrota (zarpazo) deben ser llamativas para captar la atención del grupo, pero breves para no interrumpir el ritmo de la clase.
 
 **Panel de equipo:** cada uno de los 4 paneles debe mostrar el nombre del equipo en una pestaña sobre el borde superior, el saldo actual con un ícono de moneda, y los intentos restantes de vocales y consonantes, todo dentro de un marco con efecto de relieve. Cuando es el turno de un equipo, su panel se destaca con un resplandor en el color propio del equipo y una etiqueta "En turno" en verde fosforescente; cuando un equipo puede robar la frase, se marca con una etiqueta distinta en el color de acento dorado.
 

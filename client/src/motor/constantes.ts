@@ -14,12 +14,15 @@ export const EQUIPOS_BASE: readonly { id: EquipoId; nombre: string }[] = [
 // en Ronda 1 alimentan el Repechaje). firestore.rules exige lo mismo.
 export const FRASES_POR_SET = 8;
 
-// Sección 3.1: 5 niveles de premio, con repetición permitida entre las 8 frases.
-export const PREMIOS_DISPONIBLES = [100, 90, 80, 70, 60];
-
-// Sección 3.3
-export const SALDO_INICIAL = 200;
-export const COSTO_ACIERTO_SEGURO: Record<Categoria, number> = { vocal: 35, consonante: 20 };
+// Sección 3.3: la bolsa de cada carta. Empieza en BOLSA_BASE más
+// BOLSA_POR_LETRA por cada letra distinta de la frase, y cada letra
+// pedida le resta lo suyo (nunca baja de 0). Quien adivina se lleva lo
+// que queda.
+export const SALDO_INICIAL = 0;
+export const BOLSA_BASE = 50;
+export const BOLSA_POR_LETRA = 5;
+export const COSTO_LETRA = 5;
+export const COSTO_ACIERTO_SEGURO: Record<Categoria, number> = { vocal: 15, consonante: 15 };
 
 // Sección 3.2
 export const LIMITES_INTENTOS: Record<Ronda, Intentos> = {

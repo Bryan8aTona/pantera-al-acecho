@@ -19,6 +19,13 @@ export const ARCHIVOS_SONIDO = {
   comprar: 'comprar-letra.mp3', // se pulsa un botón de Acierto Seguro
   victoria: 'victoria.mp3', // un equipo adivina la frase
   derrota: 'derrota.mp3', // la pantera llega al estado 5 (zarpazo)
+  // La bolsa de la carta (Kenney, CC0).
+  bolsa: 'bolsa-aparece.ogg', // la bolsa cae al voltear la carta
+  moneda: 'moneda.ogg', // una letra le quita 5 monedas a la bolsa
+  monedas: 'monedas.ogg', // el Acierto Seguro le quita 15
+  bolsaVacia: 'bolsa-vacia.ogg', // la bolsa llega a 0
+  monedasSaldo: 'monedas-saldo.ogg', // las monedas ganadas caen en el saldo del equipo
+  latido: 'latido.ogg', // late mientras al equipo le quedan 2 vidas o 1 (Kenney, CC0)
   // Cableados pero aún SIN archivo en public/assets/sonidos/: en null no
   // se precargan ni se piden (suenan en silencio). Al agregar el audio,
   // basta con poner aquí su nombre ('inicio-repechaje.mp3',
