@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { reducerSeguro } from '../reducerSeguro.js';
-import { crearEstadoInicial } from '../../motor/index.js';
+import { crearEstadoInicial } from '../../motor/index.ts';
 
 const SET_EJEMPLO = {
   id: 'set-1',

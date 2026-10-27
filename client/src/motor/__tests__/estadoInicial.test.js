@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { crearEstadoInicial } from '../estadoInicial.js';
-import { SALDO_INICIAL, LIMITES_INTENTOS } from '../constantes.js';
+import { crearEstadoInicial } from '../estadoInicial.ts';
+import { SALDO_INICIAL, LIMITES_INTENTOS } from '../constantes.ts';
 
 const SET_EJEMPLO = {
   id: 'set-1',

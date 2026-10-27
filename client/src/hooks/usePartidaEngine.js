@@ -1,5 +1,5 @@
 import { useReducer, useCallback } from 'react';
-import { crearEstadoInicial } from '../motor/index.js';
+import { crearEstadoInicial } from '../motor/index.ts';
 import { reducerSeguro } from './reducerSeguro.js';
 
 // set: el objeto completo { id, nombre, frases } que ya está en memoria

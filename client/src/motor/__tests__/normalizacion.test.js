@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizarTexto, normalizarLetra } from '../normalizacion.js';
+import { normalizarTexto, normalizarLetra } from '../normalizacion.ts';
 
 describe('normalizarTexto', () => {
   it('quita tildes de las vocales', () => {

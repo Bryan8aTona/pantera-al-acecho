@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { equipoDelTurnoNormal } from '../motor/index.js';
+import { equipoDelTurnoNormal } from '../motor/index.ts';
 
 // Detecta el instante en que la pantera del equipo en turno avanza de
 // estado (se perdió una vida, estados 1-4, o se llegó a la derrota,

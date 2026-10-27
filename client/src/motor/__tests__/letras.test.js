@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { esVocal, categoriaDeLetra, posicionesDeLetra, letrasUnicasPorCategoria } from '../letras.js';
+import { esVocal, categoriaDeLetra, posicionesDeLetra, letrasUnicasPorCategoria } from '../letras.ts';
 
 describe('esVocal / categoriaDeLetra', () => {
   it('clasifica vocales correctamente, incluso acentuadas', () => {

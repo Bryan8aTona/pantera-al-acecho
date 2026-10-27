@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { esLetra, normalizarLetra } from '../../motor/index.js';
+import { esLetra, normalizarLetra } from '../../motor/index.ts';
 
 // Copia SOLO el caso (mayúscula/minúscula) del carácter correspondiente
 // de la frase objetivo: si en la frase esa posición va en minúscula, lo

@@ -11,7 +11,7 @@ export function normalizarFrases(frases) {
 
 // Frases normalizadas + un `id` estable derivado del orden (1–8, único y
 // garantizado): el motor de juego indexa el mazo por `frase.id`
-// (motor/mazo.js). En Firestore solo se guardan `{ orden, texto }`.
+// (motor/mazo.ts). En Firestore solo se guardan `{ orden, texto }`.
 export function frasesConId(frases) {
   return normalizarFrases(frases).map((f) => ({ ...f, id: `f${f.orden}` }));
 }

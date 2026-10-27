@@ -1,4 +1,4 @@
-import { progresoDeFrase } from '../../motor/index.js';
+import { progresoDeFrase } from '../../motor/index.ts';
 
 export default function ProgresoFrase({ texto, letrasUsadas }) {
   const progreso = progresoDeFrase(texto, letrasUsadas);

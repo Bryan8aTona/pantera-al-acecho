@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { reproducirSonido } from '../sonido/gestorSonido.js';
-import { FASES } from '../motor/constantes.js';
+import { FASES } from '../motor/constantes.ts';
 
 function contarAciertos(letrasUsadas) {
   return Object.values(letrasUsadas).filter((v) => v === 'acierto').length;

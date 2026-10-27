@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FRASES_POR_SET } from '../motor/constantes.js';
+import { FRASES_POR_SET } from '../motor/constantes.ts';
 import '../styles/campo.css';
 import './SetForm.css';
 

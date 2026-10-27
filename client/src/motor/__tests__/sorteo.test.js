@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sortearOrden } from '../sorteo.js';
+import { sortearOrden } from '../sorteo.ts';
 
 describe('sortearOrden', () => {
   it('devuelve los mismos elementos, solo reordenados', () => {

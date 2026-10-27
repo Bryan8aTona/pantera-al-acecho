@@ -14,7 +14,8 @@
     "test:firebase:ci": "firebase emulators:exec --project demo-pantera --only auth,firestore \"npm run test:firebase\"",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "firebase": "^12.18.0",
@@ -35,6 +36,8 @@
     "globals": "^17.13.0",
     "jsdom": "^25.0.1",
     "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.1",
     "vite": "^5.4.8",
     "vitest": "^2.1.2"
   }

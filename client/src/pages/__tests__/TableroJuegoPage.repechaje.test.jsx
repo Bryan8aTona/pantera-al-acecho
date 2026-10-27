@@ -8,7 +8,7 @@ import TableroJuegoPage from '../TableroJuegoPage.jsx';
 // La partida arranca directo en el Repechaje (llegar ahí jugando toda la
 // Ronda 1 desde la UI haría la prueba muy larga): solo `azul` sigue en
 // juego, con los límites de Ronda 2 y la pantera reiniciada.
-vi.mock('../../motor/estadoInicial.js', () => ({
+vi.mock('../../motor/estadoInicial.ts', () => ({
   crearEstadoInicial: () => {
     const equipo = (id, extra) => ({
       id,

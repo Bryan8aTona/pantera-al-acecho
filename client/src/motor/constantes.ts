@@ -1,7 +1,9 @@
+import type { Categoria, EquipoId, Fase, Intentos, Ronda } from './tipos.ts';
+
 // Todos los valores numéricos vienen directo de requerimientos.md —
 // no inventar ni ajustar aquí sin actualizar ese documento primero.
 
-export const EQUIPOS_BASE = [
+export const EQUIPOS_BASE: readonly { id: EquipoId; nombre: string }[] = [
   { id: 'rojo', nombre: 'Rojo' },
   { id: 'azul', nombre: 'Azul' },
   { id: 'amarillo', nombre: 'Amarillo' },
@@ -17,10 +19,10 @@ export const PREMIOS_DISPONIBLES = [100, 90, 80, 70, 60];
 
 // Sección 3.3
 export const SALDO_INICIAL = 200;
-export const COSTO_ACIERTO_SEGURO = { vocal: 35, consonante: 20 };
+export const COSTO_ACIERTO_SEGURO: Record<Categoria, number> = { vocal: 35, consonante: 20 };
 
 // Sección 3.2
-export const LIMITES_INTENTOS = {
+export const LIMITES_INTENTOS: Record<Ronda, Intentos> = {
   1: { vocales: 3, consonantes: 8 },
   2: { vocales: 2, consonantes: 5 },
 };
@@ -30,7 +32,7 @@ export const FASES = {
   RONDA1: 'RONDA1',
   REPECHAJE: 'REPECHAJE',
   CIERRE: 'CIERRE',
-};
+} as const satisfies Record<Fase, Fase>;
 
 // Sección 3.4: al llegar a este estado, derrota automática.
 export const PANTERA_ESTADO_DERROTA = 5;

@@ -1,4 +1,4 @@
-import { motorReducer, MotorError } from '../motor/index.js';
+import { motorReducer, MotorError } from '../motor/index.ts';
 
 // El motor (motorReducer) lanza MotorError ante acciones inválidas —
 // a propósito, para que sea fácil de testear con toThrow(). Pero un
