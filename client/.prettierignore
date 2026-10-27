@@ -1,0 +1,6 @@
+dist/
+coverage/
+package-lock.json
+# Recursos binarios o generados (animaciones de Lottie, etc.)
+public/
+src/assets/**/*.json
