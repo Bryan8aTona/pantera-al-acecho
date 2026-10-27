@@ -65,17 +65,17 @@ describe('crearMazo', () => {
 });
 
 describe('bolsaInicialDe', () => {
-  it('50 + 10 por cada letra distinta de la frase', () => {
-    expect(bolsaInicialDe('SOL')).toBe(80); // S, O, L
-    expect(bolsaInicialDe('LA SELVA TROPICAL')).toBe(160); // L A S E V T R O P I C
+  it('40 + 5 por cada letra distinta de la frase', () => {
+    expect(bolsaInicialDe('SOL')).toBe(55); // S, O, L
+    expect(bolsaInicialDe('LA SELVA TROPICAL')).toBe(95); // L A S E V T R O P I C
   });
 
   it('ignora espacios, mayúsculas y tildes', () => {
     expect(bolsaInicialDe('la célula')).toBe(bolsaInicialDe('LA CELULA'));
-    expect(bolsaInicialDe('LA CELULA')).toBe(100); // L A C E U
+    expect(bolsaInicialDe('LA CELULA')).toBe(65); // L A C E U
   });
 
   it('la Ñ cuenta como letra distinta de la N', () => {
-    expect(bolsaInicialDe('NAÑA')).toBe(80); // N, A, Ñ
+    expect(bolsaInicialDe('NAÑA')).toBe(55); // N, A, Ñ
   });
 });

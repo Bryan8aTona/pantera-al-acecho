@@ -139,7 +139,7 @@ El motor se construyó como módulos puros, sin dependencia de React, en `client
 | `constantes.ts` | Todos los valores numéricos de `requerimientos.md` (saldo inicial, bolsa base y por letra, costos a la bolsa, límites de intentos) en un solo lugar |
 | `normalizacion.ts` | Normalización de texto/letras (con el manejo especial de la Ñ descrito arriba) |
 | `letras.ts` | Clasificación vocal/consonante, búsqueda de posiciones y letras únicas de una frase |
-| `mazo.ts` | Construcción del mazo: baraja las frases (el número de carta es la posición en el mazo, no en el set) y calcula la bolsa inicial de cada carta (`bolsaInicialDe`: 50 + 10 por letra distinta). La función aleatoria es inyectable, para pruebas determinísticas |
+| `mazo.ts` | Construcción del mazo: baraja las frases (el número de carta es la posición en el mazo, no en el set) y calcula la bolsa inicial de cada carta (`bolsaInicialDe`: 40 + 5 por letra distinta). La función aleatoria es inyectable, para pruebas determinísticas |
 | `sorteo.ts` | Barajado Fisher-Yates, usado para el orden de equipos y para el mazo (misma inyección de aleatoriedad) |
 | `estadoInicial.ts` | Construye el estado completo de una partida nueva a partir de un set de 8 frases |
 | `reducer.ts` | La máquina de estados en sí: un reducer puro `(estado, accion) => nuevoEstado`, que lanza `MotorError` ante acciones inválidas |

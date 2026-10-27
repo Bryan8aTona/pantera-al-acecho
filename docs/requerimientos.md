@@ -34,7 +34,7 @@ El sistema actúa como soporte visual y lógico central de la clase, reemplazand
 
 **Carga de Frases:** El docente selecciona un set de frases previamente guardado o crea uno nuevo desde el módulo de configuración antes de iniciar la partida.
 
-**Bolsa de la tarjeta:** Cada tarjeta tiene una bolsa de monedas que se calcula a partir de su frase: 50 monedas más 10 por cada letra distinta (sin contar espacios, mayúsculas ni tildes; la Ñ cuenta como letra propia). Las frases más largas y variadas valen más. Todas las tarjetas son visualmente idénticas boca abajo; la bolsa se descubre al elegir la tarjeta y baja en vivo mientras se juega (ver 3.3).
+**Bolsa de la tarjeta:** Cada tarjeta tiene una bolsa de monedas que se calcula a partir de su frase: 40 monedas más 5 por cada letra distinta (sin contar espacios, mayúsculas ni tildes; la Ñ cuenta como letra propia). Las frases más largas y variadas valen más. Todas las tarjetas son visualmente idénticas boca abajo; la bolsa se descubre al elegir la tarjeta y baja en vivo mientras se juega (ver 3.3).
 
 **Sorteo Inicial:** El sistema realiza un barajado aleatorio de los 4 equipos. Aparecen en posiciones aleatorias en pantalla y el orden de turno es de izquierda a derecha según el resultado.
 
@@ -64,7 +64,7 @@ Los equipos no gastan su saldo: lo que cuesta cada ayuda sale de la bolsa de la 
 | **Concepto** | **Valor** |
 | --- | --- |
 | Saldo inicial | 0 monedas |
-| Bolsa de la tarjeta | 50 + 10 por cada letra distinta de la frase |
+| Bolsa de la tarjeta | 40 + 5 por cada letra distinta de la frase |
 | Cada letra pedida al aire (acierte o falle) | −5 a la bolsa |
 | Acierto Seguro (vocal o consonante) | −10 a la bolsa |
 
